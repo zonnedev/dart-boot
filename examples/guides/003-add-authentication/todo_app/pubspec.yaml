@@ -7,7 +7,8 @@ environment:
 dependencies:
   boot:
     path: ../../../../packages/boot
-  dart_jsonwebtoken: ^2.12.0
+  boot_security_jwt:
+    path: ../../../../packages/boot_security_jwt
 
 dev_dependencies:
   boot_generator:
@@ -16,3 +17,31 @@ dev_dependencies:
     path: ../../../../packages/boot_test
   build_runner: ^2.4.0
   test: ^1.25.0
+
+dependency_overrides:
+  boot:
+    path: ../../../../packages/boot
+  boot_core:
+    path: ../../../../packages/boot_core
+  boot_aop:
+    path: ../../../../packages/boot_aop
+  boot_events:
+    path: ../../../../packages/boot_events
+  boot_scheduling:
+    path: ../../../../packages/boot_scheduling
+  boot_serialization:
+    path: ../../../../packages/boot_serialization
+  boot_http_common:
+    path: ../../../../packages/boot_http_common
+  boot_http:
+    path: ../../../../packages/boot_http
+  boot_http_client:
+    path: ../../../../packages/boot_http_client
+  boot_security:
+    path: ../../../../packages/boot_security
+  boot_security_jwt:
+    path: ../../../../packages/boot_security_jwt
+  boot_generator:
+    path: ../../../../packages/boot_generator
+  boot_test:
+    path: ../../../../packages/boot_test

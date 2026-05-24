@@ -25,19 +25,19 @@ class $TodoControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'GET',
-      path: '/todos/',
-      handler: (request) async {
-        return await controller.list(request);
-      },
-    ),
-    RouteEntry(
-      method: 'POST',
-      path: '/todos/',
-      handler: (request) async {
-        return await controller.create(request);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'GET',
+          path: '/todos/',
+          handler: (request) async {
+            return await controller.list(request);
+          },
+        ),
+        RouteEntry(
+          method: 'POST',
+          path: '/todos/',
+          handler: (request) async {
+            return await controller.create(request);
+          },
+        ),
+      ];
 }

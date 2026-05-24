@@ -17,8 +17,7 @@ export 'src/http/static_file_handler.dart';
 export 'src/http/sse.dart';
 
 // Security
-export 'src/security/security.dart';
-export 'src/security/security_filter.dart';
+export 'package:boot_security/boot_security.dart';
 
 // Health
 export 'src/health/health.dart';

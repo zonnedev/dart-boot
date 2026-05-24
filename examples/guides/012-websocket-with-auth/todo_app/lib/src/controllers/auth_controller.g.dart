@@ -25,12 +25,12 @@ class $AuthControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'POST',
-      path: '/auth/login',
-      handler: (request) async {
-        return await controller.login(request);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'POST',
+          path: '/auth/login',
+          handler: (request) async {
+            return await controller.login(request);
+          },
+        ),
+      ];
 }

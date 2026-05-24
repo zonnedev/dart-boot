@@ -17,6 +17,8 @@ workspace:
   - packages/boot_generator
   - packages/boot_test
   - packages/boot_cli
+  - packages/boot_security
+  - packages/boot_security_jwt
 
 dev_dependencies:
   melos: ^7.7.0

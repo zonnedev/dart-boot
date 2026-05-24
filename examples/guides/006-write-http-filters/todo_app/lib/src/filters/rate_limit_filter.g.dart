@@ -11,9 +11,6 @@ class $RateLimitFilterDefinition extends BeanDefinition {
   String get typeName => 'RateLimitFilter';
 
   @override
-  RateLimitFilter create(BeanContainer container) => RateLimitFilter(
-    int.parse(
-      container.get<BootConfig>().resolvePlaceholder('\${rate-limit.max:60}'),
-    ),
-  );
+  RateLimitFilter create(BeanContainer container) => RateLimitFilter(int.parse(
+      container.get<BootConfig>().resolvePlaceholder('\${rate-limit.max:60}')));
 }

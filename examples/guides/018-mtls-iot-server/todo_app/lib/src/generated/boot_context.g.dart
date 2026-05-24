@@ -4,7 +4,7 @@ import 'package:boot/boot.dart';
 import 'package:todo_app/src/controllers/hello_controller.dart';
 import 'package:todo_app/src/websocket/device_socket.dart';
 import 'package:todo_app/src/security/device_cert_auth.dart';
-import 'package:boot_http/src/security/security.dart';
+import 'package:boot_security/src/authentication_provider.dart';
 
 
 class _ContainerSelfDefinition extends BeanDefinition {

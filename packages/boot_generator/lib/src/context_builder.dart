@@ -127,9 +127,10 @@ class ContextBuilder implements Builder {
                     if (typed.isNotEmpty) {
                       libraryProvidedTypes.addAll(typed);
                     } else {
-                      // Auto-detect from interfaces
+                      // Auto-detect from interfaces (including inherited)
                       libraryProvidedTypes.addAll(
-                        element.interfaces.map((i) => i.getDisplayString())
+                        element.allSupertypes
+                            .map((i) => i.getDisplayString())
                             .where((s) => s != 'Object'));
                     }
                   }
@@ -250,9 +251,10 @@ class ContextBuilder implements Builder {
                     if (typed.isNotEmpty) {
                       libraryProvidedTypes.addAll(typed);
                     } else {
-                      // Auto-detect from interfaces
+                      // Auto-detect from interfaces (including inherited)
                       libraryProvidedTypes.addAll(
-                        element.interfaces.map((i) => i.getDisplayString())
+                        element.allSupertypes
+                            .map((i) => i.getDisplayString())
                             .where((s) => s != 'Object'));
                     }
                   }
@@ -451,15 +453,18 @@ class ContextBuilder implements Builder {
                 .toList() ??
             [];
 
-        // Auto-detect implemented interfaces from AST
-        final autoInterfaces = element.interfaces
+        // Auto-detect implemented interfaces from AST (including inherited)
+        final autoInterfaces = element.allSupertypes
             .map((i) => i.getDisplayString())
             .where((s) => s != 'Object')
+            .toSet()
             .toList();
 
         // Collect import URIs for interface types
-        final interfaceImports = element.interfaces
+        final interfaceImports = element.allSupertypes
+            .where((t) => t.getDisplayString() != 'Object')
             .map((i) => i.element.source.uri.toString())
+            .toSet()
             .toList();
 
         // Merge: explicit typed takes priority, otherwise use auto-detected

@@ -1,0 +1,25 @@
+name: boot_security_jwt
+description: JWT authentication module for Boot — implements token interfaces with JSON Web Tokens.
+repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_security_jwt
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+resolution: workspace
+
+dependencies:
+  boot_core: ^0.1.0
+  boot_security: ^0.1.0
+  dart_jsonwebtoken: ^2.14.0
+
+dev_dependencies:
+  boot_generator: ^0.1.0
+  build_runner: ^2.4.0
+  test: ^1.25.0
+
+topics:
+  - boot
+  - jwt
+  - authentication
+  - security

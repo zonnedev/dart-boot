@@ -24,12 +24,12 @@ class $HealthControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'GET',
-      path: '/health/',
-      handler: (request) async {
-        return await controller.health(request);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'GET',
+          path: '/health/',
+          handler: (request) async {
+            return await controller.health(request);
+          },
+        ),
+      ];
 }

@@ -24,12 +24,12 @@ class $UploadControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'POST',
-      path: '/upload/avatar',
-      handler: (request) async {
-        return await controller.uploadAvatar(request);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'POST',
+          path: '/upload/avatar',
+          handler: (request) async {
+            return await controller.uploadAvatar(request);
+          },
+        ),
+      ];
 }

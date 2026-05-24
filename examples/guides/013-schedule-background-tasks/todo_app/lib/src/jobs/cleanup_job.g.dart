@@ -22,15 +22,9 @@ class $CleanupJobDefinition extends BeanDefinition {
   @override
   void postConstruct(dynamic instance) {
     final scheduler = _container!.get<TaskScheduler>();
-    scheduler.scheduleFixedRate(
-      'CleanupJob.cleanExpiredSessions',
-      parseDuration('5m'),
-      (instance as CleanupJob).cleanExpiredSessions,
-    );
-    scheduler.scheduleFixedRate(
-      'CleanupJob.checkExternalServices',
-      parseDuration('30s'),
-      (instance as CleanupJob).checkExternalServices,
-    );
+    scheduler.scheduleFixedRate('CleanupJob.cleanExpiredSessions',
+        parseDuration('5m'), (instance as CleanupJob).cleanExpiredSessions);
+    scheduler.scheduleFixedRate('CleanupJob.checkExternalServices',
+        parseDuration('30s'), (instance as CleanupJob).checkExternalServices);
   }
 }

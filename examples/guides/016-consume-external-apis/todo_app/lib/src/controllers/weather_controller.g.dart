@@ -25,13 +25,13 @@ class $WeatherControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'GET',
-      path: '/weather/<city>',
-      handler: (request) async {
-        final city = request.pathParams['city']!;
-        return await controller.getWeather(request, city);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'GET',
+          path: '/weather/<city>',
+          handler: (request) async {
+            final city = request.pathParams['city']!;
+            return await controller.getWeather(request, city);
+          },
+        ),
+      ];
 }

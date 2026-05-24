@@ -16,8 +16,7 @@ import 'package:boot_http_common/boot_http_common.dart';
 import 'package:boot_core/boot_core.dart';
 import '../health/health.dart';
 import '../logging/request_logging_filter.dart';
-import '../security/security.dart';
-import '../security/security_filter.dart';
+import 'package:boot_security/boot_security.dart';
 
 /// Error handler function type.
 typedef ErrorHandler = Response Function(Object error, StackTrace stack);
@@ -123,7 +122,7 @@ class BootRouter {
     final router = Router();
 
     for (final entry in _entries) {
-      final shelfHandler = _wrapHandler(entry.handler, entry.path);
+      final shelfHandler = _wrapHandler(entry);
       // Register both with and without trailing slash
       final paths = <String>[entry.path];
       if (entry.path.endsWith('/')) {
@@ -196,7 +195,9 @@ class BootRouter {
     return headers;
   }
 
-  shelf.Handler _wrapHandler(RouteHandler handler, String routePath) {
+  shelf.Handler _wrapHandler(RouteEntry entry) {
+    final handler = entry.handler;
+    final routePath = entry.path;
     return (shelf.Request shelfRequest) async {
       // Create BootContext for this request
       final ctx = BootContext()
@@ -210,6 +211,7 @@ class BootRouter {
       return ctx.run(() async {
         try {
           final request = Request(shelfRequest, pathParams: shelfRequest.params);
+          request.setAttribute('route.metadata', entry.metadata);
 
           // Find matching filters for this path
           final matchingFilters = <HttpServerFilter>[

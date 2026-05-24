@@ -1,0 +1,5 @@
+targets:
+  $default:
+    builders:
+      boot_generator|boot:
+        enabled: true

@@ -12,9 +12,7 @@ class $WeatherServiceDefinition extends BeanDefinition {
 
   @override
   WeatherService create(BeanContainer container) => WeatherService(
-    container.get<HttpClient>(),
-    container.get<BootConfig>().resolvePlaceholder(
-      '\${weather.base-url:https://api.openweathermap.org/data/2.5}',
-    ),
-  );
+      container.get<HttpClient>(),
+      container.get<BootConfig>().resolvePlaceholder(
+          '\${weather.base-url:https://api.openweathermap.org/data/2.5}'));
 }

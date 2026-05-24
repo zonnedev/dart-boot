@@ -6,7 +6,7 @@ import 'package:todo_app/src/services/jwt_service.dart';
 import 'package:todo_app/src/controllers/auth_controller.dart';
 import 'package:todo_app/src/websocket/chat_socket.dart';
 import 'package:todo_app/src/security/jwt_auth_provider.dart';
-import 'package:boot_http/src/security/security.dart';
+import 'package:boot_security/src/authentication_provider.dart';
 
 
 class _ContainerSelfDefinition extends BeanDefinition {

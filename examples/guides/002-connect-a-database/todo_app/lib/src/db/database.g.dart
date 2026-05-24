@@ -12,14 +12,18 @@ class $DatabaseDefinition extends BeanDefinition {
 
   @override
   Database create(BeanContainer container) => Database(
-    container.get<BootConfig>().resolvePlaceholder('\${pg.host}'),
-    int.parse(
-      container.get<BootConfig>().resolvePlaceholder('\${pg.port:5432}'),
-    ),
-    container.get<BootConfig>().resolvePlaceholder('\${pg.database:postgres}'),
-    container.get<BootConfig>().resolvePlaceholder('\${pg.username:postgres}'),
-    container.get<BootConfig>().resolvePlaceholder('\${pg.password:postgres}'),
-  );
+      container.get<BootConfig>().resolvePlaceholder('\${pg.host}'),
+      int.parse(
+          container.get<BootConfig>().resolvePlaceholder('\${pg.port:5432}')),
+      container
+          .get<BootConfig>()
+          .resolvePlaceholder('\${pg.database:postgres}'),
+      container
+          .get<BootConfig>()
+          .resolvePlaceholder('\${pg.username:postgres}'),
+      container
+          .get<BootConfig>()
+          .resolvePlaceholder('\${pg.password:postgres}'));
   @override
   bool get hasPostConstruct => true;
   @override

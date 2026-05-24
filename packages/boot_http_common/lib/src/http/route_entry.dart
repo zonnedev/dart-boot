@@ -11,10 +11,14 @@ class RouteEntry {
   final String path;
   final RouteHandler handler;
 
+  /// Annotations from the controller method and class, available to filters at runtime.
+  final List<Object> metadata;
+
   const RouteEntry({
     required this.method,
     required this.path,
     required this.handler,
+    this.metadata = const [],
   });
 }
 

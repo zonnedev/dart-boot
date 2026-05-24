@@ -2,63 +2,182 @@
 
 Unified authentication and authorization for HTTP and WebSocket.
 
-## Authentication Providers
+## Packages
 
-Implement `AuthenticationProvider` to add an auth method. Boot tries all providers in order — first non-null result wins.
+| Package | Purpose |
+|---|---|
+| `boot_security` | Interfaces, models, SecurityFilter — included via `boot_http` |
+| `boot_security_jwt` | JWT implementation — add to your app for token-based auth |
 
-### JWT Token Auth
+## Quick Start with JWT
+
+**1. Add dependency:**
+
+```yaml
+dependencies:
+  boot: ^0.1.0
+  boot_security_jwt: ^0.1.0
+```
+
+**2. Configure in `application.yml`:**
+
+```yaml
+boot:
+  security:
+    enabled: true
+    jwt:
+      secret: change-me-in-production
+      expiration: 1h
+      refresh-expiration: 7d
+      issuer: my-app
+    intercept-url-map:
+      - pattern: /auth/**
+        access: [isAnonymous()]
+      - pattern: /**
+        access: [isAuthenticated()]
+```
+
+**3. Write a login controller:**
 
 ```dart
 import 'package:boot/boot.dart';
-part 'jwt_auth_provider.g.dart';
+import 'package:boot_security_jwt/boot_security_jwt.dart';
 
-@Singleton()
-@Order(1)
-class JwtAuthProvider implements AuthenticationProvider {
-  final JwtService _jwt;
-  JwtAuthProvider(this._jwt);
+part 'auth_controller.g.dart';
 
-  @override
-  Future<Authentication?> authenticate(AuthenticationRequest request) async {
-    final header = request.authorization;
-    if (header == null || !header.startsWith('Bearer ')) return null;
+@Controller('/auth')
+class AuthController {
+  final TokenGenerator _tokens;
+  final RefreshTokenGenerator _refreshTokens;
 
-    final token = header.substring(7);
-    final claims = _jwt.verify(token);
-    if (claims == null) return null;
+  AuthController(this._tokens, this._refreshTokens);
 
-    return Authentication(
-      name: claims['sub'],
-      roles: List<String>.from(claims['roles'] ?? []),
-      attributes: {'userId': claims['uid']},
-    );
+  @Post('/login')
+  Future<Response> login(Request request) async {
+    final body = await request.json();
+    final user = await _db.findByUsername(body['username']);
+    if (user == null || !verifyPassword(body['password'], user.hash)) {
+      throw UnauthorizedException('Invalid credentials');
+    }
+    return Response.json({
+      'access_token': _tokens.generate(user.id, roles: user.roles),
+      'refresh_token': _refreshTokens.generate(user.id),
+    });
+  }
+
+  @Post('/refresh')
+  Future<Response> refresh(Request request) async {
+    final body = await request.json();
+    final refreshToken = body['refresh_token'] as String?;
+    if (refreshToken == null) throw BadRequestException('Missing refresh_token');
+
+    // Validate the refresh token
+    final validator = container.get<TokenValidator>();
+    final claims = validator.validate(refreshToken);
+    if (claims == null || claims['type'] != 'refresh') {
+      throw UnauthorizedException('Invalid refresh token');
+    }
+
+    final subject = claims['sub'] as String;
+    // Look up current roles from DB
+    final user = await _db.findById(subject);
+    return Response.json({
+      'access_token': _tokens.generate(subject, roles: user.roles),
+    });
   }
 }
 ```
 
-**Test:**
-```dart
-test('JWT auth rejects invalid token', () async {
-  await bootTest($configure, test: (client, container) async {
-    final res = await client.get('/admin/', headers: {
-      'Authorization': 'Bearer invalid-token',
-    });
-    res.expectStatus(401);
-  });
-});
+**That's it.** Everything else is auto-wired:
+- `JwtTokenGenerator` registered as `TokenGenerator`
+- `JwtRefreshTokenGenerator` registered as `RefreshTokenGenerator`
+- `JwtTokenValidator` registered as `TokenValidator`
+- `BearerTokenReader` registered as `TokenReader`
+- `JwtAuthenticationProvider` registered as `AuthenticationProvider`
+- `SecurityFilter` enforces intercept-url-map rules
 
-test('JWT auth accepts valid token', () async {
-  await bootTest($configure, test: (client, container) async {
-    final jwt = container.get<JwtService>();
-    final token = jwt.sign({'sub': 'alice', 'roles': ['admin']});
+## Architecture
 
-    final res = await client.get('/admin/', headers: {
-      'Authorization': 'Bearer $token',
-    });
-    res.expectStatus(200);
-  });
-});
 ```
+Request → SecurityFilter → TokenReader.read() → TokenValidator.validate() → Authentication
+                                ↑                        ↑
+                        BearerTokenReader          JwtTokenValidator
+                        (reads Bearer header)      (verifies JWT signature)
+```
+
+All components are replaceable via `@Replaces`:
+
+```dart
+@Singleton()
+@Replaces(TokenReader)
+class CookieTokenReader implements TokenReader {
+  @override
+  String? read(AuthenticationRequest request) {
+    return request.headers['cookie']
+        ?.split(';')
+        .map((c) => c.trim().split('='))
+        .where((c) => c[0] == 'access_token')
+        .map((c) => c[1])
+        .firstOrNull;
+  }
+}
+```
+
+## Interfaces
+
+### TokenReader
+
+Extracts a token string from the request. Default: `BearerTokenReader` (reads `Authorization: Bearer <token>`).
+
+```dart
+abstract class TokenReader {
+  String? read(AuthenticationRequest request);
+}
+```
+
+### TokenValidator
+
+Validates a token and returns its claims. Default: `JwtTokenValidator`.
+
+```dart
+abstract class TokenValidator {
+  Map<String, dynamic>? validate(String token);
+}
+```
+
+### TokenGenerator
+
+Creates access tokens. Default: `JwtTokenGenerator`.
+
+```dart
+abstract class TokenGenerator {
+  String generate(String subject, {List<String> roles, Map<String, dynamic> claims});
+}
+```
+
+### RefreshTokenGenerator
+
+Creates refresh tokens. Default: `JwtRefreshTokenGenerator`.
+
+```dart
+abstract class RefreshTokenGenerator {
+  String generate(String subject);
+}
+```
+
+### AuthenticationProvider
+
+The top-level interface. `JwtAuthenticationProvider` composes `TokenReader` + `TokenValidator`. You can also implement this directly for non-token auth (API keys, mTLS).
+
+```dart
+abstract class AuthenticationProvider {
+  Future<Authentication?> authenticate(AuthenticationRequest request);
+}
+```
+
+## Custom Authentication Providers
+
+For auth methods that don't use tokens (API keys, mTLS), implement `AuthenticationProvider` directly:
 
 ### API Key Auth
 
@@ -82,21 +201,7 @@ class ApiKeyAuthProvider implements AuthenticationProvider {
 }
 ```
 
-**Test:**
-```dart
-test('API key auth works', () async {
-  await bootTest($configure, test: (client, container) async {
-    final res = await client.get('/api/data', headers: {
-      'x-api-key': 'valid-key-123',
-    });
-    res.expectStatus(200);
-  });
-});
-```
-
 ### mTLS Certificate Auth
-
-For IoT devices, OCPP chargers, service-to-service:
 
 ```dart
 @Singleton()
@@ -118,61 +223,22 @@ class MtlsAuthProvider implements AuthenticationProvider {
 
     return Authentication(name: cn, roles: ['device'], attributes: {'deviceId': device.id});
   }
-
-  String _extractCN(String subject) {
-    final match = RegExp(r'CN=([^,]+)').firstMatch(subject);
-    return match?.group(1) ?? subject;
-  }
 }
 ```
 
-**Test:**
-```dart
-test('mTLS provider registered', () async {
-  await bootTest($configure, test: (client, container) async {
-    final providers = container.getAll<AuthenticationProvider>();
-    expect(providers.any((p) => p is MtlsAuthProvider), isTrue);
-  });
-});
-```
+## Multiple Auth Methods
 
-## TLS/mTLS Configuration
-
-```yaml
-boot:
-  server:
-    ssl:
-      enabled: true
-      cert: certs/server.pem
-      key: certs/server-key.pem
-      client-auth: required       # none | optional | required
-      trust-store: certs/ca.pem   # CA that signed client certs
-```
-
-| `client-auth` | Behavior |
-|---|---|
-| `none` | No client cert requested |
-| `optional` | Client cert requested but not required |
-| `required` | Connection rejected if no valid client cert |
-
-## AuthenticationRequest
-
-Every provider receives the full connection context:
+Boot tries all `AuthenticationProvider` beans in `@Order` sequence. First non-null result wins:
 
 ```dart
-class AuthenticationRequest {
-  String? authorization;           // Authorization header value
-  Map<String, String> headers;     // All request headers
-  Map<String, String> queryParams; // Query parameters
-  String path;                     // Request path
-  String method;                   // HTTP method
-  List<dynamic>? clientCertificates; // mTLS client certs
-  bool isTls;                      // Is this a TLS connection?
-  String? remoteAddress;           // Client IP
-}
+@Singleton() @Order(0) class MtlsAuthProvider implements AuthenticationProvider { ... }
+@Singleton() @Order(1) class JwtAuthenticationProvider implements AuthenticationProvider { ... }  // from boot_security_jwt
+@Singleton() @Order(2) class ApiKeyAuthProvider implements AuthenticationProvider { ... }
 ```
 
-This works identically for HTTP requests and WebSocket upgrades.
+- IoT devices authenticate via mTLS cert
+- Web users authenticate via JWT
+- External services authenticate via API key
 
 ## Intercept URL Map
 
@@ -194,89 +260,31 @@ boot:
         access: [isAnonymous()]
 ```
 
-**Test:**
-```dart
-test('public endpoints accessible without auth', () async {
-  await bootTest($configure, test: (client, container) async {
-    final res = await client.get('/public/info');
-    res.expectStatus(200);
-  });
-});
-
-test('api endpoints require auth', () async {
-  await bootTest($configure, test: (client, container) async {
-    final res = await client.get('/api/users');
-    res.expectStatus(401);
-  });
-});
-
-test('admin requires ROLE_ADMIN', () async {
-  await bootTest($configure, overrides: (c) {
-    c.override<AuthenticationProvider>(FixedRoleAuth(['user']));
-  }, test: (client, container) async {
-    final res = await client.get('/admin/dashboard', headers: {
-      'Authorization': 'Bearer token',
-    });
-    res.expectStatus(403); // authenticated but wrong role
-  });
-});
-```
-
 ## @Secured Annotation
 
 Method-level access control:
 
 ```dart
 @Controller('/admin')
+@Secured([SecurityRule.isAuthenticated])
 class AdminController {
   @Get('/dashboard')
   @Secured(['ROLE_ADMIN'])
-  Future<Response> dashboard(Request req) async {
-    return Response.json({'status': 'admin panel'});
-  }
+  Future<Response> dashboard(Request req) async { ... }
 
   @Get('/reports')
   @Secured(['ROLE_ADMIN', 'ROLE_ANALYST'])  // either role works
-  Future<Response> reports(Request req) async {
-    return Response.json({'reports': []});
-  }
+  Future<Response> reports(Request req) async { ... }
 }
-```
-
-**Test:**
-```dart
-test('Secured endpoint rejects wrong role', () async {
-  await bootTest($configure, overrides: (c) {
-    c.override<AuthenticationProvider>(FixedRoleAuth(['user']));
-  }, test: (client, container) async {
-    final res = await client.get('/admin/dashboard', headers: {
-      'Authorization': 'Bearer token',
-    });
-    res.expectStatus(403);
-  });
-});
-
-test('Secured endpoint allows correct role', () async {
-  await bootTest($configure, overrides: (c) {
-    c.override<AuthenticationProvider>(FixedRoleAuth(['ROLE_ADMIN']));
-  }, test: (client, container) async {
-    final res = await client.get('/admin/dashboard', headers: {
-      'Authorization': 'Bearer token',
-    });
-    res.expectStatus(200);
-  });
-});
 ```
 
 ## Accessing Authentication in Controllers
 
 ```dart
+// Required — 401 if not authenticated
 @Get('/me')
 Future<Response> me(Request req, Authentication auth) async {
-  return Response.json({
-    'name': auth.name,
-    'roles': auth.roles,
-  });
+  return Response.json({'name': auth.name, 'roles': auth.roles});
 }
 
 // Optional — null if not authenticated
@@ -287,17 +295,34 @@ Future<Response> greeting(Request req, Authentication? auth) async {
 }
 ```
 
-**Test:**
+## AuthenticationRequest
+
+Every provider receives the full connection context:
+
 ```dart
-test('Authentication injected into controller', () async {
-  await bootTest($configure, overrides: (c) {
-    c.override<AuthenticationProvider>(FixedAuth('alice', ['user']));
-  }, test: (client, container) async {
-    final res = await client.get('/me', headers: {'Authorization': 'Bearer x'});
-    res.expectStatus(200);
-    expect(res.json()['name'], 'alice');
-  });
-});
+class AuthenticationRequest {
+  String? authorization;             // Authorization header value
+  Map<String, String> headers;       // All request headers
+  Map<String, String> queryParams;   // Query parameters
+  String path;                       // Request path
+  String method;                     // HTTP method
+  List<dynamic>? clientCertificates; // mTLS client certs
+  bool isTls;                        // Is this a TLS connection?
+  String? remoteAddress;             // Client IP
+}
+```
+
+## TLS/mTLS Configuration
+
+```yaml
+boot:
+  server:
+    ssl:
+      enabled: true
+      cert: certs/server.pem
+      key: certs/server-key.pem
+      client-auth: required       # none | optional | required
+      trust-store: certs/ca.pem   # CA that signed client certs
 ```
 
 ## WebSocket Authentication
@@ -310,44 +335,48 @@ boot:
     auth: true  # uses same AuthenticationProvider beans
 ```
 
-## Multiple Auth Methods Coexisting
+## Testing
 
 ```dart
-@Singleton() @Order(0) class MtlsAuthProvider implements AuthenticationProvider { ... }
-@Singleton() @Order(1) class JwtAuthProvider implements AuthenticationProvider { ... }
-@Singleton() @Order(2) class ApiKeyAuthProvider implements AuthenticationProvider { ... }
+test('protected endpoint rejects without token', () async {
+  await bootTest($configure, test: (client, container) async {
+    final res = await client.get('/api/users');
+    res.expectStatus(401);
+  });
+});
+
+test('protected endpoint works with valid token', () async {
+  await bootTest($configure, test: (client, container) async {
+    final tokens = container.get<TokenGenerator>();
+    final token = tokens.generate('alice', roles: ['ROLE_USER']);
+
+    final res = await client.get('/api/users', headers: {
+      'Authorization': 'Bearer $token',
+    });
+    res.expectStatus(200);
+  });
+});
+
+test('admin endpoint rejects wrong role', () async {
+  await bootTest($configure, test: (client, container) async {
+    final tokens = container.get<TokenGenerator>();
+    final token = tokens.generate('alice', roles: ['ROLE_USER']);
+
+    final res = await client.get('/admin/dashboard', headers: {
+      'Authorization': 'Bearer $token',
+    });
+    res.expectStatus(403);
+  });
+});
 ```
 
-Boot tries them in `@Order` sequence. First non-null `Authentication` wins. This means:
-- IoT devices authenticate via mTLS cert
-- Web users authenticate via JWT
-- External services authenticate via API key
-- All through the same pipeline, no special cases
+## JWT Configuration Reference
 
-## Test Helpers
+| YAML Key | Default | Description |
+|---|---|---|
+| `boot.security.jwt.secret` | (required) | HMAC signing key |
+| `boot.security.jwt.expiration` | `1h` | Access token lifetime |
+| `boot.security.jwt.refresh-expiration` | `7d` | Refresh token lifetime |
+| `boot.security.jwt.issuer` | (none) | `iss` claim — rejects tokens with wrong issuer |
 
-```dart
-// Reusable mock auth provider for tests
-class FixedAuth implements AuthenticationProvider {
-  final String name;
-  final List<String> roles;
-  FixedAuth(this.name, this.roles);
-
-  @override
-  Future<Authentication?> authenticate(AuthenticationRequest req) async {
-    if (req.authorization == null && req.clientCertificates == null) return null;
-    return Authentication(name: name, roles: roles);
-  }
-}
-
-class FixedRoleAuth implements AuthenticationProvider {
-  final List<String> roles;
-  FixedRoleAuth(this.roles);
-
-  @override
-  Future<Authentication?> authenticate(AuthenticationRequest req) async {
-    if (req.authorization == null) return null;
-    return Authentication(name: 'test-user', roles: roles);
-  }
-}
-```
+Duration formats: `500ms`, `30s`, `15m`, `2h`, `7d`

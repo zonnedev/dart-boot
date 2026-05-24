@@ -3,11 +3,8 @@
 import 'package:boot/boot.dart';
 import 'package:todo_app/src/controllers/hello_controller.dart';
 import 'package:todo_app/src/controllers/todo_controller.dart';
-import 'package:todo_app/src/services/jwt_service.dart';
 import 'package:todo_app/src/controllers/auth_controller.dart';
-import 'package:todo_app/src/security/jwt_auth_provider.dart';
-import 'package:boot_http/src/security/security.dart';
-
+import 'package:boot_security_jwt/src/generated/boot_module.g.dart';
 
 class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
@@ -26,15 +23,12 @@ void $configure(BeanContainer container, BootRouter router) {
   final deferred = <void Function()>[];
 
   // Load library modules
-
+  $BootSecurityJwtModule(container, router, config, deferred);
 
   // Register beans in dependency order
   container.register<HelloController>($HelloControllerDefinition());
   container.register<TodoController>($TodoControllerDefinition());
-  container.register<JwtService>($JwtServiceDefinition());
   container.register<AuthController>($AuthControllerDefinition());
-  container.register<JwtAuthProvider>($JwtAuthProviderDefinition());
-  container.register<AuthenticationProvider>($JwtAuthProviderDefinition());
 
   // Evaluate deferred beans (beans/missingBeans conditions)
 
@@ -53,7 +47,7 @@ void $configure(BeanContainer container, BootRouter router) {
 
 
   // Register authentication providers
-  router.addAuthenticationProvider(container.get<JwtAuthProvider>());
+
 
   // Register health indicators
 

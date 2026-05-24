@@ -25,13 +25,13 @@ class $ProductControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'GET',
-      path: '/products/<id>',
-      handler: (request) async {
-        final id = request.pathParams['id']!;
-        return await controller.get(request, id);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'GET',
+          path: '/products/<id>',
+          handler: (request) async {
+            final id = request.pathParams['id']!;
+            return await controller.get(request, id);
+          },
+        ),
+      ];
 }

@@ -25,12 +25,12 @@ class $NotificationControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'POST',
-      path: '/notifications/broadcast',
-      handler: (request) async {
-        return await controller.broadcast(request);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'POST',
+          path: '/notifications/broadcast',
+          handler: (request) async {
+            return await controller.broadcast(request);
+          },
+        ),
+      ];
 }

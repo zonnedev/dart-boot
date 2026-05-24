@@ -24,20 +24,20 @@ class $HelloControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'GET',
-      path: '/hello/',
-      handler: (request) async {
-        return await controller.hello(request);
-      },
-    ),
-    RouteEntry(
-      method: 'GET',
-      path: '/hello/<name>',
-      handler: (request) async {
-        final name = request.pathParams['name']!;
-        return await controller.greet(request, name);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'GET',
+          path: '/hello/',
+          handler: (request) async {
+            return await controller.hello(request);
+          },
+        ),
+        RouteEntry(
+          method: 'GET',
+          path: '/hello/<name>',
+          handler: (request) async {
+            final name = request.pathParams['name']!;
+            return await controller.greet(request, name);
+          },
+        ),
+      ];
 }

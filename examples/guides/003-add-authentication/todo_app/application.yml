@@ -2,8 +2,15 @@ boot:
   env: dev
   security:
     enabled: true
+    jwt:
+      secret: boot-guide-secret-change-in-production
+      expiration: 1h
+      refresh-expiration: 7d
+      issuer: todo-app
     intercept-url-map:
       - pattern: /auth/**
+        access: [isAnonymous()]
+      - pattern: /hello/**
         access: [isAnonymous()]
       - pattern: /todos/**
         access: [isAuthenticated()]

@@ -11,9 +11,7 @@ class $JwtServiceDefinition extends BeanDefinition {
   String get typeName => 'JwtService';
 
   @override
-  JwtService create(BeanContainer container) => JwtService(
-    container.get<BootConfig>().resolvePlaceholder(
-      '\${auth.jwt.secret:boot-secret-change-me}',
-    ),
-  );
+  JwtService create(BeanContainer container) => JwtService(container
+      .get<BootConfig>()
+      .resolvePlaceholder('\${auth.jwt.secret:boot-secret-change-me}'));
 }

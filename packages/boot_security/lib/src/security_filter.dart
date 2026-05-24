@@ -1,12 +1,12 @@
 import 'package:boot_http_common/boot_http_common.dart';
 
+import 'authentication.dart';
+import 'authentication_provider.dart';
+import 'authentication_request.dart';
+import 'secured.dart';
 
-
-
-import 'security.dart';
-
-/// Internal security filter — intercepts requests and enforces @Secured rules.
-/// Registered automatically when security is enabled.
+/// Internal security filter — intercepts requests and enforces access rules.
+/// Checks both intercept-url-map (YAML) and @Secured annotations (route metadata).
 class SecurityFilter implements HttpServerFilter {
   final List<AuthenticationProvider> _providers;
   final List<SecurityRuleEntry> _rules;
@@ -17,10 +17,6 @@ class SecurityFilter implements HttpServerFilter {
 
   @override
   Future<Response> filter(Request request, FilterChain chain) async {
-    // Find matching rule for this request
-    final rule = _findRule(request.method, request.path);
-
-    // Always attempt authentication (to populate request.authentication)
     final authRequest = AuthenticationRequest(
       authorization: request.headers['authorization'],
       headers: request.headers,
@@ -28,6 +24,7 @@ class SecurityFilter implements HttpServerFilter {
       method: request.method,
     );
 
+    // Authenticate
     Authentication? authentication;
     for (final provider in _providers) {
       authentication = await provider.authenticate(authRequest);
@@ -38,40 +35,60 @@ class SecurityFilter implements HttpServerFilter {
       request.setAttribute('authentication', authentication);
     }
 
-    // If anonymous access is allowed, proceed regardless
-    if (rule.contains(SecurityRule.isAnonymous)) {
-      return chain.proceed(request);
-    }
+    // Check intercept-url-map rules
+    final urlRule = _findRule(request.method, request.path);
+    final urlResult = _enforce(urlRule, authentication);
+    if (urlResult != null) return urlResult;
 
-    // If deny all, reject immediately
-    if (rule.contains(SecurityRule.denyAll)) {
-      return Response(403, headers: {'content-type': 'application/json'},
-          body: '{"error":"Forbidden"}');
-    }
-
-    // No authentication and it's required
-    if (authentication == null) {
-      return Response(401, headers: {'content-type': 'application/json'},
-          body: '{"error":"Unauthorized"}');
-    }
-
-    // Check roles if specified
-    if (rule.isNotEmpty && !rule.contains(SecurityRule.isAuthenticated)) {
-      final hasRole = rule.any((r) => authentication!.roles.contains(r));
-      if (!hasRole) {
-        return Response(403, headers: {'content-type': 'application/json'},
-            body: '{"error":"Forbidden"}');
+    // Check route-level @Secured metadata
+    final metadata = request.getAttribute<List<Object>>('route.metadata');
+    if (metadata != null) {
+      for (final secured in metadata.whereType<Secured>()) {
+        final metaResult = _enforce(secured.value, authentication);
+        if (metaResult != null) return metaResult;
       }
     }
 
     return chain.proceed(request);
   }
 
+  /// Enforce a set of access rules. Returns a rejection Response, or null if allowed.
+  Response? _enforce(List<String> rules, Authentication? authentication) {
+    if (rules.isEmpty) return null;
+
+    if (rules.contains(SecurityRule.isAnonymous)) return null;
+
+    if (rules.contains(SecurityRule.denyAll)) {
+      return Response(403,
+          headers: {'content-type': 'application/json'},
+          body: '{"error":"Forbidden"}');
+    }
+
+    if (authentication == null) {
+      return Response(401,
+          headers: {'content-type': 'application/json'},
+          body: '{"error":"Unauthorized"}');
+    }
+
+    if (rules.contains(SecurityRule.isAuthenticated)) return null;
+
+    // Role check
+    final hasRole = rules.any((r) => authentication.roles.contains(r));
+    if (!hasRole) {
+      return Response(403,
+          headers: {'content-type': 'application/json'},
+          body: '{"error":"Forbidden"}');
+    }
+
+    return null;
+  }
+
   List<String> _findRule(String method, String path) {
     final normalizedPath = path.startsWith('/') ? path : '/$path';
     for (final entry in _rules) {
       if (_pathMatches(entry.pattern, normalizedPath)) {
-        if (entry.method == null || entry.method!.toUpperCase() == method.toUpperCase()) {
+        if (entry.method == null ||
+            entry.method!.toUpperCase() == method.toUpperCase()) {
           return entry.access;
         }
       }
@@ -87,7 +104,8 @@ class SecurityFilter implements HttpServerFilter {
     }
     if (pattern.endsWith('/*')) {
       final prefix = pattern.substring(0, pattern.length - 2);
-      return path.startsWith(prefix) && !path.substring(prefix.length + 1).contains('/');
+      return path.startsWith(prefix) &&
+          !path.substring(prefix.length + 1).contains('/');
     }
     return pattern == path;
   }

@@ -1,0 +1,24 @@
+name: boot_security
+description: Security module for Boot — authentication, authorization, token interfaces.
+repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_security
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+resolution: workspace
+
+dependencies:
+  boot_core: ^0.1.0
+  boot_http_common: ^0.1.0
+
+dev_dependencies:
+  boot_core: ^0.1.0
+  shelf: ^1.4.0
+  test: ^1.25.0
+
+topics:
+  - boot
+  - security
+  - authentication
+  - authorization

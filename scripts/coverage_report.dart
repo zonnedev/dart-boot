@@ -32,6 +32,11 @@ void main(List<String> args) {
     for (final line in file.readAsLinesSync()) {
       if (line.startsWith('SF:')) {
         currentFile = line.substring(3);
+        if (currentFile!.endsWith('.g.dart') || currentFile!.contains('/generated/')) {
+          currentFile = null;
+        }
+      } else if (currentFile == null) {
+        continue;
       } else if (line.startsWith('LF:')) {
         final lf = int.parse(line.substring(3));
         files.update(currentFile!, (v) => (lines: v.lines + lf, hit: v.hit),

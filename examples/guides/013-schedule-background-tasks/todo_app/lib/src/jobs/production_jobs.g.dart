@@ -22,10 +22,7 @@ class $ProductionJobsDefinition extends BeanDefinition {
   @override
   void postConstruct(dynamic instance) {
     final scheduler = _container!.get<TaskScheduler>();
-    scheduler.scheduleFixedRate(
-      'ProductionJobs.compactDatabase',
-      parseDuration('1h'),
-      (instance as ProductionJobs).compactDatabase,
-    );
+    scheduler.scheduleFixedRate('ProductionJobs.compactDatabase',
+        parseDuration('1h'), (instance as ProductionJobs).compactDatabase);
   }
 }

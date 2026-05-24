@@ -11,8 +11,8 @@ class $AuthControllerDefinition extends BeanDefinition {
   String get typeName => 'AuthController';
 
   @override
-  AuthController create(BeanContainer container) =>
-      AuthController(container.get<JwtService>());
+  AuthController create(BeanContainer container) => AuthController(
+      container.get<TokenGenerator>(), container.get<RefreshTokenGenerator>());
 }
 
 // **************************************************************************
@@ -25,12 +25,12 @@ class $AuthControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'POST',
-      path: '/auth/login',
-      handler: (request) async {
-        return await controller.login(request);
-      },
-    ),
-  ];
+        RouteEntry(
+          method: 'POST',
+          path: '/auth/login',
+          handler: (request) async {
+            return await controller.login(request);
+          },
+        ),
+      ];
 }

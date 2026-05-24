@@ -6,157 +6,85 @@ Add JWT-based authentication to the Todo app. Some endpoints will be public, oth
 
 ## What you'll learn
 
-- How to implement an `AuthenticationProvider`
-- How to protect endpoints with `@Secured`
-- How to configure URL-based access rules
+- How `boot_security_jwt` auto-wires authentication
+- How to write a login endpoint using `TokenGenerator`
+- How to protect endpoints with `@Secured` and intercept-url-map
 - How to access the authenticated user in controllers
 - How to test protected endpoints
 
 ## Prerequisites
 
 - Completed [Guide 001](001-build-a-rest-api.md)
-- Basic understanding of JWT tokens (we'll explain as we go)
 
 ---
 
-## Step 1: Add a JWT dependency
-
-We'll use the `dart_jsonwebtoken` package to create and verify tokens.
+## Step 1: Add boot_security_jwt
 
 **`pubspec.yaml`** — add under dependencies:
 
 ```yaml
 dependencies:
   boot: ^0.1.0
-  dart_jsonwebtoken: ^2.12.0
+  boot_security_jwt: ^0.1.0
 ```
 
 ```bash
 dart pub get
 ```
 
+That's all you need. `boot_security_jwt` is a Boot library — it auto-registers:
+- `JwtTokenGenerator` → creates access tokens
+- `JwtRefreshTokenGenerator` → creates refresh tokens
+- `JwtTokenValidator` → verifies tokens
+- `BearerTokenReader` → extracts tokens from `Authorization: Bearer <token>`
+- `JwtAuthenticationProvider` → ties it all together
+
 ---
 
-## Step 2: Create a JWT service
+## Step 2: Configure security
 
-This service creates and verifies tokens. It's a regular Boot bean.
+**`application.yml`**
 
-**`lib/src/services/jwt_service.dart`**
-
-```dart
-import 'package:boot/boot.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-
-part 'jwt_service.g.dart';
-
-/// Creates and verifies JWT tokens.
-@Singleton()
-class JwtService {
-  final String _secret;
-
-  JwtService(@Value('\${auth.jwt.secret:boot-secret-change-me}') this._secret);
-
-  /// Create a token for a user.
-  String createToken(String username, List<String> roles) {
-    final jwt = JWT({
-      'sub': username,
-      'roles': roles,
-      'iat': DateTime.now().millisecondsSinceEpoch ~/ 1000,
-    });
-    return jwt.sign(SecretKey(_secret), expiresIn: Duration(hours: 24));
-  }
-
-  /// Verify a token. Returns the claims if valid, null if invalid/expired.
-  Map<String, dynamic>? verify(String token) {
-    try {
-      final jwt = JWT.verify(token, SecretKey(_secret));
-      return jwt.payload as Map<String, dynamic>;
-    } catch (_) {
-      return null;
-    }
-  }
-}
+```yaml
+boot:
+  env: dev
+  security:
+    enabled: true
+    jwt:
+      secret: boot-guide-secret-change-in-production
+      expiration: 1h
+      refresh-expiration: 7d
+      issuer: todo-app
+    intercept-url-map:
+      - pattern: /auth/**
+        access: [isAnonymous()]
+      - pattern: /todos/**
+        access: [isAuthenticated()]
 ```
 
-**What's happening:**
-
-- `@Value('\${auth.jwt.secret:boot-secret-change-me}')` — reads the secret from config, with a default for development. In production, you'd set a real secret.
-- `createToken()` — creates a signed JWT with the username and roles inside.
-- `verify()` — checks if a token is valid and not expired. Returns the data inside, or null if invalid.
+This means:
+- `/auth/**` — anyone can access (login endpoint)
+- `/todos/**` — requires a valid JWT token
 
 ---
 
-## Step 3: Create the authentication provider
-
-This is the core piece. Boot calls this for every request that needs authentication.
-
-**`lib/src/security/jwt_auth_provider.dart`**
-
-```dart
-import 'package:boot/boot.dart';
-import '../services/jwt_service.dart';
-
-part 'jwt_auth_provider.g.dart';
-
-/// Validates JWT tokens from the Authorization header.
-/// Boot discovers this automatically and uses it for all protected endpoints.
-@Singleton()
-class JwtAuthProvider implements AuthenticationProvider {
-  final JwtService _jwt;
-
-  JwtAuthProvider(this._jwt);
-
-  @override
-  Future<Authentication?> authenticate(AuthenticationRequest request) async {
-    // Look for "Authorization: Bearer <token>" header
-    final header = request.authorization;
-    if (header == null || !header.startsWith('Bearer ')) return null;
-
-    // Extract and verify the token
-    final token = header.substring(7); // remove "Bearer " prefix
-    final claims = _jwt.verify(token);
-    if (claims == null) return null; // invalid or expired
-
-    // Return the authenticated user
-    return Authentication(
-      name: claims['sub'] as String,
-      roles: List<String>.from(claims['roles'] ?? []),
-    );
-  }
-}
-```
-
-**What's happening:**
-
-- `implements AuthenticationProvider` — this tells Boot "use me for authentication"
-- Boot automatically discovers this bean and calls `authenticate()` on every request that needs auth
-- If the method returns `Authentication` → the user is authenticated
-- If it returns `null` → this provider can't authenticate the request (maybe another provider can, or it's rejected)
-- The `Authentication` object carries the username and roles — available in controllers later
-
----
-
-## Step 4: Create a login endpoint
-
-Users need a way to get a token. Create a simple login controller:
+## Step 3: Create a login controller
 
 **`lib/src/controllers/auth_controller.dart`**
 
 ```dart
 import 'package:boot/boot.dart';
-import '../services/jwt_service.dart';
+import 'package:boot_security_jwt/boot_security_jwt.dart';
 
 part 'auth_controller.g.dart';
 
-/// Handles login — issues JWT tokens.
 @Controller('/auth')
 class AuthController {
-  final JwtService _jwt;
+  final TokenGenerator _tokens;
+  final RefreshTokenGenerator _refreshTokens;
 
-  AuthController(this._jwt);
+  AuthController(this._tokens, this._refreshTokens);
 
-  /// POST /auth/login — returns a JWT token.
-  /// In a real app, you'd verify the password against a database.
   @Post('/login')
   Future<Response> login(Request request) async {
     final body = await request.json();
@@ -170,13 +98,17 @@ class AuthController {
     // Simple hardcoded check for this guide.
     // In a real app, verify against a database with hashed passwords.
     if (username == 'admin' && password == 'admin123') {
-      final token = _jwt.createToken(username, ['ROLE_ADMIN']);
-      return Response.json({'token': token});
+      return Response.json({
+        'access_token': _tokens.generate(username, roles: ['ROLE_ADMIN']),
+        'refresh_token': _refreshTokens.generate(username),
+      });
     }
 
     if (username == 'user' && password == 'user123') {
-      final token = _jwt.createToken(username, ['ROLE_USER']);
-      return Response.json({'token': token});
+      return Response.json({
+        'access_token': _tokens.generate(username, roles: ['ROLE_USER']),
+        'refresh_token': _refreshTokens.generate(username),
+      });
     }
 
     throw UnauthorizedException('Invalid credentials');
@@ -184,35 +116,34 @@ class AuthController {
 }
 ```
 
+**What's happening:**
+- `TokenGenerator` and `RefreshTokenGenerator` are injected automatically — provided by `boot_security_jwt`
+- You just call `.generate()` with the subject and roles
+- No need to write JWT signing logic — the framework handles it
+
 ---
 
-## Step 5: Protect the todo endpoints
+## Step 4: Protect the todo endpoints
 
-Add `@Secured` to require authentication:
-
-**`lib/src/controllers/todo_controller.dart`** — add the annotation:
+**`lib/src/controllers/todo_controller.dart`** — add `@Secured`:
 
 ```dart
 import 'package:boot/boot.dart';
-import '../models/todo.dart';
 
 part 'todo_controller.g.dart';
 
-/// All endpoints in this controller require authentication.
 @Controller('/todos')
-@Secured(['isAuthenticated()'])
+@Secured([SecurityRule.isAuthenticated])
 class TodoController {
   // ... same as before
 }
 ```
 
-**What's happening:** `@Secured(['isAuthenticated()'])` means every endpoint in this controller requires a valid token. Without it, the request gets a 401 response.
-
 ---
 
-## Step 6: Access the authenticated user
+## Step 5: Access the authenticated user
 
-You can inject `Authentication` into any controller method. Add this to your `TodoController`:
+Add a method that uses the current user:
 
 ```dart
 @Get('/mine')
@@ -221,28 +152,9 @@ Future<Response> mine(Request request, Authentication auth) async {
 }
 ```
 
-**Important:** Put this method **before** `@Get('/<id>')` in your controller. Routes are matched in order — if `/<id>` comes first, it will catch `/mine` and try to use "mine" as an ID.
+**Important:** Put specific routes (`/mine`) before parameterized routes (`/<id>`) in your controller.
 
-The correct order in your controller:
-
-```dart
-@Controller('/todos')
-@Secured(['isAuthenticated()'])
-class TodoController {
-  // Specific routes first
-  @Get('/mine')
-  Future<Response> mine(Request request, Authentication auth) async { ... }
-
-  @Get('/')
-  Future<Response> list(Request request) async { ... }
-
-  // Parameterized routes last
-  @Get('/<id>')
-  Future<Response> getById(Request request, @PathParam() String id) async { ... }
-}
-```
-
-If you declare `Authentication?` (nullable), the endpoint works for both authenticated and anonymous users:
+For optional auth (works for both authenticated and anonymous):
 
 ```dart
 @Get('/greeting')
@@ -254,33 +166,7 @@ Future<Response> greeting(Request request, Authentication? auth) async {
 
 ---
 
-## Step 7: Enable security in configuration
-
-Add to your `application.yml`:
-
-```yaml
-boot:
-  env: dev
-  security:
-    enabled: true
-    intercept-url-map:
-      - pattern: /auth/**
-        access: [isAnonymous()]
-      - pattern: /todos/public
-        access: [isAnonymous()]
-      - pattern: /todos/**
-        access: [isAuthenticated()]
-```
-
-This means:
-- `/auth/login` — anyone can access (no token needed)
-- `/todos/public` — anyone can access
-- `/todos/**` — requires authentication
-- `@Secured` annotations on individual methods add further restrictions (like role checks)
-
----
-
-## Step 8: Update exports
+## Step 6: Update exports
 
 **`lib/todo_app.dart`**
 
@@ -290,32 +176,18 @@ library todo_app;
 export 'src/controllers/auth_controller.dart';
 export 'src/controllers/todo_controller.dart';
 export 'src/models/todo.dart';
-export 'src/security/jwt_auth_provider.dart';
-export 'src/services/jwt_service.dart';
 ```
 
 ---
 
-## Step 9: Build and test manually
+## Step 7: Build and test manually
 
 ```bash
 boot build
 boot serve
 ```
 
-**Try accessing todos without a token:**
-
-```bash
-curl http://localhost:8080/todos/
-```
-
-Response:
-```json
-{"error": "Unauthorized"}
-```
-Status: 401
-
-**Login to get a token:**
+**Login:**
 
 ```bash
 curl -X POST http://localhost:8080/auth/login \
@@ -325,45 +197,46 @@ curl -X POST http://localhost:8080/auth/login \
 
 Response:
 ```json
-{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+{"access_token": "eyJ...", "refresh_token": "eyJ..."}
 ```
 
-**Use the token to access todos:**
+**Access protected endpoint:**
 
 ```bash
 curl http://localhost:8080/todos/ \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  -H "Authorization: Bearer eyJ..."
 ```
 
-Response:
-```json
-[]
+**Without token:**
+
+```bash
+curl http://localhost:8080/todos/
+# → 401 {"error": "Unauthorized"}
 ```
-Status: 200 ✓
 
 ---
 
-## Step 10: Write automated tests
+## Step 8: Write automated tests
 
 **`test/auth_test.dart`**
 
 ```dart
 import 'package:boot_test/boot_test.dart';
+import 'package:boot_security_jwt/boot_security_jwt.dart';
 import 'package:todo_app/src/generated/boot_context.g.dart';
-import 'package:todo_app/src/services/jwt_service.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('Authentication', () {
-    test('login with valid credentials returns token', () async {
+    test('login with valid credentials returns tokens', () async {
       await bootTest($configure, test: (client, container) async {
         final res = await client.post('/auth/login', body: {
           'username': 'admin',
           'password': 'admin123',
         });
         res.expectStatus(200);
-        expect(res.json()['token'], isNotNull);
-        expect(res.json()['token'], isA<String>());
+        expect(res.json()['access_token'], isNotNull);
+        expect(res.json()['refresh_token'], isNotNull);
       });
     });
 
@@ -386,11 +259,9 @@ void main() {
 
     test('protected endpoint works with valid token', () async {
       await bootTest($configure, test: (client, container) async {
-        // Get a token
-        final jwt = container.get<JwtService>();
-        final token = jwt.createToken('testuser', ['ROLE_USER']);
+        final tokens = container.get<TokenGenerator>();
+        final token = tokens.generate('testuser', roles: ['ROLE_USER']);
 
-        // Use it
         final res = await client.get('/todos/', headers: {
           'Authorization': 'Bearer $token',
         });
@@ -398,7 +269,7 @@ void main() {
       });
     });
 
-    test('expired/invalid token returns 401', () async {
+    test('invalid token returns 401', () async {
       await bootTest($configure, test: (client, container) async {
         final res = await client.get('/todos/', headers: {
           'Authorization': 'Bearer invalid-garbage-token',
@@ -418,15 +289,15 @@ boot test
 
 ---
 
-## Step 11: Add role-based access (optional)
+## Step 9: Add role-based access (optional)
 
 Restrict specific endpoints to certain roles:
 
 ```dart
 @Delete('/<id>')
-@Secured(['ROLE_ADMIN'])  // only admins can delete
+@Secured(['ROLE_ADMIN'])
 Future<Response> delete(Request request, @PathParam() String id) async {
-  // ...
+  // only admins can delete
 }
 ```
 
@@ -435,42 +306,59 @@ Future<Response> delete(Request request, @PathParam() String id) async {
 ```dart
 test('non-admin cannot delete', () async {
   await bootTest($configure, test: (client, container) async {
-    final jwt = container.get<JwtService>();
-    final userToken = jwt.createToken('user', ['ROLE_USER']); // not admin
+    final tokens = container.get<TokenGenerator>();
+    final userToken = tokens.generate('user', roles: ['ROLE_USER']);
 
     final res = await client.delete('/todos/1', headers: {
       'Authorization': 'Bearer $userToken',
     });
-    res.expectStatus(403); // Forbidden — authenticated but wrong role
-  });
-});
-
-test('admin can delete', () async {
-  await bootTest($configure, test: (client, container) async {
-    final jwt = container.get<JwtService>();
-    final adminToken = jwt.createToken('admin', ['ROLE_ADMIN']);
-
-    final res = await client.delete('/todos/1', headers: {
-      'Authorization': 'Bearer $adminToken',
-    });
-    // 204 or 404 depending on whether the todo exists — but NOT 403
-    expect(res.statusCode, isNot(403));
+    res.expectStatus(403);
   });
 });
 ```
 
 ---
 
+## Step 10: Override token extraction (optional)
+
+If you need tokens from cookies instead of the Authorization header:
+
+```dart
+import 'package:boot/boot.dart';
+import 'package:boot_security_jwt/boot_security_jwt.dart';
+
+part 'cookie_token_reader.g.dart';
+
+@Singleton()
+@Replaces(TokenReader)
+class CookieTokenReader implements TokenReader {
+  @override
+  String? read(AuthenticationRequest request) {
+    final cookie = request.headers['cookie'];
+    if (cookie == null) return null;
+    for (final part in cookie.split(';')) {
+      final kv = part.trim().split('=');
+      if (kv.length == 2 && kv[0] == 'access_token') return kv[1];
+    }
+    return null;
+  }
+}
+```
+
+The framework uses your `CookieTokenReader` instead of the default `BearerTokenReader`. Everything else (validation, authentication) stays the same.
+
+---
+
 ## What you've learned
 
-- `AuthenticationProvider` — implement this to add any auth method (JWT, API key, mTLS, etc.)
-- Boot auto-discovers providers — just annotate with `@Singleton()` and implement the interface
-- `@Secured(['isAuthenticated()'])` — requires any valid authentication
+- `boot_security_jwt` auto-registers all JWT beans — no manual wiring
+- `TokenGenerator` / `RefreshTokenGenerator` — inject and call `.generate()`
+- `@Secured([SecurityRule.isAuthenticated])` — requires any valid token
 - `@Secured(['ROLE_ADMIN'])` — requires a specific role
 - `Authentication auth` in controller methods — access the current user
-- `Authentication? auth` — optional, works for both authenticated and anonymous
 - `intercept-url-map` in YAML — declarative URL-based rules
-- In tests, create tokens directly via `JwtService` — no need to call the login endpoint
+- `@Replaces(TokenReader)` — swap how tokens are extracted
+- In tests, get `TokenGenerator` from container to create tokens directly
 
 ## Next steps
 

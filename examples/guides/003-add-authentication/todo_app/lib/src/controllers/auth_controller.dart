@@ -1,13 +1,14 @@
 import 'package:boot/boot.dart';
-import '../services/jwt_service.dart';
+import 'package:boot_security_jwt/boot_security_jwt.dart';
 
 part 'auth_controller.g.dart';
 
 @Controller('/auth')
 class AuthController {
-  final JwtService _jwt;
+  final TokenGenerator _tokens;
+  final RefreshTokenGenerator _refreshTokens;
 
-  AuthController(this._jwt);
+  AuthController(this._tokens, this._refreshTokens);
 
   @Post('/login')
   Future<Response> login(Request request) async {
@@ -20,13 +21,17 @@ class AuthController {
     }
 
     if (username == 'admin' && password == 'admin123') {
-      final token = _jwt.createToken(username, ['ROLE_ADMIN']);
-      return Response.json({'token': token});
+      return Response.json({
+        'access_token': _tokens.generate(username, roles: ['ROLE_ADMIN']),
+        'refresh_token': _refreshTokens.generate(username),
+      });
     }
 
     if (username == 'user' && password == 'user123') {
-      final token = _jwt.createToken(username, ['ROLE_USER']);
-      return Response.json({'token': token});
+      return Response.json({
+        'access_token': _tokens.generate(username, roles: ['ROLE_USER']),
+        'refresh_token': _refreshTokens.generate(username),
+      });
     }
 
     throw UnauthorizedException('Invalid credentials');

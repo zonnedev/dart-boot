@@ -25,39 +25,35 @@ class $EventsControllerRoutes implements RouteRegistration {
 
   @override
   List<RouteEntry> get routes => [
-    RouteEntry(
-      method: 'GET',
-      path: '/events/time',
-      handler: (request) async {
-        final stream = controller.time(request);
-        final body = stream.map((e) => e.encode());
-        return Response(
-          200,
-          headers: {
-            'content-type': 'text/event-stream',
-            'cache-control': 'no-cache',
-            'connection': 'keep-alive',
+        RouteEntry(
+          method: 'GET',
+          path: '/events/time',
+          handler: (request) async {
+            final stream = controller.time(request);
+            final body = stream.map((e) => e.encode());
+            return Response(200,
+                headers: {
+                  'content-type': 'text/event-stream',
+                  'cache-control': 'no-cache',
+                  'connection': 'keep-alive'
+                },
+                body: await body.join());
           },
-          body: await body.join(),
-        );
-      },
-    ),
-    RouteEntry(
-      method: 'GET',
-      path: '/events/notifications',
-      handler: (request) async {
-        final stream = controller.notifications(request);
-        final body = stream.map((e) => e.encode());
-        return Response(
-          200,
-          headers: {
-            'content-type': 'text/event-stream',
-            'cache-control': 'no-cache',
-            'connection': 'keep-alive',
+        ),
+        RouteEntry(
+          method: 'GET',
+          path: '/events/notifications',
+          handler: (request) async {
+            final stream = controller.notifications(request);
+            final body = stream.map((e) => e.encode());
+            return Response(200,
+                headers: {
+                  'content-type': 'text/event-stream',
+                  'cache-control': 'no-cache',
+                  'connection': 'keep-alive'
+                },
+                body: await body.join());
           },
-          body: await body.join(),
-        );
-      },
-    ),
-  ];
+        ),
+      ];
 }

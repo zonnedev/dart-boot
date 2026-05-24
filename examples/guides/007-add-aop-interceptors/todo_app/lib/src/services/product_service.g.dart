@@ -28,7 +28,7 @@ class $ProductService$Proxy extends ProductService {
     return await InterceptorChain(
       interceptors: [
         ..._$container.getInterceptors(Timed),
-        ..._$container.getInterceptors(Cached),
+        ..._$container.getInterceptors(Cached)
       ],
       methodName: 'getProduct',
       args: [id],
@@ -43,6 +43,7 @@ class $ProductService$ProxyDefinition extends BeanDefinition {
   String get typeName => 'ProductService (proxy)';
 
   @override
-  ProductService create(BeanContainer container) =>
-      $ProductService$Proxy(container);
+  ProductService create(BeanContainer container) => $ProductService$Proxy(
+        container,
+      );
 }

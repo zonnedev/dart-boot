@@ -21,6 +21,7 @@ final _patchChecker = TypeChecker.fromRuntime(Patch);
 final _requestChecker = TypeChecker.fromRuntime(Request);
 final _responseChecker = TypeChecker.fromRuntime(Response);
 final _authenticationChecker = TypeChecker.fromRuntime(Authentication);
+final _securedChecker = TypeChecker.fromRuntime(Secured);
 
 final _routeCheckers = {
   'GET': _getChecker,
@@ -53,6 +54,9 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
 
     final routes = <String>[];
 
+    // Collect class-level annotations for metadata (e.g., @Secured on the class)
+    final classMetadata = _collectMetadata(element);
+
     for (final method in element.methods) {
       final routeInfo = _extractRoute(method);
       if (routeInfo == null) continue;
@@ -61,11 +65,18 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
       final fullPath = '$basePath$path';
       final handlerCode = _buildHandler(method, className);
 
+      // Merge class + method annotations as route metadata
+      final methodMetadata = _collectMetadata(method);
+      final allMetadata = [...classMetadata, ...methodMetadata];
+      final metadataCode = allMetadata.isEmpty
+          ? ''
+          : '\n      metadata: [${allMetadata.join(', ')}],';
+
       routes.add('''
     RouteEntry(
       method: '$httpMethod',
       path: '$fullPath',
-      handler: $handlerCode,
+      handler: $handlerCode,$metadataCode
     )''');
     }
 
@@ -316,6 +327,45 @@ ${routes.join(',\n')},
       RegExp(r'[A-Z]'),
       (m) => '-${m.group(0)!.toLowerCase()}',
     );
+  }
+
+  /// Structural annotations that are consumed by the generator — not forwarded as metadata.
+  static final _structuralAnnotations = {
+    'Controller', 'Get', 'Post', 'Put', 'Delete', 'Patch',
+    'PathParam', 'QueryParam', 'Body', 'Header', 'CookieValue',
+    'Singleton', 'Prototype', 'Factory', 'Order',
+  };
+
+  /// Collect non-structural annotations from an element as metadata code strings.
+  List<String> _collectMetadata(dynamic element) {
+    final result = <String>[];
+    for (final annotation in element.metadata) {
+      final name = annotation.element?.enclosingElement3?.name;
+      if (name == null || _structuralAnnotations.contains(name)) continue;
+
+      // @Secured(['ROLE_ADMIN'])
+      if (name == 'Secured') {
+        final value = annotation.computeConstantValue();
+        if (value == null) continue;
+        final roles = value.getField('value')?.toListValue()
+            ?.map((v) => "'${v.toStringValue()}'")
+            .join(', ');
+        if (roles != null) {
+          result.add("Secured([$roles])");
+        }
+        continue;
+      }
+
+      // Generic: emit const AnnotationName() for no-arg annotations
+      final value = annotation.computeConstantValue();
+      if (value != null && value.type?.element?.name != null) {
+        final typeName = value.type!.element!.name!;
+        if (!_structuralAnnotations.contains(typeName)) {
+          result.add('const $typeName()');
+        }
+      }
+    }
+    return result;
   }
 }
 
