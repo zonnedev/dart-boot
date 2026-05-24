@@ -2,7 +2,6 @@ import 'dart:io' as io;
 
 import 'package:boot_core/boot_core.dart';
 import 'package:boot_http/boot_http.dart';
-import 'package:boot_http_common/boot_http_common.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 

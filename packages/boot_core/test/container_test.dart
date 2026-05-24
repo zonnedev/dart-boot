@@ -424,7 +424,6 @@ void main() {
 
     test('conditional user bean + library fallback', () {
       final deferred = <void Function()>[];
-      final redisEnabled = false; // simulate config
 
       // Library: default
       deferred.add(() {
@@ -433,10 +432,7 @@ void main() {
         }
       });
 
-      // User app: conditional on config
-      if (redisEnabled) {
-        container.register<Service>(_SimpleDef((_) => ServiceC()));
-      }
+      // User app does NOT register any bean (config disabled scenario)
 
       // Evaluate deferred
       for (final d in deferred.reversed) { d(); }
