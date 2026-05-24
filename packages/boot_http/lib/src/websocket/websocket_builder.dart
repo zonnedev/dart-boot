@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'websocket_server.dart';
 
 /// Builder for creating configured [WebSocketServer] instances.

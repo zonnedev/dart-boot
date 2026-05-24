@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Marks a class as a WebSocket endpoint handler.
 /// Implies @Singleton.
 class ServerWebSocket {

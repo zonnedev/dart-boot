@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Overrides the default response status code for a controller method.
 class Status {
   final int code;

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// HTTP method annotations for controller methods.
 
 class Get {

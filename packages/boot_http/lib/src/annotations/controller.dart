@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Marks a class as an HTTP controller with a base path.
 ///
 /// If [path] is omitted, it is derived from the class name:

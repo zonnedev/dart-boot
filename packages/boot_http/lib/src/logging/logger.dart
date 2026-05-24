@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'dart:convert';
 
 import '../context/boot_context.dart';

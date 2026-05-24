@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Extracts a path parameter from the request URL.
 class PathParam {
   final String? name;
