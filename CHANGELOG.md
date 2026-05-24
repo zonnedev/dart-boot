@@ -15,6 +15,48 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_generator` - `v0.1.2+1`](#boot_generator---v0121)
+ - [`boot_security` - `v0.1.1+1`](#boot_security---v0111)
+ - [`boot_security_jwt` - `v0.1.1+1`](#boot_security_jwt---v0111)
+ - [`boot_http` - `v0.1.2+1`](#boot_http---v0121)
+ - [`boot` - `v0.1.1+6`](#boot---v0116)
+ - [`boot_test` - `v0.1.1+6`](#boot_test---v0116)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `boot_http` - `v0.1.2+1`
+ - `boot` - `v0.1.1+6`
+ - `boot_test` - `v0.1.1+6`
+
+---
+
+#### `boot_generator` - `v0.1.2+1`
+
+ - **FIX**: resolve publish warnings and unused declaration. ([15ed3f00](https://github.com/zonnedev/dart-boot/commit/15ed3f000b086a094cb2b224cf7c5f24e6f1b808))
+
+#### `boot_security` - `v0.1.1+1`
+
+ - **FIX**: resolve publish warnings and unused declaration. ([15ed3f00](https://github.com/zonnedev/dart-boot/commit/15ed3f000b086a094cb2b224cf7c5f24e6f1b808))
+
+#### `boot_security_jwt` - `v0.1.1+1`
+
+ - **FIX**: resolve publish warnings and unused declaration. ([15ed3f00](https://github.com/zonnedev/dart-boot/commit/15ed3f000b086a094cb2b224cf7c5f24e6f1b808))
+
+
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_generator` - `v0.1.2`](#boot_generator---v012)
  - [`boot_http` - `v0.1.2`](#boot_http---v012)
  - [`boot_http_common` - `v0.1.2`](#boot_http_common---v012)
