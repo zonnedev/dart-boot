@@ -9,20 +9,13 @@ environment:
 resolution: workspace
 
 dependencies:
-  boot_core:
-    path: ../boot_core
-  boot_aop:
-    path: ../boot_aop
-  boot_events:
-    path: ../boot_events
-  boot_scheduling:
-    path: ../boot_scheduling
-  boot_serialization:
-    path: ../boot_serialization
-  boot_http:
-    path: ../boot_http
-  boot_http_client:
-    path: ../boot_http_client
+  boot_core: ^0.1.0
+  boot_aop: ^0.1.0
+  boot_events: ^0.1.0
+  boot_scheduling: ^0.1.0
+  boot_serialization: ^0.1.0
+  boot_http: ^0.1.0
+  boot_http_client: ^0.1.0
 
 dev_dependencies:
   test: ^1.25.0

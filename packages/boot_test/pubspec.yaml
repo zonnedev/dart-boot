@@ -9,8 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  boot:
-    path: ../boot
+  boot: ^0.1.0
   shelf: ^1.4.0
   test: ^1.25.0
 

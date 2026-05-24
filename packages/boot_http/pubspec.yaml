@@ -6,12 +6,9 @@ environment:
   sdk: ^3.5.0
 resolution: workspace
 dependencies:
-  boot_core:
-    path: ../boot_core
-  boot_aop:
-    path: ../boot_aop
-  boot_http_common:
-    path: ../boot_http_common
+  boot_core: ^0.1.0
+  boot_aop: ^0.1.0
+  boot_http_common: ^0.1.0
   shelf: ^1.4.0
   shelf_router: ^1.1.0
   path: ^1.9.0

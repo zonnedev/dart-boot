@@ -6,8 +6,7 @@ environment:
   sdk: ^3.5.0
 resolution: workspace
 dependencies:
-  boot_core:
-    path: ../boot_core
+  boot_core: ^0.1.0
 
 topics:
   - boot
