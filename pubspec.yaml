@@ -44,6 +44,10 @@ melos:
       exec: dart test
       packageFilters:
         dirExists: test
+    coverage:
+      run: melos exec --concurrency=1 -- "dart pub global run coverage:test_with_coverage" && dart run scripts/coverage_report.dart
+      packageFilters:
+        dirExists: test
     build:
       exec: dart run build_runner build --delete-conflicting-outputs
       packageFilters:

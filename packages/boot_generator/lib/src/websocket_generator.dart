@@ -8,10 +8,6 @@ import 'package:boot_http/boot_http.dart';
 
 
 
-final _onOpenChecker = TypeChecker.fromRuntime(OnOpen);
-final _onMessageChecker = TypeChecker.fromRuntime(OnMessage);
-final _onCloseChecker = TypeChecker.fromRuntime(OnClose);
-final _onErrorChecker = TypeChecker.fromRuntime(OnError);
 final _injectChecker = TypeChecker.fromRuntime(Inject);
 final _namedChecker = TypeChecker.fromRuntime(Named);
 final _valueChecker = TypeChecker.fromRuntime(Value);

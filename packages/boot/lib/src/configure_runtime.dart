@@ -2,7 +2,6 @@ import 'package:boot_core/boot_core.dart';
 import 'package:boot_events/boot_events.dart';
 import 'package:boot_http/boot_http.dart';
 import 'package:boot_http_client/boot_http_client.dart';
-import 'package:boot_scheduling/boot_scheduling.dart';
 
 /// Shared runtime configuration used by both Boot.run and bootTest.
 /// Wires all config-driven features (WebSocket, static files, security, etc.)

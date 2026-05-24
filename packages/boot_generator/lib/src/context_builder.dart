@@ -459,8 +459,7 @@ class ContextBuilder implements Builder {
 
         // Collect import URIs for interface types
         final interfaceImports = element.interfaces
-            .where((i) => i.element.source != null)
-            .map((i) => i.element.source!.uri.toString())
+            .map((i) => i.element.source.uri.toString())
             .toList();
 
         // Merge: explicit typed takes priority, otherwise use auto-detected

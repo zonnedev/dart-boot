@@ -8,7 +8,6 @@ import 'package:boot_core/boot_core.dart';
 
 final _singletonChecker = TypeChecker.fromRuntime(Singleton);
 final _prototypeChecker = TypeChecker.fromRuntime(Prototype);
-final _namedChecker = TypeChecker.fromRuntime(Named);
 
 /// Generates BeanDefinition classes for methods in @Factory classes.
 class FactoryGenerator extends GeneratorForAnnotation<Factory> {

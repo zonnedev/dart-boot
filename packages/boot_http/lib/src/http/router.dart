@@ -16,7 +16,6 @@ import 'package:boot_http_common/boot_http_common.dart';
 import 'package:boot_core/boot_core.dart';
 import '../health/health.dart';
 import '../logging/request_logging_filter.dart';
-import 'package:boot_core/boot_core.dart' show Logger;
 import '../security/security.dart';
 import '../security/security_filter.dart';
 

@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:boot_http/boot_http.dart';
-import 'package:boot_http_common/boot_http_common.dart';
 import 'package:boot_core/boot_core.dart';
 import 'package:boot_events/boot_events.dart';
 import 'package:boot_aop/boot_aop.dart';
@@ -15,7 +14,6 @@ final _namedChecker = TypeChecker.fromRuntime(Named);
 final _valueChecker = TypeChecker.fromRuntime(Value);
 final _eventListenerChecker = TypeChecker.fromRuntime(EventListener);
 final _scheduledChecker = TypeChecker.fromRuntime(Scheduled);
-final _singletonChecker = TypeChecker.fromRuntime(Singleton);
 
 /// Generates BeanDefinition classes for @Singleton annotated classes.
 class BeanGenerator extends GeneratorForAnnotation<Singleton> {
@@ -124,7 +122,7 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
         buf.writeln('  bool get hasPostConstructAsync => true;');
         buf.writeln('  @override');
         buf.writeln('  Future<void> postConstructAsync(dynamic instance) async {');
-        buf.writeln('    await (instance as $className).${postConstruct!.name}();');
+        buf.writeln('    await (instance as $className).${postConstruct.name}();');
         buf.writeln('  }');
       } else {
         // Sync postConstruct (possibly with event listeners and scheduled tasks)

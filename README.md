@@ -143,6 +143,7 @@ All wiring is resolved at compile time. The runtime is a lightweight container t
 
 - Dart SDK 3.5+
 - Melos: `dart pub global activate melos`
+- Coverage (optional): `dart pub global activate coverage`
 
 ### Setup
 
