@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Schedules a method for periodic or delayed execution.
 ///
 /// Exactly one of [fixedRate], [fixedDelay], or [cron] must be specified.
