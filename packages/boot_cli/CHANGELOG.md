@@ -1,3 +1,7 @@
+## 0.1.3+1
+
+ - **FIX**(workspace): use preCommit hook for version.dart sync. ([46309947](https://github.com/jfsanchez/dart-boot/commit/46309947b80724eddb1277b36dbc9b400488958f))
+
 ## 0.1.3
 
  - **FEAT**(boot_cli): add --version flag. ([bc583971](https://github.com/jfsanchez/dart-boot/commit/bc583971f94e068987ae41e24166a8f4b78605f6))

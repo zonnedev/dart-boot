@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_cli` - `v0.1.3+1`](#boot_cli---v0131)
+
+---
+
+#### `boot_cli` - `v0.1.3+1`
+
+ - **FIX**(workspace): use preCommit hook for version.dart sync. ([46309947](https://github.com/jfsanchez/dart-boot/commit/46309947b80724eddb1277b36dbc9b400488958f))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_cli` - `v0.1.3`](#boot_cli---v013)
 
 ---
