@@ -1,7 +1,7 @@
 name: boot_events
 description: Event system for Boot (EventBus, @EventListener).
 repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_events
-version: 0.1.0
+version: 0.1.1
 environment:
   sdk: ^3.5.0
 resolution: workspace

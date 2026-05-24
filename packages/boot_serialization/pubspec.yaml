@@ -1,7 +1,7 @@
 name: boot_serialization
 description: Serialization annotations for Boot (@Serdeable).
 repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_serialization
-version: 0.1.0
+version: 0.1.1
 environment:
   sdk: ^3.5.0
 resolution: workspace
