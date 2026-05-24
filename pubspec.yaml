@@ -26,7 +26,7 @@ melos:
 
   command:
     version:
-      branch: main
+      branch: master
       linkToCommits: true
       workspaceChangelog: true
       includeCommitId: true
