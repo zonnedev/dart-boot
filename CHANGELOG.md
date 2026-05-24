@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_cli` - `v0.1.5`](#boot_cli---v015)
+
+---
+
+#### `boot_cli` - `v0.1.5`
+
+ - **FEAT**(boot_cli): derive SDK constraint from framework's pubspec via version hook. ([aff7e080](https://github.com/jfsanchez/dart-boot/commit/aff7e080b4b679e7523a7bc5d323d58bd0097097))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_cli` - `v0.1.4`](#boot_cli---v014)
 
 ---

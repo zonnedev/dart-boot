@@ -1,3 +1,7 @@
+## 0.1.5
+
+ - **FEAT**(boot_cli): derive SDK constraint from framework's pubspec via version hook. ([aff7e080](https://github.com/jfsanchez/dart-boot/commit/aff7e080b4b679e7523a7bc5d323d58bd0097097))
+
 ## 0.1.4
 
  - **FEAT**(boot_cli): track framework version independently from CLI version. ([bdfb08c1](https://github.com/jfsanchez/dart-boot/commit/bdfb08c1b732413724fe392813f8c12ba07f2254))
