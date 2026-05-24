@@ -15,6 +15,82 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot` - `v0.1.1+4`](#boot---v0114)
+ - [`boot_aop` - `v0.1.1+3`](#boot_aop---v0113)
+ - [`boot_cli` - `v0.1.5+2`](#boot_cli---v0152)
+ - [`boot_core` - `v0.1.2+2`](#boot_core---v0122)
+ - [`boot_events` - `v0.1.1+3`](#boot_events---v0113)
+ - [`boot_generator` - `v0.1.1+4`](#boot_generator---v0114)
+ - [`boot_http` - `v0.1.1+4`](#boot_http---v0114)
+ - [`boot_http_client` - `v0.1.1+4`](#boot_http_client---v0114)
+ - [`boot_http_common` - `v0.1.1+4`](#boot_http_common---v0114)
+ - [`boot_scheduling` - `v0.1.1+3`](#boot_scheduling---v0113)
+ - [`boot_serialization` - `v0.1.1+4`](#boot_serialization---v0114)
+ - [`boot_test` - `v0.1.1+4`](#boot_test---v0114)
+
+---
+
+#### `boot` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_aop` - `v0.1.1+3`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_cli` - `v0.1.5+2`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_core` - `v0.1.2+2`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_events` - `v0.1.1+3`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_generator` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_http` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_http_client` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_http_common` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_scheduling` - `v0.1.1+3`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_serialization` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+#### `boot_test` - `v0.1.1+4`
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot` - `v0.1.1+3`](#boot---v0113)
  - [`boot_aop` - `v0.1.1+2`](#boot_aop---v0112)
  - [`boot_events` - `v0.1.1+2`](#boot_events---v0112)

@@ -1,3 +1,7 @@
+## 0.1.2+2
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
 ## 0.1.2+1
 
  - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))

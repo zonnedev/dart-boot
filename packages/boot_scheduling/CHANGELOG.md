@@ -1,3 +1,7 @@
+## 0.1.1+3
+
+ - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
+
 ## 0.1.1+2
 
  - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
