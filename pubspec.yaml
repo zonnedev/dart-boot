@@ -22,7 +22,7 @@ dev_dependencies:
   melos: ^7.7.0
 
 melos:
-  repository: https://github.com/jfsanchez/dart-boot
+  repository: https://github.com/zonnedev/dart-boot
 
   command:
     version:

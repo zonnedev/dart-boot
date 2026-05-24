@@ -1,6 +1,6 @@
 name: boot_aop
 description: AOP (Aspect-Oriented Programming) support for Boot.
-repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_aop
+repository: https://github.com/zonnedev/dart-boot/tree/main/packages/boot_aop
 version: 0.1.1
 environment:
   sdk: ^3.5.0
