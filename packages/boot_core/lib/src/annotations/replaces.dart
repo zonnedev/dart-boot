@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Declares that this bean replaces another bean.
 ///
 /// The replacement bean must be assignable to the replaced type.

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Marks a package as a Boot library module.
 ///
 /// When the app's build discovers this annotation on a dependency's barrel file,

@@ -85,6 +85,21 @@ void main() {
     container = BeanContainer();
   });
 
+  group('BeanDefinition defaults', () {
+    test('default methods are no-ops', () async {
+      final def = _SimpleDef<ServiceA>((_) => ServiceA());
+      expect(def.hasPostConstruct, isFalse);
+      expect(def.hasPostConstructAsync, isFalse);
+      expect(def.hasPreDestroy, isFalse);
+      expect(def.hasPreDestroyAsync, isFalse);
+      // Call defaults — should not throw
+      def.postConstruct(ServiceA());
+      await def.postConstructAsync(ServiceA());
+      def.preDestroy(ServiceA());
+      await def.preDestroyAsync(ServiceA());
+    });
+  });
+
   group('Basic registration and retrieval', () {
     test('register and get returns the bean', () {
       container.register<ServiceA>(_SimpleDef((_) => ServiceA()));

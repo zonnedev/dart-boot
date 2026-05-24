@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Controls the ordering of beans, interceptors, or filters.
 /// Lower values have higher priority (execute first).
 /// Default is 0.

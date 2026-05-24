@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Called after bean construction and dependency injection.
 class PostConstruct {
   const PostConstruct();

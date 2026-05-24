@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Qualifier that identifies a bean by name.
 ///
 /// If [value] is omitted, it is derived from the class name:

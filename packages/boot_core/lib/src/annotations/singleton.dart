@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Marks a class as a singleton-scoped managed bean (one shared instance).
 /// This is the default and most common scope.
 class Singleton {

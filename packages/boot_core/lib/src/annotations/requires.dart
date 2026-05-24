@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Conditional bean loading. The bean is only registered if all conditions are met.
 ///
 /// Can be applied multiple times (repeatable) — all conditions must pass.

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Marks the application entry point class.
 class BootApplication {
   /// Packages to scan for beans. If empty, auto-discovers all packages

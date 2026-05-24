@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Creates a bean for each sub-property under the given prefix.
 ///
 /// For config like:

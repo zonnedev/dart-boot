@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Injects a configuration value. Supports placeholder syntax: ${key:defaultValue}
 class Value {
   final String value;
