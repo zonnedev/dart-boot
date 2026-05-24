@@ -1,0 +1,11 @@
+boot:
+  env: dev
+  static:
+    enabled: true
+    path: /static
+    directory: public
+    index: index.html
+    cache:
+      max-age: 3600
+      etag: true
+    gzip: true

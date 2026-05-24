@@ -1,0 +1,10 @@
+boot:
+  env: dev
+
+# Database configuration - set pg.host to activate
+# pg:
+#   host: localhost
+#   port: 5432
+#   database: todo_app
+#   username: postgres
+#   password: postgres

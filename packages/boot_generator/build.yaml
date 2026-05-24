@@ -1,0 +1,32 @@
+builders:
+  bean_builder:
+    import: "package:boot_generator/builder.dart"
+    builder_factories: ["beanBuilder"]
+    build_extensions: {".dart": [".boot.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
+
+  controller_builder:
+    import: "package:boot_generator/builder.dart"
+    builder_factories: ["controllerBuilder"]
+    build_extensions: {".dart": [".boot_route.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
+
+  serializable_builder:
+    import: "package:boot_generator/builder.dart"
+    builder_factories: ["serializableBuilder"]
+    build_extensions: {".dart": [".boot_serde.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
+
+  context_builder:
+    import: "package:boot_generator/builder.dart"
+    builder_factories: ["contextBuilder"]
+    build_extensions: {"lib/$lib$": ["lib/src/generated/boot_context.g.dart", "lib/src/generated/boot_module.g.dart"]}
+    auto_apply: dependents
+    build_to: source
+    runs_before: []

@@ -1,0 +1,25 @@
+name: boot
+description: Boot Framework — compile-time DI and HTTP framework for Dart. Umbrella package.
+repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+resolution: workspace
+
+dependencies:
+  boot_core:
+    path: ../boot_core
+  boot_aop:
+    path: ../boot_aop
+  boot_events:
+    path: ../boot_events
+  boot_scheduling:
+    path: ../boot_scheduling
+  boot_serialization:
+    path: ../boot_serialization
+  boot_http:
+    path: ../boot_http
+  boot_http_client:
+    path: ../boot_http_client

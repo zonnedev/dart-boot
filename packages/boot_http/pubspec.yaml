@@ -1,0 +1,17 @@
+name: boot_http
+description: HTTP server for Boot (@Controller, routing, filters).
+repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_http
+version: 0.1.0
+environment:
+  sdk: ^3.5.0
+resolution: workspace
+dependencies:
+  boot_core:
+    path: ../boot_core
+  boot_aop:
+    path: ../boot_aop
+  boot_http_common:
+    path: ../boot_http_common
+  shelf: ^1.4.0
+  shelf_router: ^1.1.0
+  path: ^1.9.0

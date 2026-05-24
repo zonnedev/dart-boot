@@ -1,0 +1,10 @@
+boot:
+  env: dev
+  websocket:
+    enabled: true
+    auth: true
+  security:
+    enabled: true
+    intercept-url-map:
+      - pattern: /auth/**
+        access: [isAnonymous()]

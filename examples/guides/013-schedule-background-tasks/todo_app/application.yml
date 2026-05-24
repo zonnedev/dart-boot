@@ -1,0 +1,56 @@
+# ─── Boot Application Configuration ───────────────────────────────────────────
+# ─── Boot Application Configuration ───────────────────────────────────────────
+# All values shown are defaults. Uncomment and modify as needed.
+
+boot:
+  env: dev                          # Active environment (dev, test, prod)
+  logging:
+    level: info                     # Root log level (trace, debug, info, warn, error)
+    format: text                    # Log format (text, json)
+    # request-logging: true         # Log incoming requests
+    stacktrace:
+      filter:
+        enabled: true               # Set to false to show full unfiltered stack traces
+        max-depth: 10               # Max frames to show after filtering
+        exclude:                    # Hide frames from these packages
+          - dart:
+          - package:shelf/
+          - package:shelf_router/
+        # include:                  # If set, ONLY show frames matching these
+        #   - package:myapp/
+        #   - package:boot_
+  # static:
+  #   enabled: true
+  #   path: /static
+  #   directory: public/
+  #   index: index.html
+  #   cache:
+  #     max-age: 3600
+  # security:
+  #   enabled: false
+  #   intercept-url-map:
+  #     - pattern: /api/**
+  #       access: [isAuthenticated()]
+  #     - pattern: /public/**
+  #       access: [permitAll()]
+  # websocket:
+  #   enabled: false
+  #   auth: false
+
+# ─── HTTP Server ──────────────────────────────────────────────────────────────
+server:
+  host: 0.0.0.0                     # Bind address
+  port: 8080                        # Listen port
+
+# ─── CORS ─────────────────────────────────────────────────────────────────────
+# cors:
+#   enabled: false
+#   allowed-origins:
+#     - http://localhost:3000
+#   allowed-methods: [GET, POST, PUT, DELETE]
+#   allowed-headers: [Content-Type, Authorization]
+#   max-age: 3600
+
+# ─── Custom application properties ───────────────────────────────────────────
+# app:
+#   name: todo_app

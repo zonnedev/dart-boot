@@ -1,0 +1,5 @@
+targets:
+  $default:
+    builders:
+      boot_generator|context_builder:
+        enabled: true

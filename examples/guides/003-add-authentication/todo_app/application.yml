@@ -1,0 +1,9 @@
+boot:
+  env: dev
+  security:
+    enabled: true
+    intercept-url-map:
+      - pattern: /auth/**
+        access: [isAnonymous()]
+      - pattern: /todos/**
+        access: [isAuthenticated()]

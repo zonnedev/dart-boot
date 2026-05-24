@@ -1,0 +1,20 @@
+name: boot_cache
+description: Cache library with mongo-backed token store.
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  boot:
+    path: ../../../../packages/boot
+  boot_token:
+    path: ../boot_token
+
+dev_dependencies:
+  boot_generator:
+    path: ../../../../packages/boot_generator
+  boot_test:
+    path: ../../../../packages/boot_test
+  build_runner: ^2.4.0
+  test: ^1.25.0

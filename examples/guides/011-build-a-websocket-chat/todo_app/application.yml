@@ -1,0 +1,4 @@
+boot:
+  env: dev
+  websocket:
+    enabled: true

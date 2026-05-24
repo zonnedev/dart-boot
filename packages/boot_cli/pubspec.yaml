@@ -1,0 +1,17 @@
+name: boot_cli
+description: CLI tool for the Boot framework.
+repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_cli
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+resolution: workspace
+
+executables:
+  boot: boot
+
+dependencies:
+  args: ^2.7.0
+  path: ^1.9.0
+  io: ^1.0.0
