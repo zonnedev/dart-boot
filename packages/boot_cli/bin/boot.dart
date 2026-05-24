@@ -9,6 +9,7 @@ import 'package:boot_cli/src/commands/doctor_command.dart';
 import 'package:boot_cli/src/commands/routes_command.dart';
 import 'package:boot_cli/src/commands/serve_command.dart';
 import 'package:boot_cli/src/commands/test_command.dart';
+import 'package:boot_cli/src/version.dart';
 
 void main(List<String> args) async {
   final runner = CommandRunner<int>('boot', 'Boot framework CLI')
@@ -20,6 +21,11 @@ void main(List<String> args) async {
     ..addCommand(DoctorCommand())
     ..addCommand(BeansCommand())
     ..addCommand(RoutesCommand());
+
+  if (args.contains('--version') || args.contains('-v')) {
+    print('Boot CLI $version');
+    exit(0);
+  }
 
   try {
     final code = await runner.run(args) ?? 0;

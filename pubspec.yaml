@@ -34,6 +34,8 @@ melos:
         chore(release): publish packages
 
         {new_package_versions}
+      hooks:
+        post: dart run scripts/update_cli_version.dart
 
   scripts:
     analyze:
