@@ -16,7 +16,19 @@ class CreateCommand extends Command<int> {
   String get description => 'Create a new Boot project.';
 }
 
+/// Generates dependency YAML for a given package.
+String _dep(String package, String? gitUrl, String? ref) {
+  if (gitUrl == null) return '  $package: ^0.1.0';
+  final refLine = ref != null ? '\n      ref: $ref' : '';
+  return '  $package:\n    git:\n      url: $gitUrl\n      path: packages/$package$refLine';
+}
+
 class CreateAppCommand extends Command<int> {
+  CreateAppCommand() {
+    argParser.addOption('git', help: 'Git repository URL for Boot packages.');
+    argParser.addOption('ref', help: 'Git ref (branch, tag, or SHA).', defaultsTo: null);
+  }
+
   @override
   String get name => 'app';
 
@@ -24,7 +36,7 @@ class CreateAppCommand extends Command<int> {
   String get description => 'Create a new Boot application.';
 
   @override
-  String get invocation => 'boot create app <name>';
+  String get invocation => 'boot create app <name> [--git <url>] [--ref <ref>]';
 
   @override
   Future<int> run() async {
@@ -34,6 +46,8 @@ class CreateAppCommand extends Command<int> {
     }
 
     final projectName = argResults!.rest.first;
+    final gitUrl = argResults!['git'] as String?;
+    final ref = argResults!['ref'] as String?;
     final dir = Directory(p.join(Directory.current.path, projectName));
 
     if (dir.existsSync()) {
@@ -44,19 +58,23 @@ class CreateAppCommand extends Command<int> {
     print('⚡ Creating Boot app "$projectName"...');
     dir.createSync();
 
+    final bootDep = _dep('boot', gitUrl, ref);
+    final generatorDep = _dep('boot_generator', gitUrl, ref);
+    final testDep = _dep('boot_test', gitUrl, ref);
+
     _write(dir, 'pubspec.yaml', '''
 name: $projectName
 description: A Boot framework application.
 
 environment:
-  sdk: ^3.12.0
+  sdk: ^3.5.0
 
 dependencies:
-  boot: ^0.1.0
+$bootDep
 
 dev_dependencies:
-  boot_generator: ^0.1.0
-  boot_test: ^0.1.0
+$generatorDep
+$testDep
   build_runner: ^2.4.0
   test: ^1.25.0
 ''');
@@ -103,61 +121,14 @@ class HelloController {
 
     _write(dir, 'application.yml', '''
 # ─── Boot Application Configuration ───────────────────────────────────────────
-# ─── Boot Application Configuration ───────────────────────────────────────────
-# All values shown are defaults. Uncomment and modify as needed.
-
 boot:
-  env: dev                          # Active environment (dev, test, prod)
+  env: dev
   logging:
-    level: info                     # Root log level (trace, debug, info, warn, error)
-    format: text                    # Log format (text, json)
-    # request-logging: true         # Log incoming requests
-    stacktrace:
-      filter:
-        enabled: true               # Set to false to show full unfiltered stack traces
-        max-depth: 10               # Max frames to show after filtering
-        exclude:                    # Hide frames from these packages
-          - dart:
-          - package:shelf/
-          - package:shelf_router/
-        # include:                  # If set, ONLY show frames matching these
-        #   - package:myapp/
-        #   - package:boot_
-  # static:
-  #   enabled: true
-  #   path: /static
-  #   directory: public/
-  #   index: index.html
-  #   cache:
-  #     max-age: 3600
-  # security:
-  #   enabled: false
-  #   intercept-url-map:
-  #     - pattern: /api/**
-  #       access: [isAuthenticated()]
-  #     - pattern: /public/**
-  #       access: [permitAll()]
-  # websocket:
-  #   enabled: false
-  #   auth: false
+    level: info
 
-# ─── HTTP Server ──────────────────────────────────────────────────────────────
 server:
-  host: 0.0.0.0                     # Bind address
-  port: 8080                        # Listen port
-
-# ─── CORS ─────────────────────────────────────────────────────────────────────
-# cors:
-#   enabled: false
-#   allowed-origins:
-#     - http://localhost:3000
-#   allowed-methods: [GET, POST, PUT, DELETE]
-#   allowed-headers: [Content-Type, Authorization]
-#   max-age: 3600
-
-# ─── Custom application properties ───────────────────────────────────────────
-# app:
-#   name: $projectName
+  host: 0.0.0.0
+  port: 8080
 ''');
 
     _write(dir, 'test/hello_test.dart', '''
@@ -195,6 +166,11 @@ pubspec.lock
 }
 
 class CreateLibraryCommand extends Command<int> {
+  CreateLibraryCommand() {
+    argParser.addOption('git', help: 'Git repository URL for Boot packages.');
+    argParser.addOption('ref', help: 'Git ref (branch, tag, or SHA).', defaultsTo: null);
+  }
+
   @override
   String get name => 'library';
 
@@ -202,7 +178,7 @@ class CreateLibraryCommand extends Command<int> {
   String get description => 'Create a new Boot library.';
 
   @override
-  String get invocation => 'boot create library <name>';
+  String get invocation => 'boot create library <name> [--git <url>] [--ref <ref>]';
 
   @override
   Future<int> run() async {
@@ -212,6 +188,8 @@ class CreateLibraryCommand extends Command<int> {
     }
 
     final projectName = argResults!.rest.first;
+    final gitUrl = argResults!['git'] as String?;
+    final ref = argResults!['ref'] as String?;
     final dir = Directory(p.join(Directory.current.path, projectName));
 
     if (dir.existsSync()) {
@@ -222,20 +200,24 @@ class CreateLibraryCommand extends Command<int> {
     print('⚡ Creating Boot library "$projectName"...');
     dir.createSync();
 
+    final bootDep = _dep('boot', gitUrl, ref);
+    final generatorDep = _dep('boot_generator', gitUrl, ref);
+    final testDep = _dep('boot_test', gitUrl, ref);
+
     _write(dir, 'pubspec.yaml', '''
 name: $projectName
 description: A Boot framework library.
 version: 0.1.0
 
 environment:
-  sdk: ^3.12.0
+  sdk: ^3.5.0
 
 dependencies:
-  boot: ^0.1.0
+$bootDep
 
 dev_dependencies:
-  boot_generator: ^0.1.0
-  boot_test: ^0.1.0
+$generatorDep
+$testDep
   build_runner: ^2.4.0
   test: ^1.25.0
 ''');
@@ -337,12 +319,8 @@ Commit all `.g.dart` files before publishing.
     print('Next steps:');
     print('  cd $projectName');
     print('  dart pub get');
-    print('  dart run build_runner build --delete-conflicting-outputs');
+    print('  boot build');
     print('  dart test');
-    print('');
-    print('Before publishing:');
-    print('  - Commit all .g.dart files');
-    print('  - Ensure boot_module.g.dart is exported from barrel');
 
     return 0;
   }
