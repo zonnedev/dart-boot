@@ -11,3 +11,9 @@ dependencies:
 
 dev_dependencies:
   test: ^1.25.0
+
+topics:
+  - boot
+  - scheduling
+  - cron
+  - tasks

@@ -8,3 +8,9 @@ resolution: workspace
 dependencies:
   boot_core:
     path: ../boot_core
+
+topics:
+  - boot
+  - serialization
+  - json
+  - codegen

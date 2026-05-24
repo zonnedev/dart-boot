@@ -15,3 +15,9 @@ dependencies:
   args: ^2.7.0
   path: ^1.9.0
   io: ^1.0.0
+
+topics:
+  - boot
+  - cli
+  - developer-tools
+  - codegen

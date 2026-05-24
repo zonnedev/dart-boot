@@ -36,3 +36,9 @@ dev_dependencies:
   build_test: ^2.2.0
   source_gen_test: ^1.0.0
   test: ^1.25.0
+
+topics:
+  - boot
+  - codegen
+  - build-runner
+  - dependency-injection

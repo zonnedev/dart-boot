@@ -13,3 +13,8 @@ dependencies:
     path: ../boot
   shelf: ^1.4.0
   test: ^1.25.0
+
+topics:
+  - boot
+  - testing
+  - server

@@ -1,0 +1,9 @@
+# Development files not needed by consumers
+.dart_tool/
+build/
+coverage/
+test/
+doc/
+example/
+.gitignore
+pubspec_overrides.yaml

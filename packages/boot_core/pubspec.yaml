@@ -10,3 +10,9 @@ dependencies:
 
 dev_dependencies:
   test: ^1.25.0
+
+topics:
+  - boot
+  - dependency-injection
+  - configuration
+  - logging
