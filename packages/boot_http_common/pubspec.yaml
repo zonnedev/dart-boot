@@ -1,7 +1,7 @@
 name: boot_http_common
 description: Shared HTTP primitives for Boot (Request, Response, Filter).
 repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_http_common
-version: 0.1.1
+version: 0.1.1+1
 environment:
   sdk: ^3.5.0
 resolution: workspace

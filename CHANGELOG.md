@@ -15,6 +15,53 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_http` - `v0.1.1+1`](#boot_http---v0111)
+ - [`boot_http_client` - `v0.1.1+1`](#boot_http_client---v0111)
+ - [`boot_http_common` - `v0.1.1+1`](#boot_http_common---v0111)
+ - [`boot_serialization` - `v0.1.1+1`](#boot_serialization---v0111)
+ - [`boot` - `v0.1.1+1`](#boot---v0111)
+ - [`boot_generator` - `v0.1.1+1`](#boot_generator---v0111)
+ - [`boot_test` - `v0.1.1+1`](#boot_test---v0111)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `boot` - `v0.1.1+1`
+ - `boot_generator` - `v0.1.1+1`
+ - `boot_test` - `v0.1.1+1`
+
+---
+
+#### `boot_http` - `v0.1.1+1`
+
+ - **FIX**(boot_http_common): add ClientFilterChain for type-safe client filter chaining. ([4d2af9a6](https://github.com/jfsanchez/dart-boot/commit/4d2af9a6a486f03aaf38dc8b6969273aafe11344))
+
+#### `boot_http_client` - `v0.1.1+1`
+
+ - **FIX**(boot_http_common): add ClientFilterChain for type-safe client filter chaining. ([4d2af9a6](https://github.com/jfsanchez/dart-boot/commit/4d2af9a6a486f03aaf38dc8b6969273aafe11344))
+
+#### `boot_http_common` - `v0.1.1+1`
+
+ - **FIX**(boot_http_common): add ClientFilterChain for type-safe client filter chaining. ([4d2af9a6](https://github.com/jfsanchez/dart-boot/commit/4d2af9a6a486f03aaf38dc8b6969273aafe11344))
+
+#### `boot_serialization` - `v0.1.1+1`
+
+ - **FIX**(boot_http_common): add ClientFilterChain for type-safe client filter chaining. ([4d2af9a6](https://github.com/jfsanchez/dart-boot/commit/4d2af9a6a486f03aaf38dc8b6969273aafe11344))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_cli` - `v0.1.5`](#boot_cli---v015)
 
 ---

@@ -1,7 +1,7 @@
 name: boot_test
 description: Testing utilities for Boot framework applications.
 repository: https://github.com/jfsanchez/dart-boot/tree/main/packages/boot_test
-version: 0.1.1
+version: 0.1.1+1
 
 environment:
   sdk: ^3.5.0
