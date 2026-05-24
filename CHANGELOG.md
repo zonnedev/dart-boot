@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_cli` - `v0.1.3`](#boot_cli---v013)
+
+---
+
+#### `boot_cli` - `v0.1.3`
+
+ - **FEAT**(boot_cli): add --version flag. ([bc583971](https://github.com/jfsanchez/dart-boot/commit/bc583971f94e068987ae41e24166a8f4b78605f6))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_cli` - `v0.1.2`](#boot_cli---v012)
 
 ---

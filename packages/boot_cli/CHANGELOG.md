@@ -1,3 +1,7 @@
+## 0.1.3
+
+ - **FEAT**(boot_cli): add --version flag. ([bc583971](https://github.com/jfsanchez/dart-boot/commit/bc583971f94e068987ae41e24166a8f4b78605f6))
+
 ## 0.1.2
 
  - **FEAT**(boot_cli): add --git and --ref flags to boot create app/library. ([a14eef39](https://github.com/jfsanchez/dart-boot/commit/a14eef39049f2de100a94b00407f9411f7cea53d))
