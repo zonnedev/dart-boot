@@ -1,0 +1,16 @@
+# Dart
+.dart_tool/
+build/
+
+# Melos
+pubspec_overrides.yaml
+
+# Library package locks (consumers resolve their own)
+packages/*/pubspec.lock
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
