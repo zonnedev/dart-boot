@@ -1,3 +1,7 @@
+## 0.1.1+2
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
 ## 0.1.1+1
 
  - Update a dependency to the latest release.

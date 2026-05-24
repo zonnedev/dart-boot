@@ -1,3 +1,7 @@
+## 0.1.5+1
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
 ## 0.1.5
 
  - **FEAT**(boot_cli): derive SDK constraint from framework's pubspec via version hook. ([aff7e080](https://github.com/zonnedev/dart-boot/commit/aff7e080b4b679e7523a7bc5d323d58bd0097097))

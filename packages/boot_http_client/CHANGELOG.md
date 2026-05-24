@@ -1,3 +1,7 @@
+## 0.1.1+2
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
 ## 0.1.1+1
 
  - **FIX**(boot_http_common): add ClientFilterChain for type-safe client filter chaining. ([4d2af9a6](https://github.com/zonnedev/dart-boot/commit/4d2af9a6a486f03aaf38dc8b6969273aafe11344))

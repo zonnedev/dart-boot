@@ -15,6 +15,82 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot` - `v0.1.1+2`](#boot---v0112)
+ - [`boot_aop` - `v0.1.1+1`](#boot_aop---v0111)
+ - [`boot_cli` - `v0.1.5+1`](#boot_cli---v0151)
+ - [`boot_core` - `v0.1.2+1`](#boot_core---v0121)
+ - [`boot_events` - `v0.1.1+1`](#boot_events---v0111)
+ - [`boot_generator` - `v0.1.1+2`](#boot_generator---v0112)
+ - [`boot_http` - `v0.1.1+2`](#boot_http---v0112)
+ - [`boot_http_client` - `v0.1.1+2`](#boot_http_client---v0112)
+ - [`boot_http_common` - `v0.1.1+2`](#boot_http_common---v0112)
+ - [`boot_scheduling` - `v0.1.1+1`](#boot_scheduling---v0111)
+ - [`boot_serialization` - `v0.1.1+2`](#boot_serialization---v0112)
+ - [`boot_test` - `v0.1.1+2`](#boot_test---v0112)
+
+---
+
+#### `boot` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_aop` - `v0.1.1+1`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_cli` - `v0.1.5+1`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_core` - `v0.1.2+1`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_events` - `v0.1.1+1`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_generator` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_http` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_http_client` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_http_common` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_scheduling` - `v0.1.1+1`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_serialization` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+#### `boot_test` - `v0.1.1+2`
+
+ - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_http` - `v0.1.1+1`](#boot_http---v0111)
  - [`boot_http_client` - `v0.1.1+1`](#boot_http_client---v0111)
  - [`boot_http_common` - `v0.1.1+1`](#boot_http_common---v0111)
