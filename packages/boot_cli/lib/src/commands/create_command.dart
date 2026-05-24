@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
+import '../version.dart' as cli;
+
 class CreateCommand extends Command<int> {
   CreateCommand() {
     addSubcommand(CreateAppCommand());
@@ -18,7 +20,10 @@ class CreateCommand extends Command<int> {
 
 /// Generates dependency YAML for a given package.
 String _dep(String package, String? gitUrl, String? ref) {
-  if (gitUrl == null) return '  $package: ^0.1.0';
+  if (gitUrl == null) {
+    final parts = cli.frameworkVersion.split('+').first.split('.');
+    return '  $package: ^${parts[0]}.${parts[1]}.0';
+  }
   final refLine = ref != null ? '\n      ref: $ref' : '';
   return '  $package:\n    git:\n      url: $gitUrl\n      path: packages/$package$refLine';
 }

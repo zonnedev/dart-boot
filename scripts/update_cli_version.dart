@@ -2,17 +2,22 @@
 import 'dart:io';
 import 'package:yaml/yaml.dart';
 
-/// Reads boot_cli's pubspec.yaml version and writes it to version.dart.
+/// Reads versions from pubspecs and writes them to version.dart.
 void main() {
-  final pubspec = File('packages/boot_cli/pubspec.yaml').readAsStringSync();
-  final yaml = loadYaml(pubspec) as YamlMap;
-  final version = yaml['version'] as String;
+  final cliPubspec = File('packages/boot_cli/pubspec.yaml').readAsStringSync();
+  final cliVersion = (loadYaml(cliPubspec) as YamlMap)['version'] as String;
+
+  final bootPubspec = File('packages/boot/pubspec.yaml').readAsStringSync();
+  final frameworkVersion = (loadYaml(bootPubspec) as YamlMap)['version'] as String;
 
   File('packages/boot_cli/lib/src/version.dart').writeAsStringSync(
-    "/// Package version. Updated by melos version.\nconst String version = '$version';\n",
+    "/// CLI version. Updated by melos version.\n"
+    "const String version = '$cliVersion';\n"
+    "\n"
+    "/// Framework packages version. Updated by melos version hook.\n"
+    "const String frameworkVersion = '$frameworkVersion';\n",
   );
 
-  // Stage the updated file
   Process.runSync('git', ['add', 'packages/boot_cli/lib/src/version.dart']);
-  print('Updated boot_cli version.dart to $version');
+  print('Updated boot_cli: version=$cliVersion, frameworkVersion=$frameworkVersion');
 }
