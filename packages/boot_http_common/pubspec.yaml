@@ -9,3 +9,6 @@ dependencies:
   boot_core:
     path: ../boot_core
   shelf: ^1.4.0
+
+dev_dependencies:
+  test: ^1.25.0
