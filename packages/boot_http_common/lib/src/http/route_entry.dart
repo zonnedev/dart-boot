@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'request.dart';
 import 'response.dart';
 

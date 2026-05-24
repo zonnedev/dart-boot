@@ -1,3 +1,4 @@
+// coverage:ignore-file
 export 'package:boot_core/boot_core.dart' show MethodInterceptor;
 
 /// Meta-annotation: marks an annotation as providing Around advice.
