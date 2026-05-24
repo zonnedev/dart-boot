@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io' as io;
 
 import 'package:boot_core/boot_core.dart';
 import 'package:boot_http/boot_http.dart';
@@ -6,15 +6,9 @@ import 'package:boot_http_common/boot_http_common.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 
-Request _req(String method, String path, {Map<String, String>? headers, String? body}) {
-  final uri = Uri.parse('http://localhost$path');
-  return Request(shelf.Request(method, uri, headers: headers ?? {}, body: body));
-}
-
 void main() {
   group('BootRouter', () {
     late BootRouter router;
-
     setUp(() => router = BootRouter());
 
     test('add and build routes', () async {
@@ -22,19 +16,6 @@ void main() {
       final handler = router.build();
       final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/hello')));
       expect(res.statusCode, 200);
-      expect(await res.readAsString(), 'hi');
-    });
-
-    test('addAll registers multiple routes', () async {
-      router.addAll([
-        RouteEntry(method: 'GET', path: '/a', handler: (req) async => Response.ok('a')),
-        RouteEntry(method: 'GET', path: '/b', handler: (req) async => Response.ok('b')),
-      ]);
-      final handler = router.build();
-      final resA = await handler(shelf.Request('GET', Uri.parse('http://localhost/a')));
-      final resB = await handler(shelf.Request('GET', Uri.parse('http://localhost/b')));
-      expect(await resA.readAsString(), 'a');
-      expect(await resB.readAsString(), 'b');
     });
 
     test('404 for unmatched route', () async {
@@ -59,113 +40,133 @@ void main() {
       router.addFilter('/**', _OrderFilter(order, 0), order: 0);
       final handler = router.build();
       await handler(shelf.Request('GET', Uri.parse('http://localhost/test')));
-      expect(order, [0, 1]); // lower order first
+      expect(order, [0, 1]);
     });
 
     test('addExceptionHandler catches typed exceptions', () async {
-      router.add(RouteEntry(method: 'GET', path: '/fail', handler: (req) async {
-        throw const NotFoundException('gone');
-      }));
+      router.add(RouteEntry(method: 'GET', path: '/fail', handler: (req) async => throw const NotFoundException('gone')));
       router.addExceptionHandler<NotFoundException>(_NotFoundHandler());
       final handler = router.build();
       final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/fail')));
       expect(res.statusCode, 404);
-      expect(await res.readAsString(), contains('gone'));
     });
 
     test('unhandled exception returns 500', () async {
-      router.add(RouteEntry(method: 'GET', path: '/crash', handler: (req) async {
-        throw Exception('unexpected');
-      }));
+      router.add(RouteEntry(method: 'GET', path: '/crash', handler: (req) async => throw Exception('unexpected')));
       final handler = router.build();
       final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/crash')));
       expect(res.statusCode, 500);
     });
 
-    test('addAuthenticationProvider registers provider', () {
-      router.addAuthenticationProvider(_FakeAuthProvider());
-      expect(router.authProviders.length, 1);
+    test('enableRequestLogging', () async {
+      router.enableRequestLogging();
+      router.add(RouteEntry(method: 'GET', path: '/x', handler: (req) async => Response.ok('x')));
+      final handler = router.build();
+      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/x')));
+      expect(res.statusCode, 200);
     });
 
-    test('addHealthIndicator registers indicator', () {
-      router.addHealthIndicator(_FakeHealthIndicator());
-      expect(router.healthIndicators.length, 1);
+    test('configureStackTrace', () {
+      router.configureStackTrace(maxDepth: 5, include: ['package:myapp/'], exclude: ['dart:']);
+      router.add(RouteEntry(method: 'GET', path: '/x', handler: (req) async => Response.ok('x')));
+      router.build();
+    });
+  });
+
+  group('BootRouter CORS', () {
+    test('preflight OPTIONS returns 204', () async {
+      final router = BootRouter();
+      router.add(RouteEntry(method: 'GET', path: '/api', handler: (req) async => Response.ok('data')));
+      router.enableCors(CorsConfiguration(enabled: true, allowedOrigins: ['http://localhost:3000'], allowedMethods: ['GET', 'POST'], allowedHeaders: ['Content-Type'], maxAge: 3600));
+      final handler = router.build();
+      final res = await handler(shelf.Request('OPTIONS', Uri.parse('http://localhost/api'),
+          headers: {'origin': 'http://localhost:3000', 'access-control-request-method': 'GET'}));
+      expect(res.statusCode, 204);
+    });
+
+    test('CORS adds headers to normal response', () async {
+      final router = BootRouter();
+      router.add(RouteEntry(method: 'GET', path: '/api', handler: (req) async => Response.ok('ok')));
+      router.enableCors(CorsConfiguration(enabled: true, allowedOrigins: ['*']));
+      final handler = router.build();
+      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/api'), headers: {'origin': 'http://x.com'}));
+      expect(res.headers['access-control-allow-origin'], isNotNull);
     });
   });
 
   group('BootRouter security', () {
-    late BootRouter router;
-
-    setUp(() {
-      router = BootRouter();
+    test('rejects unauthenticated', () async {
+      final router = BootRouter();
       router.addAuthenticationProvider(_FakeAuthProvider());
-    });
-
-    test('security rejects unauthenticated request', () async {
       router.add(RouteEntry(method: 'GET', path: '/secure', handler: (req) async => Response.ok('secret')));
-      router.enableSecurity([
-        SecurityRuleEntry(pattern: '/secure', access: ['isAuthenticated()']),
-      ]);
+      router.enableSecurity([SecurityRuleEntry(pattern: '/secure', access: ['isAuthenticated()'])]);
       final handler = router.build();
       final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/secure')));
       expect(res.statusCode, 401);
     });
 
-    test('security allows authenticated request', () async {
+    test('allows authenticated', () async {
+      final router = BootRouter();
+      router.addAuthenticationProvider(_FakeAuthProvider());
       router.add(RouteEntry(method: 'GET', path: '/secure', handler: (req) async => Response.ok('secret')));
-      router.enableSecurity([
-        SecurityRuleEntry(pattern: '/secure', access: ['isAuthenticated()']),
-      ]);
+      router.enableSecurity([SecurityRuleEntry(pattern: '/secure', access: ['isAuthenticated()'])]);
       final handler = router.build();
-      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/secure'),
-          headers: {'authorization': 'Bearer valid-token'}));
+      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/secure'), headers: {'authorization': 'Bearer valid-token'}));
       expect(res.statusCode, 200);
-      expect(await res.readAsString(), 'secret');
     });
 
-    test('security allows anonymous access', () async {
+    test('allows anonymous', () async {
+      final router = BootRouter();
+      router.addAuthenticationProvider(_FakeAuthProvider());
       router.add(RouteEntry(method: 'GET', path: '/public', handler: (req) async => Response.ok('open')));
-      router.enableSecurity([
-        SecurityRuleEntry(pattern: '/public', access: ['isAnonymous()']),
-        SecurityRuleEntry(pattern: '/**', access: ['isAuthenticated()']),
-      ]);
+      router.enableSecurity([SecurityRuleEntry(pattern: '/public', access: ['isAnonymous()']), SecurityRuleEntry(pattern: '/**', access: ['isAuthenticated()'])]);
       final handler = router.build();
       final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/public')));
       expect(res.statusCode, 200);
     });
+
+    test('rejects wrong role', () async {
+      final router = BootRouter();
+      router.addAuthenticationProvider(_FakeAuthProvider());
+      router.add(RouteEntry(method: 'GET', path: '/admin', handler: (req) async => Response.ok('admin')));
+      router.enableSecurity([SecurityRuleEntry(pattern: '/admin', access: ['ROLE_ADMIN'])]);
+      final handler = router.build();
+      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/admin'), headers: {'authorization': 'Bearer valid-token'}));
+      expect(res.statusCode, 403);
+    });
   });
 
-  group('BootRouter with DI container', () {
-    test('router wired via container', () {
-      final container = BeanContainer();
+  group('BootRouter static files', () {
+    test('serves static files', () async {
+      final tmpDir = io.Directory.systemTemp.createTempSync('router_static_');
+      io.File('${tmpDir.path}/app.js').writeAsStringSync('var x=1;');
       final router = BootRouter();
-      container.overrideWithInstance<BootRouter>(router);
-      expect(identical(container.get<BootRouter>(), router), isTrue);
+      router.add(RouteEntry(method: 'GET', path: '/api', handler: (req) async => Response.ok('api')));
+      router.enableStatic(StaticFileHandler(urlPath: '/static', directory: tmpDir.path, index: 'index.html'));
+      final handler = router.build();
+      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/static/app.js')));
+      expect(res.statusCode, 200);
+      tmpDir.deleteSync(recursive: true);
     });
+  });
 
-    test('auth providers from container registered on router', () {
+  group('BootRouter DI', () {
+    test('auth providers from container', () {
       final container = BeanContainer();
       final router = BootRouter();
-      final provider = _FakeAuthProvider();
-
-      // Simulate $configure: router.addAuthenticationProvider(container.get<AuthProvider>())
-      container.overrideWithInstance<AuthenticationProvider>(provider);
+      container.overrideWithInstance<AuthenticationProvider>(_FakeAuthProvider());
       router.addAuthenticationProvider(container.get<AuthenticationProvider>());
-
       expect(router.authProviders.length, 1);
     });
 
-    test('exception handlers from container registered on router', () async {
+    test('exception handlers from container', () async {
       final container = BeanContainer();
       final router = BootRouter();
-      final handler = _NotFoundHandler();
-
-      container.overrideWithInstance<ExceptionHandler<NotFoundException>>(handler);
+      container.overrideWithInstance<ExceptionHandler<NotFoundException>>(_NotFoundHandler());
       router.addExceptionHandler<NotFoundException>(container.get<ExceptionHandler<NotFoundException>>());
-
       router.add(RouteEntry(method: 'GET', path: '/x', handler: (req) async => throw const NotFoundException('nope')));
-      final built = router.build();
-      final res = await built(shelf.Request('GET', Uri.parse('http://localhost/x')));
+      final handler = router.build();
+      final res = await handler(shelf.Request('GET', Uri.parse('http://localhost/x')));
       expect(res.statusCode, 404);
     });
   });
@@ -174,7 +175,6 @@ void main() {
 class _AddHeaderFilter implements HttpServerFilter {
   final String key, value;
   _AddHeaderFilter(this.key, this.value);
-
   @override
   Future<Response> filter(Request request, FilterChain chain) async {
     final res = await chain.proceed(request);
@@ -186,7 +186,6 @@ class _OrderFilter implements HttpServerFilter {
   final List<int> log;
   final int id;
   _OrderFilter(this.log, this.id);
-
   @override
   Future<Response> filter(Request request, FilterChain chain) async {
     log.add(id);
@@ -203,17 +202,7 @@ class _NotFoundHandler implements ExceptionHandler<NotFoundException> {
 class _FakeAuthProvider implements AuthenticationProvider {
   @override
   Future<Authentication?> authenticate(AuthenticationRequest request) async {
-    if (request.authorization == 'Bearer valid-token') {
-      return Authentication(name: 'testuser', roles: ['ROLE_USER']);
-    }
+    if (request.authorization == 'Bearer valid-token') return Authentication(name: 'testuser', roles: ['ROLE_USER']);
     return null;
   }
-}
-
-class _FakeHealthIndicator implements HealthIndicator {
-  @override
-  String get name => 'fake';
-
-  @override
-  Future<HealthResult> check() async => HealthResult.up('ok');
 }

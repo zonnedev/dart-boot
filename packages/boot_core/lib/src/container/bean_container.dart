@@ -149,7 +149,7 @@ class BeanContainer {
   }
 
   /// Check if a bean type is registered.
-  bool has<T>() => _definitions.containsKey(T) && _definitions[T]!.isNotEmpty;
+  bool has<T>() => _singletons.containsKey(T) || (_definitions.containsKey(T) && _definitions[T]!.isNotEmpty);
 
   bool hasNamed<T>(String name) => _namedDefinitions.containsKey(name);
 
