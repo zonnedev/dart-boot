@@ -7,7 +7,6 @@ import 'package:source_gen/source_gen.dart';
 import 'package:yaml/yaml.dart';
 import 'package:boot_core/boot_core.dart';
 
-import 'package:boot_http_client/boot_http_client.dart' as client_ann;
 import 'package:boot_http/boot_http.dart';
 import 'package:boot_events/boot_events.dart';
 import 'package:boot_scheduling/boot_scheduling.dart';
@@ -26,7 +25,7 @@ class ContextBuilder implements Builder {
 
   // Type checkers (initialized once, used across scans)
   final _singletonChecker = TypeChecker.fromRuntime(Singleton);
-  final _clientChecker = TypeChecker.fromRuntime(client_ann.Client);
+  final _beanSourceChecker = TypeChecker.fromRuntime(BeanSource);
   final _clientFilterChecker = TypeChecker.fromRuntime(ClientFilter);
   final _controllerChecker = TypeChecker.fromRuntime(Controller);
   final _serverWebSocketChecker = TypeChecker.fromRuntime(ServerWebSocket);
@@ -631,8 +630,8 @@ class ContextBuilder implements Builder {
         serverFilterMeta.add(_ServerFilterMeta(className: element.name, import: importUri, order: order, pattern: pattern));
       }
 
-      // @Client interfaces
-      if (_clientChecker.hasAnnotationOf(element)) {
+      // Beans from @BeanSource meta-annotated annotations (e.g., @Client)
+      if (_hasBeanSourceAnnotation(element)) {
         beanMeta.add(_BeanMeta(
           className: element.name,
           definitionClass: '\$${element.name}Definition',
@@ -1264,6 +1263,20 @@ $eventListenerRegistrations
 $scheduledRegistrations
 }
 ''';
+  }
+
+  /// Checks if an element has an annotation that is itself meta-annotated with @BeanSource.
+  bool _hasBeanSourceAnnotation(ClassElement element) {
+    for (final annotation in element.metadata) {
+      final annotationType = annotation.element;
+      if (annotationType == null) continue;
+      final enclosing = annotationType.enclosingElement3;
+      if (enclosing == null) continue;
+      if (enclosing is ClassElement) {
+        if (_beanSourceChecker.hasAnnotationOf(enclosing)) return true;
+      }
+    }
+    return false;
   }
 }
 

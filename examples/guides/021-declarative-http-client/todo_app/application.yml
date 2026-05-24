@@ -1,0 +1,6 @@
+boot:
+  env: dev
+  http:
+    services:
+      jsonplaceholder:
+        url: https://jsonplaceholder.typicode.com

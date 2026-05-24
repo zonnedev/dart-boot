@@ -6,6 +6,7 @@ import 'method_interceptor.dart';
 class BeanContainer {
   final _definitions = <Type, List<BeanDefinition>>{};
   final _namedDefinitions = <String, BeanDefinition>{};
+  final _namedTypes = <String, Type>{};
   final _singletons = <Type, Object>{};
   final _namedSingletons = <String, Object>{};
   final _allSingletons = <BeanDefinition, Object>{};
@@ -31,6 +32,7 @@ class BeanContainer {
   /// Register a named bean definition.
   void registerNamed<T>(String name, BeanDefinition definition) {
     _namedDefinitions[name] = definition;
+    _namedTypes[name] = T;
     // Also register by type for getAll<T>()
     _definitions.putIfAbsent(T, () => []).add(definition);
   }
@@ -151,7 +153,8 @@ class BeanContainer {
   /// Check if a bean type is registered.
   bool has<T>() => _singletons.containsKey(T) || (_definitions.containsKey(T) && _definitions[T]!.isNotEmpty);
 
-  bool hasNamed<T>(String name) => _namedDefinitions.containsKey(name);
+  bool hasNamed<T>(String name) =>
+      _namedDefinitions.containsKey(name) && _namedTypes[name] == T;
 
   /// Check if a library module has been loaded (per-container, test-safe).
   bool hasModule(String name) => _loadedModules.contains(name);

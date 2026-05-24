@@ -1,0 +1,24 @@
+name: boot_http_client_generator
+description: Code generator for Boot HTTP client (@Client annotation).
+repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_http_client_generator
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+resolution: workspace
+
+dependencies:
+  boot_core: ^0.1.0
+  boot_http: ^0.1.0
+  boot_http_common: ^0.1.0
+  boot_http_client: ^0.1.0
+  analyzer: ^7.0.0
+  build: ^2.4.0
+  source_gen: ^2.0.0
+
+topics:
+  - boot
+  - codegen
+  - http-client
+  - build-runner

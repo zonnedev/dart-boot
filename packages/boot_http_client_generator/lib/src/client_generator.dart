@@ -215,7 +215,15 @@ class \$${className}Definition extends BeanDefinition {
     } else if (innerType.isDartCoreMap) {
       responseHandling = '    return response.json;';
     } else if (innerType.isDartCoreList) {
-      responseHandling = '    return response.jsonList;';
+      // Get the list's type argument for proper casting
+      final listTypeArg = (innerType is InterfaceType && innerType.typeArguments.isNotEmpty)
+          ? innerType.typeArguments.first.getDisplayString()
+          : 'dynamic';
+      if (listTypeArg == 'dynamic' || listTypeArg == 'Map<String, dynamic>') {
+        responseHandling = '    return List<Map<String, dynamic>>.from(response.jsonList);';
+      } else {
+        responseHandling = '    return response.jsonList.map((e) => \$${listTypeArg}FromJson(e as Map<String, dynamic>)).toList();';
+      }
     } else {
       // POJO — validate it has @Serdeable or @Deserializable
       final typeName = innerType.getDisplayString();

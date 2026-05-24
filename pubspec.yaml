@@ -19,6 +19,7 @@ workspace:
   - packages/boot_cli
   - packages/boot_security
   - packages/boot_security_jwt
+  - packages/boot_http_client_generator
 
 dev_dependencies:
   melos: ^7.7.0

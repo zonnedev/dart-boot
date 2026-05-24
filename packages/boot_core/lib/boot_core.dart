@@ -32,3 +32,4 @@ export 'src/logging/logger.dart';
 
 // Context (tracing)
 export 'src/context/boot_context.dart';
+export 'src/annotations/bean_source.dart';

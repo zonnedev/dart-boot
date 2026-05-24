@@ -1,4 +1,6 @@
 // coverage:ignore-file
+import 'package:boot_core/boot_core.dart';
+
 /// Declares a compile-time generated HTTP client from an interface.
 ///
 /// Use either a URL or a name (service ID), not both:
@@ -7,6 +9,7 @@
 ///
 /// The generator produces an implementation that makes real HTTP calls
 /// based on the route annotations (@Get, @Post, etc.) on the interface methods.
+@BeanSource()
 class Client {
   /// The base URL (mutually exclusive with [name]).
   final String? url;
