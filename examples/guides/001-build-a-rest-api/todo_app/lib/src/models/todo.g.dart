@@ -8,20 +8,20 @@ part of 'todo.dart';
 
 extension $TodoSerialization on Todo {
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'id': id,
-    'title': title,
-    'completed': completed,
-  };
+        'id': id,
+        'title': title,
+        'completed': completed,
+      };
 }
 
 Map<String, dynamic> $TodoToJson(Todo instance) => <String, dynamic>{
-  'id': instance.id,
-  'title': instance.title,
-  'completed': instance.completed,
-};
+      'id': instance.id,
+      'title': instance.title,
+      'completed': instance.completed,
+    };
 
 Todo $TodoFromJson(Map<String, dynamic> json) => Todo(
-  id: json['id'] as String,
-  title: json['title'] as String,
-  completed: json['completed'] as bool,
-);
+      id: json['id'] as String,
+      title: json['title'] as String,
+      completed: json['completed'] as bool,
+    );

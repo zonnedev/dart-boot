@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Declares a compile-time generated HTTP client from an interface.
 ///
 /// Use either a URL or a name (service ID), not both:

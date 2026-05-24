@@ -13,3 +13,6 @@ dependencies:
   boot_http_common:
     path: ../boot_http_common
   http: ^1.0.0
+
+dev_dependencies:
+  test: ^1.25.0

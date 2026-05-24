@@ -129,7 +129,11 @@ class HttpClient {
 
     ClientResponse result;
     if (_filters.isNotEmpty) {
-      final chain = _HttpClientFilterChain(_filters, _doSend);
+      final chain = ClientFilterChain(_filters, (req) async {
+        final clientResponse = await _doSend(req);
+        return Response(clientResponse.statusCode,
+            headers: clientResponse.headers, body: clientResponse.body);
+      });
       final response = await chain.proceed(request);
       result = ClientResponse(
         statusCode: response.statusCode,
@@ -205,24 +209,4 @@ class ClientResponse {
   Map<String, dynamic> get json => jsonDecode(body) as Map<String, dynamic>;
   List<dynamic> get jsonList => jsonDecode(body) as List<dynamic>;
   bool get isSuccess => statusCode >= 200 && statusCode < 300;
-}
-
-/// Client filter chain implementation.
-class _HttpClientFilterChain implements FilterChain {
-  final List<HttpClientFilter> _filters;
-  final Future<ClientResponse> Function(MutableRequest) _sender;
-  int _index = 0;
-
-  _HttpClientFilterChain(this._filters, this._sender);
-
-  @override
-  Future<Response> proceed(dynamic request) async {
-    if (_index >= _filters.length) {
-      final clientResponse = await _sender(request as MutableRequest);
-      return Response(clientResponse.statusCode,
-          headers: clientResponse.headers, body: clientResponse.body);
-    }
-    final filter = _filters[_index++];
-    return filter.filter(request as MutableRequest, this);
-  }
 }

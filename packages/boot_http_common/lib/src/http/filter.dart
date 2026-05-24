@@ -29,7 +29,7 @@ abstract class HttpServerFilter {
 
 /// Client-side filter interface.
 abstract class HttpClientFilter {
-  Future<Response> filter(MutableRequest request, FilterChain chain);
+  Future<Response> filter(MutableRequest request, ClientFilterChain chain);
 }
 
 /// Filter chain — call proceed() to invoke the next filter or the handler.
@@ -43,6 +43,23 @@ class FilterChain {
   Future<Response> proceed(Request request) async {
     if (_index >= _filters.length) {
       return _handler(request);
+    }
+    final filter = _filters[_index++];
+    return filter.filter(request, this);
+  }
+}
+
+/// Filter chain for client-side filters.
+class ClientFilterChain {
+  final List<HttpClientFilter> _filters;
+  final Future<Response> Function(MutableRequest) _sender;
+  int _index = 0;
+
+  ClientFilterChain(this._filters, this._sender);
+
+  Future<Response> proceed(MutableRequest request) async {
+    if (_index >= _filters.length) {
+      return _sender(request);
     }
     final filter = _filters[_index++];
     return filter.filter(request, this);

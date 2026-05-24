@@ -184,7 +184,7 @@ class AuthFilter implements HttpClientFilter {
   AuthFilter(this._tokens);
 
   @override
-  Future<Response> filter(MutableRequest request, FilterChain chain) async {
+  Future<Response> filter(MutableRequest request, ClientFilterChain chain) async {
     request.headers['Authorization'] = 'Bearer ${_tokens.current}';
     return chain.proceed(request);
   }
