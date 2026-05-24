@@ -477,4 +477,294 @@ void main() {
       expect(bean.service.name, 'B'); // got the override
     });
   });
+
+  group('Complex real-world scenarios', () {
+    // Simulate: Controller → Service → Repository → Database
+    test('deep dependency chain resolves correctly', () {
+      container.register<ServiceA>(_SimpleDef((_) => ServiceA())); // "Database"
+      container.register<ServiceB>(_SimpleDef((c) {
+        c.get<ServiceA>(); // depends on "Database"
+        return ServiceB();
+      })); // "Repository"
+      container.register<ServiceC>(_SimpleDef((c) {
+        c.get<ServiceB>(); // depends on "Repository"
+        return ServiceC();
+      })); // "Service"
+      container.register<DependsOnService>(_SimpleDef((c) => DependsOnService(c.get<Service>())));
+      container.registerPrimary<Service>(_SimpleDef((c) {
+        c.get<ServiceC>(); // depends on "Service"
+        return ServiceC();
+      })); // "Controller"
+
+      final bean = container.get<DependsOnService>();
+      expect(bean.service.name, 'C');
+    });
+
+    test('multiple interfaces on same bean (registered under both)', () {
+      // A bean implements both Service and Disposable
+      container.register<Service>(_SimpleDef((_) => ServiceA()));
+      container.register<ServiceA>(_SimpleDef((_) => ServiceA()));
+
+      expect(container.get<Service>().name, 'A');
+      expect(container.get<ServiceA>().name, 'A');
+    });
+
+    test('override deep dependency affects entire chain', () {
+      // Override the "database" layer, everything above uses the fake
+      container.overrideWithInstance<ServiceA>(ServiceA()); // fake DB
+
+      container.register<DependsOnService>(_SimpleDef((c) {
+        return DependsOnService(c.get<ServiceA>());
+      }));
+
+      final bean = container.get<DependsOnService>();
+      expect(bean.service, isA<ServiceA>());
+    });
+
+    test('getAll with mix of primary, named, and plain registrations', () {
+      container.register<Service>(_SimpleDef((_) => ServiceA()));
+      container.registerNamed<Service>('sms', _SimpleDef((_) => ServiceB()));
+      container.registerPrimary<Service>(_SimpleDef((_) => ServiceC()));
+
+      final all = container.getAll<Service>();
+      expect(all.length, 3);
+      expect(all.map((s) => s.name).toSet(), {'A', 'B', 'C'});
+
+      // get<Service>() returns primary
+      expect(container.get<Service>().name, 'C');
+      // getNamed returns specific
+      expect(container.getNamed<Service>('sms').name, 'B');
+    });
+
+    test('replace after getAll invalidates cache', () {
+      container.register<Service>(_SimpleDef((_) => ServiceA()));
+      container.getAll<Service>(); // cache it
+
+      container.replace<Service>(_SimpleDef((_) => ServiceB()));
+      // Note: getAll uses _allSingletons keyed by definition, new def = new entry
+      final all = container.getAll<Service>();
+      expect(all.length, 1);
+      expect(all.first.name, 'B');
+    });
+
+    test('multiple overrides — last one wins', () {
+      container.overrideWithInstance<Service>(ServiceA());
+      container.overrideWithInstance<Service>(ServiceB());
+      container.overrideWithInstance<Service>(ServiceC());
+      expect(container.get<Service>().name, 'C');
+    });
+
+    test('shutdown calls @PreDestroy in reverse order', () async {
+      final order = <String>[];
+
+      container.register<ServiceA>(_PreDestroyDef(
+        (_) => ServiceA(),
+        (_) => order.add('A'),
+      ));
+      container.register<ServiceB>(_PreDestroyDef(
+        (_) => ServiceB(),
+        (_) => order.add('B'),
+      ));
+
+      container.get<ServiceA>();
+      container.get<ServiceB>();
+      await container.shutdown();
+
+      expect(order, ['B', 'A']); // reverse creation order
+    });
+
+    test('prototype with @PostConstruct runs every time', () {
+      var count = 0;
+      container.registerPrototype<ServiceA>(_PostConstructDef(
+        (_) => ServiceA(),
+        (_) => count++,
+      ));
+
+      container.get<ServiceA>();
+      container.get<ServiceA>();
+      container.get<ServiceA>();
+      expect(count, 3);
+    });
+
+    test('concurrent module loading (diamond dependency)', () {
+      // App → LibA → LibC
+      // App → LibB → LibC
+      // LibC should only load once
+
+      void libC(BeanContainer c) {
+        if (c.hasModule('libC')) return;
+        c.markModule('libC');
+        c.register<ServiceA>(_SimpleDef((_) => ServiceA()));
+      }
+
+      void libA(BeanContainer c) {
+        if (c.hasModule('libA')) return;
+        c.markModule('libA');
+        libC(c); // depends on C
+        c.register<ServiceB>(_SimpleDef((_) => ServiceB()));
+      }
+
+      void libB(BeanContainer c) {
+        if (c.hasModule('libB')) return;
+        c.markModule('libB');
+        libC(c); // also depends on C
+        c.register<ServiceC>(_SimpleDef((_) => ServiceC()));
+      }
+
+      // App loads both
+      libA(container);
+      libB(container);
+
+      // ServiceA registered only once (from libC)
+      expect(container.getAll<ServiceA>().length, 1);
+      expect(container.has<ServiceB>(), isTrue);
+      expect(container.has<ServiceC>(), isTrue);
+    });
+
+    test('deferred beans with property + missingBeans combined condition', () {
+      final deferred = <void Function()>[];
+      final config = {'mongo.enabled': 'true', 'redis.enabled': 'false'};
+
+      // Library 2: unconditional default
+      deferred.add(() {
+        if (!container.has<Service>()) {
+          container.register<Service>(_SimpleDef((_) => ServiceA())); // in-memory
+        }
+      });
+
+      // Library 1: conditional on mongo + missingBeans
+      deferred.add(() {
+        if (config['mongo.enabled'] == 'true' && !container.has<Service>()) {
+          container.register<Service>(_SimpleDef((_) => ServiceB())); // mongo
+        }
+      });
+
+      // User app: conditional on redis
+      if (config['redis.enabled'] == 'true') {
+        container.register<Service>(_SimpleDef((_) => ServiceC())); // redis
+      }
+
+      // Evaluate LIFO
+      for (final d in deferred.reversed) { d(); }
+
+      // mongo wins (redis disabled, mongo enabled, lib1 > lib2)
+      expect(container.get<Service>().name, 'B');
+    });
+
+    test('deferred beans — all conditions false, last resort wins', () {
+      final deferred = <void Function()>[];
+      final config = {'mongo.enabled': 'false', 'redis.enabled': 'false'};
+
+      // Library 2: unconditional default
+      deferred.add(() {
+        if (!container.has<Service>()) {
+          container.register<Service>(_SimpleDef((_) => ServiceA()));
+        }
+      });
+
+      // Library 1: conditional on mongo
+      deferred.add(() {
+        if (config['mongo.enabled'] == 'true' && !container.has<Service>()) {
+          container.register<Service>(_SimpleDef((_) => ServiceB()));
+        }
+      });
+
+      // User: conditional on redis
+      if (config['redis.enabled'] == 'true') {
+        container.register<Service>(_SimpleDef((_) => ServiceC()));
+      }
+
+      for (final d in deferred.reversed) { d(); }
+
+      // Only lib2 default passes
+      expect(container.get<Service>().name, 'A');
+    });
+
+    test('interceptor registration and retrieval', () {
+      final interceptor = _FakeInterceptor('timing');
+      container.registerInterceptor(ServiceA, interceptor);
+
+      final interceptors = container.getInterceptors(ServiceA);
+      expect(interceptors.length, 1);
+      expect((interceptors.first as _FakeInterceptor).name, 'timing');
+    });
+
+    test('multiple interceptors for same annotation', () {
+      container.registerInterceptor(ServiceA, _FakeInterceptor('a'));
+      container.registerInterceptor(ServiceA, _FakeInterceptor('b'));
+
+      final interceptors = container.getInterceptors(ServiceA);
+      expect(interceptors.length, 2);
+    });
+
+    test('getInterceptors returns empty for unregistered annotation', () {
+      expect(container.getInterceptors(ServiceA), isEmpty);
+    });
+
+    test('ready() waits for async @PostConstruct', () async {
+      var initialized = false;
+      container.register<ServiceA>(_AsyncPostConstructDef(
+        (_) => ServiceA(),
+        (_) async {
+          await Future.delayed(Duration(milliseconds: 10));
+          initialized = true;
+        },
+      ));
+
+      container.get<ServiceA>();
+      expect(initialized, isFalse); // not yet
+      await container.ready();
+      expect(initialized, isTrue); // now done
+    });
+
+    test('has returns true even if bean not yet instantiated', () {
+      container.register<ServiceA>(_SimpleDef((_) => ServiceA()));
+      // Never called get<ServiceA>() — but has() checks definitions, not singletons
+      expect(container.has<ServiceA>(), isTrue);
+    });
+
+    test('shutdown clears singletons — subsequent get creates new instance', () async {
+      var createCount = 0;
+      container.register<ServiceA>(_SimpleDef((_) {
+        createCount++;
+        return ServiceA();
+      }));
+
+      container.get<ServiceA>();
+      expect(createCount, 1);
+
+      await container.shutdown();
+
+      // After shutdown, singleton cache is cleared
+      container.get<ServiceA>();
+      expect(createCount, 2);
+    });
+  });
+}
+
+class _FakeInterceptor implements MethodInterceptor {
+  final String name;
+  _FakeInterceptor(this.name);
+
+  @override
+  dynamic intercept(dynamic ctx) => null;
+}
+
+class _AsyncPostConstructDef<T> extends BeanDefinition {
+  final T Function(BeanContainer) _factory;
+  final Future<void> Function(T) _postConstruct;
+
+  _AsyncPostConstructDef(this._factory, this._postConstruct);
+
+  @override
+  String get typeName => T.toString();
+
+  @override
+  dynamic create(BeanContainer container) => _factory(container);
+
+  @override
+  bool get hasPostConstructAsync => true;
+
+  @override
+  Future<void> postConstructAsync(dynamic instance) => _postConstruct(instance as T);
 }
