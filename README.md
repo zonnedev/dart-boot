@@ -137,6 +137,103 @@ All wiring is resolved at compile time. The runtime is a lightweight container t
 15. [CLI](docs/cli.md)
 16. [Writing Libraries](docs/libraries.md)
 
+## Contributing
+
+### Prerequisites
+
+- Dart SDK 3.5+
+- Melos: `dart pub global activate melos`
+
+### Setup
+
+```bash
+git clone git@github.com:zonnedev/dart-boot.git
+cd dart-boot
+melos bootstrap
+```
+
+### Common Commands
+
+```bash
+# Build code generators for all packages
+melos run build
+
+# Run tests across all packages
+melos run test
+
+# Run static analysis
+melos run analyze
+
+# Run a command in a specific package
+cd packages/boot_core && dart test
+
+# Activate the CLI from local source
+dart pub global activate --source path packages/boot_cli
+```
+
+### Project Structure
+
+```
+dart-boot/
+├── packages/           ← Framework packages (publishable)
+│   ├── boot_core/      ← DI container, annotations, config
+│   ├── boot_aop/       ← AOP interceptors
+│   ├── boot_events/    ← EventBus
+│   ├── boot_scheduling/← @Scheduled
+│   ├── boot_serialization/ ← @Serdeable
+│   ├── boot_http_common/   ← Request/Response/Filter primitives
+│   ├── boot_http/      ← Server, Router, Security, WebSocket
+│   ├── boot_http_client/   ← HTTP client
+│   ├── boot/           ← Umbrella (re-exports all + Boot.run)
+│   ├── boot_generator/ ← Code generators
+│   ├── boot_test/      ← Test utilities
+│   └── boot_cli/       ← Developer CLI
+├── docs/               ← Reference documentation
+│   └── guides/         ← Step-by-step tutorials
+├── examples/guides/    ← Guide implementations (integration tests)
+├── pubspec.yaml        ← Workspace root + Melos config
+└── README.md
+```
+
+### Making Changes
+
+1. Create a branch: `git checkout -b feat/my-feature`
+2. Make changes — packages link locally via workspace, changes reflect immediately
+3. Run `melos run build` if you changed generator code
+4. Run `melos run test` to verify
+5. Run `examples/guides/run_all_tests.sh` to validate guides still pass
+6. Commit with [Conventional Commits](https://www.conventionalcommits.org/):
+   - `feat: add @ServerFilter annotation` → minor version bump
+   - `fix: resolve import issue in generator` → patch bump
+   - `feat!: change module function signature` → breaking change
+
+### Publishing
+
+```bash
+melos version    # auto-bumps versions from commit history
+melos publish    # publishes to pub.dev in dependency order
+```
+
+### Package Dependency Order
+
+When adding features, know the dependency chain (bottom → top):
+
+```
+boot_core
+├── boot_aop
+├── boot_events
+├── boot_scheduling
+├── boot_serialization
+├── boot_http_common
+│   ├── boot_http
+│   └── boot_http_client
+└── boot (umbrella)
+    ├── boot_generator
+    └── boot_test
+```
+
+Changes to `boot_core` affect everything. Changes to `boot_http` only affect `boot` and `boot_generator`.
+
 ## License
 
 MIT
