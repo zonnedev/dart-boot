@@ -1,0 +1,39 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'boot-v*'
+      - 'boot_core-v*'
+      - 'boot_aop-v*'
+      - 'boot_events-v*'
+      - 'boot_scheduling-v*'
+      - 'boot_serialization-v*'
+      - 'boot_http_common-v*'
+      - 'boot_http-v*'
+      - 'boot_http_client-v*'
+      - 'boot_generator-v*'
+      - 'boot_test-v*'
+      - 'boot_cli-v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Determine package from tag
+        id: package
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PACKAGE=$(echo "$TAG" | sed 's/-v.*//')
+          echo "name=$PACKAGE" >> $GITHUB_OUTPUT
+          echo "Publishing $PACKAGE from tag $TAG"
+
+      - name: Publish
+        run: |
+          cd packages/${{ steps.package.outputs.name }}
+          dart pub publish --force
