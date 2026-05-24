@@ -282,6 +282,31 @@ void main() {
       expect(h2.handle(_makeRequest('GET', '/'), const BadRequestException()).statusCode, 400);
     });
   });
+
+  group('ClientFilterChain', () {
+    test('proceed calls sender when no filters', () async {
+      final chain = ClientFilterChain([], (req) async => Response.ok('sent'));
+      final req = MutableRequest(method: 'GET', uri: Uri.parse('http://x.com'));
+      final res = await chain.proceed(req);
+      expect(res.body, 'sent');
+    });
+
+    test('filters execute in order', () async {
+      final order = <int>[];
+      final f1 = _TestClientFilter((req, chain) async { order.add(1); return chain.proceed(req); });
+      final f2 = _TestClientFilter((req, chain) async { order.add(2); return chain.proceed(req); });
+      final chain = ClientFilterChain([f1, f2], (req) async { order.add(3); return Response.ok('end'); });
+      await chain.proceed(MutableRequest(method: 'GET', uri: Uri.parse('http://x.com')));
+      expect(order, [1, 2, 3]);
+    });
+
+    test('filter can short-circuit', () async {
+      final f = _TestClientFilter((req, chain) async => Response(403, body: 'blocked'));
+      final chain = ClientFilterChain([f], (req) async => Response.ok('never'));
+      final res = await chain.proceed(MutableRequest(method: 'GET', uri: Uri.parse('http://x.com')));
+      expect(res.statusCode, 403);
+    });
+  });
 }
 
 class _TestFilter implements HttpServerFilter {
@@ -302,4 +327,13 @@ class _BadRequestHandler implements ExceptionHandler<BadRequestException> {
   @override
   Response handle(Request request, BadRequestException e) =>
       Response(400, headers: {'content-type': 'application/json'}, body: '{"error":"${e.message}"}');
+}
+
+
+
+class _TestClientFilter implements HttpClientFilter {
+  final Future<Response> Function(MutableRequest, ClientFilterChain) _fn;
+  _TestClientFilter(this._fn);
+  @override
+  Future<Response> filter(MutableRequest request, ClientFilterChain chain) => _fn(request, chain);
 }
