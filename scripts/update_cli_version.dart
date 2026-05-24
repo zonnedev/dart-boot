@@ -8,16 +8,25 @@ void main() {
   final cliVersion = (loadYaml(cliPubspec) as YamlMap)['version'] as String;
 
   final bootPubspec = File('packages/boot/pubspec.yaml').readAsStringSync();
-  final frameworkVersion = (loadYaml(bootPubspec) as YamlMap)['version'] as String;
+  final bootYaml = loadYaml(bootPubspec) as YamlMap;
+  final frameworkVersion = bootYaml['version'] as String;
+
+  final corePubspec = File('packages/boot_core/pubspec.yaml').readAsStringSync();
+  final coreYaml = loadYaml(corePubspec) as YamlMap;
+  final sdkConstraint = (coreYaml['environment'] as YamlMap)['sdk'] as String;
+  final minSdk = sdkConstraint.replaceAll('^', '');
 
   File('packages/boot_cli/lib/src/version.dart').writeAsStringSync(
     "/// CLI version. Updated by melos version.\n"
     "const String version = '$cliVersion';\n"
     "\n"
     "/// Framework packages version. Updated by melos version hook.\n"
-    "const String frameworkVersion = '$frameworkVersion';\n",
+    "const String frameworkVersion = '$frameworkVersion';\n"
+    "\n"
+    "/// Minimum Dart SDK required by the framework. Updated by melos version hook.\n"
+    "const String minSdk = '$minSdk';\n",
   );
 
   Process.runSync('git', ['add', 'packages/boot_cli/lib/src/version.dart']);
-  print('Updated boot_cli: version=$cliVersion, frameworkVersion=$frameworkVersion');
+  print('Updated boot_cli: version=$cliVersion, frameworkVersion=$frameworkVersion, minSdk=$minSdk');
 }

@@ -72,7 +72,7 @@ name: $projectName
 description: A Boot framework application.
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^${cli.minSdk}
 
 dependencies:
 $bootDep
@@ -215,7 +215,7 @@ description: A Boot framework library.
 version: 0.1.0
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^${cli.minSdk}
 
 dependencies:
 $bootDep
