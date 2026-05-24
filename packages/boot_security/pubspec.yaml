@@ -13,7 +13,6 @@ dependencies:
   boot_http_common: ^0.1.2
 
 dev_dependencies:
-  boot_core: ^0.1.0
   shelf: ^1.4.0
   test: ^1.25.0
 

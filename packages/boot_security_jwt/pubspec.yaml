@@ -9,6 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
+  boot: ^0.1.0
   boot_core: ^0.1.0
   boot_security: ^0.1.1
   dart_jsonwebtoken: ^2.14.0

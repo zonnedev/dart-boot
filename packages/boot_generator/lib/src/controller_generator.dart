@@ -21,7 +21,6 @@ final _patchChecker = TypeChecker.fromRuntime(Patch);
 final _requestChecker = TypeChecker.fromRuntime(Request);
 final _responseChecker = TypeChecker.fromRuntime(Response);
 final _authenticationChecker = TypeChecker.fromRuntime(Authentication);
-final _securedChecker = TypeChecker.fromRuntime(Secured);
 
 final _routeCheckers = {
   'GET': _getChecker,
