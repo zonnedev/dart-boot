@@ -15,6 +15,72 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot` - `v0.1.1+3`](#boot---v0113)
+ - [`boot_aop` - `v0.1.1+2`](#boot_aop---v0112)
+ - [`boot_events` - `v0.1.1+2`](#boot_events---v0112)
+ - [`boot_generator` - `v0.1.1+3`](#boot_generator---v0113)
+ - [`boot_http` - `v0.1.1+3`](#boot_http---v0113)
+ - [`boot_http_client` - `v0.1.1+3`](#boot_http_client---v0113)
+ - [`boot_http_common` - `v0.1.1+3`](#boot_http_common---v0113)
+ - [`boot_scheduling` - `v0.1.1+2`](#boot_scheduling---v0112)
+ - [`boot_serialization` - `v0.1.1+3`](#boot_serialization---v0113)
+ - [`boot_test` - `v0.1.1+3`](#boot_test---v0113)
+
+---
+
+#### `boot` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_aop` - `v0.1.1+2`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_events` - `v0.1.1+2`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_generator` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_http` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_http_client` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_http_common` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_scheduling` - `v0.1.1+2`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_serialization` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+#### `boot_test` - `v0.1.1+3`
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot` - `v0.1.1+2`](#boot---v0112)
  - [`boot_aop` - `v0.1.1+1`](#boot_aop---v0111)
  - [`boot_cli` - `v0.1.5+1`](#boot_cli---v0151)

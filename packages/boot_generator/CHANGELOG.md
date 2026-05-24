@@ -1,3 +1,7 @@
+## 0.1.1+3
+
+ - **FIX**: use hosted version constraints for all inter-package dependencies. ([9f80a8f8](https://github.com/zonnedev/dart-boot/commit/9f80a8f8a0d37cc79a7b19dfeb06c3daf3be5762))
+
 ## 0.1.1+2
 
  - **FIX**: correct repository URLs to zonnedev/dart-boot. ([ee6ed62f](https://github.com/zonnedev/dart-boot/commit/ee6ed62fdce023117cdf24aad927cf4b8b6e40ea))
