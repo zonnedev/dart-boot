@@ -1,3 +1,7 @@
+## 0.1.4
+
+ - **FEAT**(boot_cli): track framework version independently from CLI version. ([bdfb08c1](https://github.com/jfsanchez/dart-boot/commit/bdfb08c1b732413724fe392813f8c12ba07f2254))
+
 ## 0.1.3+1
 
  - **FIX**(workspace): use preCommit hook for version.dart sync. ([46309947](https://github.com/jfsanchez/dart-boot/commit/46309947b80724eddb1277b36dbc9b400488958f))

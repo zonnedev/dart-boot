@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_cli` - `v0.1.4`](#boot_cli---v014)
+
+---
+
+#### `boot_cli` - `v0.1.4`
+
+ - **FEAT**(boot_cli): track framework version independently from CLI version. ([bdfb08c1](https://github.com/jfsanchez/dart-boot/commit/bdfb08c1b732413724fe392813f8c12ba07f2254))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_cli` - `v0.1.3+1`](#boot_cli---v0131)
 
 ---
