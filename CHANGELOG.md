@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_cli` - `v0.1.2`](#boot_cli---v012)
+
+---
+
+#### `boot_cli` - `v0.1.2`
+
+ - **FEAT**(boot_cli): add --git and --ref flags to boot create app/library. ([a14eef39](https://github.com/jfsanchez/dart-boot/commit/a14eef39049f2de100a94b00407f9411f7cea53d))
+
+
+## 2026-05-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot` - `v0.1.1`](#boot---v011)
  - [`boot_aop` - `v0.1.1`](#boot_aop---v011)
  - [`boot_cli` - `v0.1.1`](#boot_cli---v011)
