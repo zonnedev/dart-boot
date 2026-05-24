@@ -1,14 +1,14 @@
 name: boot_http_client
 description: HTTP client for Boot (@Client, HttpClientBuilder).
 repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_http_client
-version: 0.1.1+4
+version: 0.1.1+5
 environment:
   sdk: ^3.5.0
 resolution: workspace
 dependencies:
   boot_core: ^0.1.2+2
   boot_aop: ^0.1.1+3
-  boot_http_common: ^0.1.1+4
+  boot_http_common: ^0.1.2
   http: ^1.0.0
 
 dev_dependencies:

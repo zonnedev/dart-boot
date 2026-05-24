@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`boot_generator` - `v0.1.2`](#boot_generator---v012)
+ - [`boot_http` - `v0.1.2`](#boot_http---v012)
+ - [`boot_http_common` - `v0.1.2`](#boot_http_common---v012)
+ - [`boot_security` - `v0.1.1`](#boot_security---v011)
+ - [`boot_security_jwt` - `v0.1.1`](#boot_security_jwt---v011)
+ - [`boot` - `v0.1.1+5`](#boot---v0115)
+ - [`boot_http_client` - `v0.1.1+5`](#boot_http_client---v0115)
+ - [`boot_test` - `v0.1.1+5`](#boot_test---v0115)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `boot` - `v0.1.1+5`
+ - `boot_http_client` - `v0.1.1+5`
+ - `boot_test` - `v0.1.1+5`
+
+---
+
+#### `boot_generator` - `v0.1.2`
+
+ - **FEAT**(boot_security): create security module with pluggable token interfaces. ([1dd84d00](https://github.com/zonnedev/dart-boot/commit/1dd84d003f1be3d8bb9570cf6e8ba2160d4b5a4a))
+
+#### `boot_http` - `v0.1.2`
+
+ - **FEAT**(boot_security): create security module with pluggable token interfaces. ([1dd84d00](https://github.com/zonnedev/dart-boot/commit/1dd84d003f1be3d8bb9570cf6e8ba2160d4b5a4a))
+
+#### `boot_http_common` - `v0.1.2`
+
+ - **FEAT**(boot_security): create security module with pluggable token interfaces. ([1dd84d00](https://github.com/zonnedev/dart-boot/commit/1dd84d003f1be3d8bb9570cf6e8ba2160d4b5a4a))
+
+#### `boot_security` - `v0.1.1`
+
+ - **FEAT**(boot_security): create security module with pluggable token interfaces. ([1dd84d00](https://github.com/zonnedev/dart-boot/commit/1dd84d003f1be3d8bb9570cf6e8ba2160d4b5a4a))
+
+#### `boot_security_jwt` - `v0.1.1`
+
+ - **FEAT**(boot_security): create security module with pluggable token interfaces. ([1dd84d00](https://github.com/zonnedev/dart-boot/commit/1dd84d003f1be3d8bb9570cf6e8ba2160d4b5a4a))
+
+
 ## 2026-05-24
 
 ### Changes
