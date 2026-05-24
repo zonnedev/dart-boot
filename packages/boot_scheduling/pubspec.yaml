@@ -1,6 +1,6 @@
 name: boot_scheduling
 description: Task scheduling for Boot (@Scheduled).
-repository: https://github.com/zonnedev/dart-boot/tree/main/packages/boot_scheduling
+repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_scheduling
 version: 0.1.1+2
 environment:
   sdk: ^3.5.0

@@ -1,6 +1,6 @@
 name: boot_core
 description: Core DI annotations, container, and configuration for the Boot framework.
-repository: https://github.com/zonnedev/dart-boot/tree/main/packages/boot_core
+repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_core
 version: 0.1.2+1
 environment:
   sdk: ^3.5.0
