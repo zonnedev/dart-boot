@@ -15,6 +15,67 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_core` - `v0.1.3`](#boot_core---v013)
+ - [`boot_generator` - `v0.1.3`](#boot_generator---v013)
+ - [`boot_http_client` - `v0.1.2`](#boot_http_client---v012)
+ - [`boot_http_client_generator` - `v0.1.1`](#boot_http_client_generator---v011)
+ - [`boot_aop` - `v0.1.1+4`](#boot_aop---v0114)
+ - [`boot_events` - `v0.1.1+4`](#boot_events---v0114)
+ - [`boot_scheduling` - `v0.1.1+4`](#boot_scheduling---v0114)
+ - [`boot_serialization` - `v0.1.1+5`](#boot_serialization---v0115)
+ - [`boot_http_common` - `v0.1.2+1`](#boot_http_common---v0121)
+ - [`boot_http` - `v0.1.2+2`](#boot_http---v0122)
+ - [`boot` - `v0.1.1+7`](#boot---v0117)
+ - [`boot_security` - `v0.1.1+2`](#boot_security---v0112)
+ - [`boot_security_jwt` - `v0.1.1+2`](#boot_security_jwt---v0112)
+ - [`boot_test` - `v0.1.1+7`](#boot_test---v0117)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `boot_aop` - `v0.1.1+4`
+ - `boot_events` - `v0.1.1+4`
+ - `boot_scheduling` - `v0.1.1+4`
+ - `boot_serialization` - `v0.1.1+5`
+ - `boot_http_common` - `v0.1.2+1`
+ - `boot_http` - `v0.1.2+2`
+ - `boot` - `v0.1.1+7`
+ - `boot_security` - `v0.1.1+2`
+ - `boot_security_jwt` - `v0.1.1+2`
+ - `boot_test` - `v0.1.1+7`
+
+---
+
+#### `boot_core` - `v0.1.3`
+
+ - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
+
+#### `boot_generator` - `v0.1.3`
+
+ - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
+
+#### `boot_http_client` - `v0.1.2`
+
+ - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
+
+#### `boot_http_client_generator` - `v0.1.1`
+
+ - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
+
+
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_generator` - `v0.1.2+1`](#boot_generator---v0121)
  - [`boot_security` - `v0.1.1+1`](#boot_security---v0111)
  - [`boot_security_jwt` - `v0.1.1+1`](#boot_security_jwt---v0111)

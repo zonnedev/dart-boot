@@ -1,3 +1,7 @@
+## 0.1.3
+
+ - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
+
 ## 0.1.2+1
 
  - **FIX**: resolve publish warnings and unused declaration. ([15ed3f00](https://github.com/zonnedev/dart-boot/commit/15ed3f000b086a094cb2b224cf7c5f24e6f1b808))

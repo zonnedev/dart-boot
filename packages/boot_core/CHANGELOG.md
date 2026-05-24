@@ -1,3 +1,7 @@
+## 0.1.3
+
+ - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
+
 ## 0.1.2+2
 
  - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))
