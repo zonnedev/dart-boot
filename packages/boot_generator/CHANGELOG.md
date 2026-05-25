@@ -1,3 +1,7 @@
+## 0.2.0+2
+
+ - **FIX**(generator): support named constructor parameters in bean definitions. ([7b3c0d6a](https://github.com/zonnedev/dart-boot/commit/7b3c0d6a0c5bc25ace9f878a58560596b1894bb5))
+
 ## 0.2.0+1
 
  - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))

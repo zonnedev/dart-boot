@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_generator` - `v0.2.0+2`](#boot_generator---v0202)
+
+---
+
+#### `boot_generator` - `v0.2.0+2`
+
+ - **FIX**(generator): support named constructor parameters in bean definitions. ([7b3c0d6a](https://github.com/zonnedev/dart-boot/commit/7b3c0d6a0c5bc25ace9f878a58560596b1894bb5))
+
+
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot` - `v0.2.0+1`](#boot---v0201)
  - [`boot_cli` - `v0.1.6+1`](#boot_cli---v0161)
  - [`boot_core` - `v0.2.0+1`](#boot_core---v0201)
