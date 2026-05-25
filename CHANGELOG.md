@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`boot_generator` - `v0.2.0+3`](#boot_generator---v0203)
+
+---
+
+#### `boot_generator` - `v0.2.0+3`
+
+ - **FIX**(generator): suppress unused_element warning in generated app context. ([425c2d85](https://github.com/zonnedev/dart-boot/commit/425c2d854d64de66fecac21a785edd9bc02217a6))
+
+
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`boot_generator` - `v0.2.0+2`](#boot_generator---v0202)
 
 ---

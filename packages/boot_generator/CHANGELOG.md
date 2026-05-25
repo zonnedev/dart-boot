@@ -1,3 +1,7 @@
+## 0.2.0+3
+
+ - **FIX**(generator): suppress unused_element warning in generated app context. ([425c2d85](https://github.com/zonnedev/dart-boot/commit/425c2d854d64de66fecac21a785edd9bc02217a6))
+
 ## 0.2.0+2
 
  - **FIX**(generator): support named constructor parameters in bean definitions. ([7b3c0d6a](https://github.com/zonnedev/dart-boot/commit/7b3c0d6a0c5bc25ace9f878a58560596b1894bb5))
