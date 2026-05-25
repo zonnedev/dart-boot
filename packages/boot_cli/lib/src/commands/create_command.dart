@@ -152,6 +152,26 @@ void main() {
 }
 ''');
 
+    _write(dir, 'test/hello_integration_test.dart', '''
+import 'package:boot_test/boot_test.dart';
+import 'package:$projectName/src/generated/boot_context.g.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('Integration', () {
+    final app = BootIntegrationTestApp(\$configure);
+    setUpAll(() => app.start());
+    tearDownAll(() => app.stop());
+
+    test('GET /hello returns greeting via real server', () async {
+      final res = await app.client.get('/hello/');
+      res.expectStatus(200);
+      expect(res.json()['message'], 'Hello from Boot!');
+    });
+  });
+}
+''');
+
     _write(dir, '.gitignore', '''
 .dart_tool/
 build/
