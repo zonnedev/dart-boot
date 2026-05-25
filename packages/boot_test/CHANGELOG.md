@@ -1,3 +1,13 @@
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **FEAT**(test): WebSocket testing and integration test support. ([110553b2](https://github.com/zonnedev/dart-boot/commit/110553b273ab6bf25ff5b371f403bda02af38800))
+ - **FEAT**(test): WebSocket testing and integration test support. ([22df3878](https://github.com/zonnedev/dart-boot/commit/22df387820597139dfa21af867b7539a81570096))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
 ## 0.1.1+7
 
  - Update a dependency to the latest release.

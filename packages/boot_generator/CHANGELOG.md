@@ -1,3 +1,14 @@
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**(generator): remove boot_http dependency from bean_generator. ([ac51f274](https://github.com/zonnedev/dart-boot/commit/ac51f2749358f47d836db81e6eb77b412b63d921))
+ - **FIX**(generator): stop generating boot_context.g.dart for @BootLibrary packages. ([90a436ea](https://github.com/zonnedev/dart-boot/commit/90a436ea8f50bfd5e2c9587d1f71c41c607bedfb))
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
 ## 0.1.3
 
  - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))

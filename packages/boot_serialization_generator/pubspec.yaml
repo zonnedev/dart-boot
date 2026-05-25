@@ -1,7 +1,7 @@
 name: boot_serialization_generator
 description: Code generator for Boot serialization (@Serdeable, @Serializable, @Deserializable).
 repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_serialization_generator
-version: 0.1.0
+version: 0.2.0
 
 environment:
   sdk: ^3.5.0
@@ -9,7 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  boot_serialization: ^0.1.1+5
+  boot_serialization: ^0.1.1+6
   analyzer: ^7.0.0
   build: ^2.4.0
   source_gen: ^2.0.0

@@ -1,3 +1,10 @@
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
 ## 0.1.1+4
 
  - Update a dependency to the latest release.

@@ -11,6 +11,142 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - [`boot` - `v0.2.0`](#boot---v020)
+ - [`boot_aop` - `v0.2.0`](#boot_aop---v020)
+ - [`boot_aop_generator` - `v0.2.0`](#boot_aop_generator---v020)
+ - [`boot_core` - `v0.2.0`](#boot_core---v020)
+ - [`boot_events` - `v0.2.0`](#boot_events---v020)
+ - [`boot_generator` - `v0.2.0`](#boot_generator---v020)
+ - [`boot_http` - `v0.2.0`](#boot_http---v020)
+ - [`boot_http_client_generator` - `v0.2.0`](#boot_http_client_generator---v020)
+ - [`boot_http_common` - `v0.2.0`](#boot_http_common---v020)
+ - [`boot_http_generator` - `v0.2.0`](#boot_http_generator---v020)
+ - [`boot_scheduling` - `v0.2.0`](#boot_scheduling---v020)
+ - [`boot_security` - `v0.2.0`](#boot_security---v020)
+ - [`boot_security_jwt` - `v0.2.0`](#boot_security_jwt---v020)
+ - [`boot_serialization_generator` - `v0.2.0`](#boot_serialization_generator---v020)
+ - [`boot_test` - `v0.2.0`](#boot_test---v020)
+
+Packages with other changes:
+
+ - [`boot_cli` - `v0.1.6`](#boot_cli---v016)
+ - [`boot_http_client` - `v0.1.3`](#boot_http_client---v013)
+ - [`boot_serialization` - `v0.1.1+6`](#boot_serialization---v0116)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `boot_serialization` - `v0.1.1+6`
+
+---
+
+#### `boot` - `v0.2.0`
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_aop` - `v0.2.0`
+
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_aop_generator` - `v0.2.0`
+
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_core` - `v0.2.0`
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_events` - `v0.2.0`
+
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_generator` - `v0.2.0`
+
+ - **REFACTOR**(generator): remove boot_http dependency from bean_generator. ([ac51f274](https://github.com/zonnedev/dart-boot/commit/ac51f2749358f47d836db81e6eb77b412b63d921))
+ - **FIX**(generator): stop generating boot_context.g.dart for @BootLibrary packages. ([90a436ea](https://github.com/zonnedev/dart-boot/commit/90a436ea8f50bfd5e2c9587d1f71c41c607bedfb))
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_http` - `v0.2.0`
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **FEAT**(test): WebSocket testing and integration test support. ([22df3878](https://github.com/zonnedev/dart-boot/commit/22df387820597139dfa21af867b7539a81570096))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_http_client_generator` - `v0.2.0`
+
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_http_common` - `v0.2.0`
+
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_http_generator` - `v0.2.0`
+
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_scheduling` - `v0.2.0`
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FIX**(generator): avoid Type name conflicts in generated beanType getter. ([098d7596](https://github.com/zonnedev/dart-boot/commit/098d759677581ae6a70010ae35f764e8c659de7c))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_security` - `v0.2.0`
+
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_security_jwt` - `v0.2.0`
+
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_serialization_generator` - `v0.2.0`
+
+ - **FIX**(generator): library mode scans direct deps only, app mode scans transitive. ([892f959e](https://github.com/zonnedev/dart-boot/commit/892f959e03b93ee325d2a6bc797262b1916ab9f3))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_test` - `v0.2.0`
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+ - **FEAT**(test): WebSocket testing and integration test support. ([110553b2](https://github.com/zonnedev/dart-boot/commit/110553b273ab6bf25ff5b371f403bda02af38800))
+ - **FEAT**(test): WebSocket testing and integration test support. ([22df3878](https://github.com/zonnedev/dart-boot/commit/22df387820597139dfa21af867b7539a81570096))
+ - **BREAKING** **REFACTOR**(generator): metadata-driven architecture with modular generators. ([4930ecb6](https://github.com/zonnedev/dart-boot/commit/4930ecb6fb5966fdce3a9bfadcd7c9b6b26db3a2))
+
+#### `boot_cli` - `v0.1.6`
+
+ - **FEAT**(cli): generate integration test in boot create app. ([2b53cfbe](https://github.com/zonnedev/dart-boot/commit/2b53cfbe41fd9b6c464a0bffcfa80ad933e268e5))
+
+#### `boot_http_client` - `v0.1.3`
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+
+
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
  - There are no breaking changes in this release.
 
 Packages with other changes:

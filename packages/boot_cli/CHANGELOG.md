@@ -1,3 +1,7 @@
+## 0.1.6
+
+ - **FEAT**(cli): generate integration test in boot create app. ([2b53cfbe](https://github.com/zonnedev/dart-boot/commit/2b53cfbe41fd9b6c464a0bffcfa80ad933e268e5))
+
 ## 0.1.5+2
 
  - **FIX**: correct repository branch from main to master. ([e67007d9](https://github.com/zonnedev/dart-boot/commit/e67007d909db6ed245e3ee40d809e135a5db061b))

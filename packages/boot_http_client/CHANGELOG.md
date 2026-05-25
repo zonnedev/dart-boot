@@ -1,3 +1,8 @@
+## 0.1.3
+
+ - **REFACTOR**(core): consolidate parseDuration into boot_core. ([96b5bcc7](https://github.com/zonnedev/dart-boot/commit/96b5bcc74b1ec3144a7cfc934f96a7baafdc95db))
+ - **FEAT**(core): @ConfigurationProperties, lazy routes, self-contained boot_http_client. ([1d148204](https://github.com/zonnedev/dart-boot/commit/1d148204a6866779c455ace6f16cd84d17e08b19))
+
 ## 0.1.2
 
  - **FEAT**: decouple @Client generator via @BeanSource plugin architecture. ([304a2097](https://github.com/zonnedev/dart-boot/commit/304a20973c508e7c298cb9ee8de2825fb8aa5ea9))
