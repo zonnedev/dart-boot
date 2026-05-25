@@ -3,28 +3,50 @@
 part of 'cleanup_job.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $CleanupJobDefinition extends BeanDefinition {
-  BeanContainer? _container;
   @override
-  String get typeName => 'CleanupJob';
+  Type get beanType => CleanupJob;
 
   @override
-  CleanupJob create(BeanContainer container) {
-    _container = container;
-    return CleanupJob();
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
+
+  @override
+  List<MethodMetadata> get methodMetadata => const [
+        MethodMetadata('cleanExpiredSessions', [
+          const AnnotationValue(
+              AnnotationType(
+                  'package:boot_scheduling/src/annotations/scheduled.dart#Scheduled'),
+              {'fixedRate': '5m'})
+        ]),
+        MethodMetadata('checkExternalServices', [
+          const AnnotationValue(
+              AnnotationType(
+                  'package:boot_scheduling/src/annotations/scheduled.dart#Scheduled'),
+              {'fixedRate': '30s'})
+        ]),
+      ];
+
+  @override
+  dynamic dispatch(Object instance, String method, List<dynamic> args) {
+    final bean = instance as CleanupJob;
+    switch (method) {
+      case 'cleanExpiredSessions':
+        return bean.cleanExpiredSessions();
+      case 'checkExternalServices':
+        return bean.checkExternalServices();
+      default:
+        return super.dispatch(instance, method, args);
+    }
   }
 
   @override
-  bool get hasPostConstruct => true;
-  @override
-  void postConstruct(dynamic instance) {
-    final scheduler = _container!.get<TaskScheduler>();
-    scheduler.scheduleFixedRate('CleanupJob.cleanExpiredSessions',
-        parseDuration('5m'), (instance as CleanupJob).cleanExpiredSessions);
-    scheduler.scheduleFixedRate('CleanupJob.checkExternalServices',
-        parseDuration('30s'), (instance as CleanupJob).checkExternalServices);
-  }
+  CleanupJob create(BeanContainer container) => CleanupJob();
 }

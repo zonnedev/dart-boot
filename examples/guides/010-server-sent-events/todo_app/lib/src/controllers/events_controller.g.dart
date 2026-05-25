@@ -3,12 +3,20 @@
 part of 'events_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $EventsControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'EventsController';
+  Type get beanType => EventsController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/events'}),
+      ];
 
   @override
   EventsController create(BeanContainer container) =>
@@ -39,6 +47,16 @@ class $EventsControllerRoutes implements RouteRegistration {
                 },
                 body: await body.join());
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/events'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/time'})
+          ],
         ),
         RouteEntry(
           method: 'GET',
@@ -54,6 +72,16 @@ class $EventsControllerRoutes implements RouteRegistration {
                 },
                 body: await body.join());
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/events'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/notifications'})
+          ],
         ),
       ];
 }

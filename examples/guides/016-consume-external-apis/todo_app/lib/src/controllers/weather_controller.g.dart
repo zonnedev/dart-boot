@@ -3,12 +3,20 @@
 part of 'weather_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $WeatherControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'WeatherController';
+  Type get beanType => WeatherController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/weather'}),
+      ];
 
   @override
   WeatherController create(BeanContainer container) =>
@@ -32,6 +40,16 @@ class $WeatherControllerRoutes implements RouteRegistration {
             final city = request.pathParams['city']!;
             return await controller.getWeather(request, city);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/weather'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/<city>'})
+          ],
         ),
       ];
 }

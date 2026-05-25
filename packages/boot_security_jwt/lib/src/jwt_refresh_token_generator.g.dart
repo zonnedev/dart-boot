@@ -8,7 +8,15 @@ part of 'jwt_refresh_token_generator.dart';
 
 class $JwtRefreshTokenGeneratorDefinition extends BeanDefinition {
   @override
-  String get typeName => 'JwtRefreshTokenGenerator';
+  Type get beanType => JwtRefreshTokenGenerator;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   JwtRefreshTokenGenerator create(BeanContainer container) =>

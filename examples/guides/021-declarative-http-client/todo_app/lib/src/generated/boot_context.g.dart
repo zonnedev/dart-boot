@@ -9,7 +9,7 @@ class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -35,30 +35,6 @@ void $configure(BeanContainer container, BootRouter router) {
   // Register interceptors
 
 
-  // Register client filters
-
-
-  // Register server filters
-
-
-  // Register exception handlers
-
-
-  // Register authentication providers
-
-
-  // Register health indicators
-
-
-  // Register WebSocket handlers
-
-
   // Register routes
   router.addAll($PostControllerRoutes(container.get<PostController>()).routes);
-
-  // Register event listeners
-
-
-  // Register scheduled tasks
-
 }

@@ -3,12 +3,20 @@
 part of 'auth_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $AuthControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'AuthController';
+  Type get beanType => AuthController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/auth'}),
+      ];
 
   @override
   AuthController create(BeanContainer container) => AuthController(
@@ -31,6 +39,16 @@ class $AuthControllerRoutes implements RouteRegistration {
           handler: (request) async {
             return await controller.login(request);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/auth'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Post'),
+                {'path': '/login'})
+          ],
         ),
       ];
 }

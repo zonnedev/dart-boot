@@ -3,12 +3,20 @@
 part of 'product_service.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $ProductServiceDefinition extends BeanDefinition {
   @override
-  String get typeName => 'ProductService';
+  Type get beanType => ProductService;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   ProductService create(BeanContainer container) => ProductService();
@@ -40,7 +48,7 @@ class $ProductService$Proxy extends ProductService {
 
 class $ProductService$ProxyDefinition extends BeanDefinition {
   @override
-  String get typeName => 'ProductService (proxy)';
+  Type get beanType => ProductService;
 
   @override
   ProductService create(BeanContainer container) => $ProductService$Proxy(

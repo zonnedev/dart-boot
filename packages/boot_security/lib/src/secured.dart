@@ -1,4 +1,10 @@
 // coverage:ignore-file
+import 'package:boot_core/boot_core.dart';
+
+/// AnnotationType constant for runtime metadata queries.
+const securedAnnotationType = AnnotationType(
+    'package:boot_security/src/secured.dart#Secured');
+
 /// Constants for @Secured annotation values.
 class SecurityRule {
   static const String isAuthenticated = 'isAuthenticated()';

@@ -3,12 +3,30 @@
 part of 'database.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $DatabaseDefinition extends BeanDefinition {
   @override
-  String get typeName => 'Database';
+  Type get beanType => Database;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/requires.dart#Requires'),
+            {
+              'env': [],
+              'notEnv': [],
+              'property': 'pg.host',
+              'beans': [],
+              'missingBeans': []
+            }),
+      ];
 
   @override
   Database create(BeanContainer container) => Database(

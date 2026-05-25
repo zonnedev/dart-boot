@@ -114,6 +114,11 @@ class BootRouter {
     _exceptionHandlers[E] = handler;
   }
 
+  /// Register an exception handler by runtime Type (for runtime discovery).
+  void addExceptionHandlerForType(Type type, dynamic handler) {
+    _exceptionHandlers[type] = handler;
+  }
+
   /// Set a custom global error handler (fallback when no ExceptionHandler matches).
   void onError(ErrorHandler handler) => _errorHandler = handler;
 

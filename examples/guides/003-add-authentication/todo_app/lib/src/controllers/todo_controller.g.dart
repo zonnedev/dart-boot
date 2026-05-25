@@ -3,12 +3,24 @@
 part of 'todo_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $TodoControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'TodoController';
+  Type get beanType => TodoController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/todos'}),
+        const AnnotationValue(
+            AnnotationType('package:boot_security/src/secured.dart#Secured'), {
+          'value': ['isAuthenticated()']
+        }),
+      ];
 
   @override
   TodoController create(BeanContainer container) => TodoController();
@@ -31,7 +43,20 @@ class $TodoControllerRoutes implements RouteRegistration {
             return await controller.list(request);
           },
           metadata: [
-            Secured(['isAuthenticated()'])
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_security/src/secured.dart#Secured'),
+                {
+                  'value': ['isAuthenticated()']
+                }),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/'})
           ],
         ),
         RouteEntry(
@@ -42,7 +67,20 @@ class $TodoControllerRoutes implements RouteRegistration {
             return await controller.getById(request, id);
           },
           metadata: [
-            Secured(['isAuthenticated()'])
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_security/src/secured.dart#Secured'),
+                {
+                  'value': ['isAuthenticated()']
+                }),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/<id>'})
           ],
         ),
         RouteEntry(
@@ -52,7 +90,20 @@ class $TodoControllerRoutes implements RouteRegistration {
             return await controller.create(request);
           },
           metadata: [
-            Secured(['isAuthenticated()'])
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_security/src/secured.dart#Secured'),
+                {
+                  'value': ['isAuthenticated()']
+                }),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Post'),
+                {'path': '/'})
           ],
         ),
         RouteEntry(
@@ -63,8 +114,26 @@ class $TodoControllerRoutes implements RouteRegistration {
             return await controller.delete(request, id);
           },
           metadata: [
-            Secured(['isAuthenticated()']),
-            Secured(['ROLE_ADMIN'])
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_security/src/secured.dart#Secured'),
+                {
+                  'value': ['isAuthenticated()']
+                }),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Delete'),
+                {'path': '/<id>'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_security/src/secured.dart#Secured'),
+                {
+                  'value': ['ROLE_ADMIN']
+                })
           ],
         ),
       ];

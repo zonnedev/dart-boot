@@ -10,7 +10,7 @@ class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -39,32 +39,6 @@ void $configure(BeanContainer container, BootRouter router) {
   // Register interceptors
 
 
-  // Register client filters
-
-
-  // Register server filters
-
-
-  // Register exception handlers
-
-
-  // Register authentication providers
-
-
-  // Register health indicators
-
-
-  // Register WebSocket handlers
-
-
   // Register routes
   router.addAll($HelloControllerRoutes(container.get<HelloController>()).routes);
-
-  // Register event listeners
-
-
-  // Register scheduled tasks
-  container.get<TaskScheduler>().scheduleFixedRate('ProductionJobs.compactDatabase', parseDuration('1h'), () => container.get<ProductionJobs>().compactDatabase());
-  container.get<TaskScheduler>().scheduleFixedRate('CleanupJob.cleanExpiredSessions', parseDuration('5m'), () => container.get<CleanupJob>().cleanExpiredSessions());
-  container.get<TaskScheduler>().scheduleFixedRate('CleanupJob.checkExternalServices', parseDuration('30s'), () => container.get<CleanupJob>().checkExternalServices());
 }

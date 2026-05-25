@@ -3,12 +3,20 @@
 part of 'product_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $ProductControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'ProductController';
+  Type get beanType => ProductController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/products'}),
+      ];
 
   @override
   ProductController create(BeanContainer container) =>
@@ -32,6 +40,16 @@ class $ProductControllerRoutes implements RouteRegistration {
             final id = request.pathParams['id']!;
             return await controller.get(request, id);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/products'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/<id>'})
+          ],
         ),
       ];
 }

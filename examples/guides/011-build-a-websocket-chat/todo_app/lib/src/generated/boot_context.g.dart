@@ -9,7 +9,7 @@ class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -35,39 +35,6 @@ void $configure(BeanContainer container, BootRouter router) {
   // Register interceptors
 
 
-  // Register client filters
-
-
-  // Register server filters
-
-
-  // Register exception handlers
-
-
-  // Register authentication providers
-
-
-  // Register health indicators
-
-
-  // Register WebSocket handlers
-  if (container.has<WebSocketServer>()) {
-    final chatSocket = container.get<ChatSocket>();
-    container.get<WebSocketServer>().handle('/chat/<room>', (session) {
-      chatSocket.onOpen(session, session.pathParams['room']!);
-      session.onMessage((msg) => chatSocket.onMessage(session, msg, session.pathParams['room']!));
-      session.onClose((code, reason) => chatSocket.onClose(session, session.pathParams['room']!));
-      session.onError((e) => chatSocket.onError(session, e, session.pathParams['room']!));
-    });
-  }
-
-
   // Register routes
   router.addAll($HelloControllerRoutes(container.get<HelloController>()).routes);
-
-  // Register event listeners
-
-
-  // Register scheduled tasks
-
 }

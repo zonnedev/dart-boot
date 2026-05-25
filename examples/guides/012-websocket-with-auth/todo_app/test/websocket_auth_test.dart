@@ -16,7 +16,7 @@ void main() {
       });
     });
 
-    test('WebSocket server does not require auth by default', () async {
+    test('WebSocket server does not require auth when disabled', () async {
       await bootTest($configure, properties: {
         'boot.websocket.enabled': 'true',
         'boot.websocket.auth': 'false',
@@ -33,6 +33,28 @@ void main() {
       }, test: (client, container) async {
         final providers = container.container.getAll<AuthenticationProvider>();
         expect(providers, isNotEmpty);
+      });
+    });
+
+    test('endpoint is registered at /chat/<room>', () async {
+      await bootTest($configure, properties: {
+        'boot.websocket.enabled': 'true',
+      }, test: (client, container) async {
+        final server = container.get<WebSocketServer>();
+        expect(server.hasEndpoint('/chat/<room>'), isTrue);
+      });
+    });
+
+    test('ChatSocket has correct method hooks', () async {
+      await bootTest($configure, properties: {
+        'boot.websocket.enabled': 'true',
+      }, test: (client, container) async {
+        final defs = container.container.getDefinitions<ChatSocket>();
+        expect(defs, isNotEmpty);
+
+        final def = defs.first;
+        final methodNames = def.methodMetadata.map((m) => m.methodName).toSet();
+        expect(methodNames, containsAll(['onOpen', 'onMessage', 'onClose']));
       });
     });
   });

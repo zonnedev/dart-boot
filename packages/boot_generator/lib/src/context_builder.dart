@@ -7,10 +7,6 @@ import 'package:source_gen/source_gen.dart';
 import 'package:yaml/yaml.dart';
 import 'package:boot_core/boot_core.dart';
 
-import 'package:boot_http/boot_http.dart';
-import 'package:boot_events/boot_events.dart';
-import 'package:boot_scheduling/boot_scheduling.dart';
-
 import 'package:boot_aop/boot_aop.dart';
 /// Aggregating builder that collects all bean/route metadata and generates
 /// the application context wiring file.
@@ -26,12 +22,6 @@ class ContextBuilder implements Builder {
   // Type checkers (initialized once, used across scans)
   final _singletonChecker = TypeChecker.fromRuntime(Singleton);
   final _beanSourceChecker = TypeChecker.fromRuntime(BeanSource);
-  final _clientFilterChecker = TypeChecker.fromRuntime(ClientFilter);
-  final _controllerChecker = TypeChecker.fromRuntime(Controller);
-  final _serverWebSocketChecker = TypeChecker.fromRuntime(ServerWebSocket);
-  final _exceptionHandlerChecker = TypeChecker.fromRuntime(ExceptionHandler);
-  final _authProviderChecker = TypeChecker.fromRuntime(AuthenticationProvider);
-  final _healthIndicatorChecker = TypeChecker.fromRuntime(HealthIndicator);
   final _factoryChecker = TypeChecker.fromRuntime(Factory);
   final _prototypeChecker = TypeChecker.fromRuntime(Prototype);
   final _requiresChecker = TypeChecker.fromRuntime(Requires);
@@ -40,22 +30,12 @@ class ContextBuilder implements Builder {
   final _namedChecker = TypeChecker.fromUrl('package:boot_core/src/annotations/named.dart#Named');
   final _primaryChecker = TypeChecker.fromUrl('package:boot_core/src/annotations/primary.dart#Primary');
   final _aroundChecker = TypeChecker.fromRuntime(Around);
-  final _eventListenerChecker = TypeChecker.fromRuntime(EventListener);
-  final _scheduledChecker = TypeChecker.fromRuntime(Scheduled);
 
   @override
   Future<void> build(BuildStep buildStep) async {
     final beanMeta = <_BeanMeta>[];
     final routeMeta = <_RouteMeta>[];
     final interceptorMeta = <_InterceptorMeta>[];
-    final clientFilterMeta = <_ClientFilterMeta>[];
-    final serverFilterMeta = <_ServerFilterMeta>[];
-    final exceptionHandlerMeta = <_ExceptionHandlerMeta>[];
-    final authProviderMeta = <_AuthProviderMeta>[];
-    final webSocketMeta = <_WebSocketMeta>[];
-    final healthIndicatorMeta = <_HealthIndicatorMeta>[];
-    final eventListenerMeta = <_EventListenerMeta>[];
-    final scheduledMeta = <_ScheduledMeta>[];
 
     // Detect if this package is a @BootLibrary or an app
     bool isBootLibrary = false;
@@ -79,9 +59,7 @@ class ContextBuilder implements Builder {
       } catch (_) {
         continue;
       }
-      _scanLibrary(library, input, beanMeta, routeMeta, interceptorMeta,
-          clientFilterMeta, serverFilterMeta, exceptionHandlerMeta, authProviderMeta,
-          webSocketMeta, healthIndicatorMeta, eventListenerMeta, scheduledMeta);
+      _scanLibrary(library, input, beanMeta, routeMeta, interceptorMeta);
     }
 
     if (isBootLibrary) {
@@ -113,10 +91,7 @@ class ContextBuilder implements Builder {
               if (!uri.toString().startsWith('package:$packageName/')) continue;
               for (final element in exported.topLevelElements) {
                 if (element is ClassElement) {
-                  if (_singletonChecker.hasAnnotationOf(element) ||
-                      _prototypeChecker.hasAnnotationOf(element) ||
-                      _controllerChecker.hasAnnotationOf(element) ||
-                      _serverWebSocketChecker.hasAnnotationOf(element)) {
+                  if (_hasBeanSourceAnnotation(element)) {
                     libraryProvidedTypes.add(element.name);
                     // Collect typed-as interfaces (explicit or auto-detected)
                     final ann = _singletonChecker.firstAnnotationOf(element);
@@ -129,7 +104,7 @@ class ContextBuilder implements Builder {
                       // Auto-detect from interfaces (including inherited)
                       libraryProvidedTypes.addAll(
                         element.allSupertypes
-                            .map((i) => i.getDisplayString())
+                            .map((i) => i.element.name)
                             .where((s) => s != 'Object'));
                     }
                   }
@@ -143,8 +118,6 @@ class ContextBuilder implements Builder {
       final sorted = _topologicalSort(beanMeta);
       final moduleOutput = _generateModuleOutput(
           buildStep.inputId.package, sorted, routeMeta, interceptorMeta,
-          clientFilterMeta, serverFilterMeta, exceptionHandlerMeta, authProviderMeta,
-          webSocketMeta, healthIndicatorMeta, eventListenerMeta, scheduledMeta,
           libraryDeps: libraryDeps);
 
       final moduleId = AssetId(
@@ -175,8 +148,6 @@ class ContextBuilder implements Builder {
       // Also generate a boot_context.g.dart for the library's own tests
       _validateGraph(beanMeta, libraryProvided: libraryProvidedTypes);
       final contextOutput = _generateOutput(sorted, routeMeta, interceptorMeta,
-          clientFilterMeta, serverFilterMeta, exceptionHandlerMeta, authProviderMeta,
-          webSocketMeta, healthIndicatorMeta, eventListenerMeta, scheduledMeta,
           libraryModules: []);
       final contextId = AssetId(
         buildStep.inputId.package,
@@ -237,10 +208,7 @@ class ContextBuilder implements Builder {
               if (!uri.toString().startsWith('package:$packageName/')) continue;
               for (final element in exported.topLevelElements) {
                 if (element is ClassElement) {
-                  if (_singletonChecker.hasAnnotationOf(element) ||
-                      _prototypeChecker.hasAnnotationOf(element) ||
-                      _controllerChecker.hasAnnotationOf(element) ||
-                      _serverWebSocketChecker.hasAnnotationOf(element)) {
+                  if (_hasBeanSourceAnnotation(element)) {
                     libraryProvidedTypes.add(element.name);
                     // Collect typed-as interfaces (explicit or auto-detected)
                     final ann = _singletonChecker.firstAnnotationOf(element);
@@ -253,7 +221,7 @@ class ContextBuilder implements Builder {
                       // Auto-detect from interfaces (including inherited)
                       libraryProvidedTypes.addAll(
                         element.allSupertypes
-                            .map((i) => i.getDisplayString())
+                            .map((i) => i.element.name)
                             .where((s) => s != 'Object'));
                     }
                   }
@@ -263,9 +231,7 @@ class ContextBuilder implements Builder {
           } else {
             // Not a boot library — try source scanning (legacy/workspace support)
             await _scanDependencyPackage(buildStep, packageName, beanMeta,
-                routeMeta, interceptorMeta, clientFilterMeta, serverFilterMeta,
-                exceptionHandlerMeta, authProviderMeta, webSocketMeta,
-                healthIndicatorMeta, eventListenerMeta, scheduledMeta);
+                routeMeta, interceptorMeta);
           }
         } catch (_) {}
       }
@@ -311,8 +277,6 @@ class ContextBuilder implements Builder {
       final sorted = _topologicalSort(beanMeta);
 
       final output = _generateOutput(sorted, routeMeta, interceptorMeta,
-          clientFilterMeta, serverFilterMeta, exceptionHandlerMeta, authProviderMeta,
-          webSocketMeta, healthIndicatorMeta, eventListenerMeta, scheduledMeta,
           libraryModules: libraryModules);
 
       final outputId = AssetId(
@@ -354,14 +318,6 @@ class ContextBuilder implements Builder {
     List<_BeanMeta> beanMeta,
     List<_RouteMeta> routeMeta,
     List<_InterceptorMeta> interceptorMeta,
-    List<_ClientFilterMeta> clientFilterMeta,
-    List<_ServerFilterMeta> serverFilterMeta,
-    List<_ExceptionHandlerMeta> exceptionHandlerMeta,
-    List<_AuthProviderMeta> authProviderMeta,
-    List<_WebSocketMeta> webSocketMeta,
-    List<_HealthIndicatorMeta> healthIndicatorMeta,
-    List<_EventListenerMeta> eventListenerMeta,
-    List<_ScheduledMeta> scheduledMeta,
   ) async {
     // Check if this package depends on boot (i.e., is a boot library)
     final depPubspecId = AssetId(packageName, 'pubspec.yaml');
@@ -383,18 +339,14 @@ class ContextBuilder implements Builder {
     try {
       final library = await buildStep.resolver.libraryFor(barrelId);
       // Scan the barrel file itself
-      _scanLibrary(library, barrelId, beanMeta, routeMeta, interceptorMeta,
-          clientFilterMeta, serverFilterMeta, exceptionHandlerMeta, authProviderMeta,
-          webSocketMeta, healthIndicatorMeta, eventListenerMeta, scheduledMeta);
+      _scanLibrary(library, barrelId, beanMeta, routeMeta, interceptorMeta);
 
       // Scan all exported libraries (transitively)
       for (final exported in library.exportedLibraries) {
         final uri = exported.source.uri;
         if (!uri.toString().startsWith('package:$packageName/')) continue;
         final assetId = AssetId.resolve(uri);
-        _scanLibrary(exported, assetId, beanMeta, routeMeta, interceptorMeta,
-            clientFilterMeta, serverFilterMeta, exceptionHandlerMeta, authProviderMeta,
-            webSocketMeta, healthIndicatorMeta, eventListenerMeta, scheduledMeta);
+        _scanLibrary(exported, assetId, beanMeta, routeMeta, interceptorMeta);
       }
     } catch (_) {}
   }
@@ -406,28 +358,14 @@ class ContextBuilder implements Builder {
     List<_BeanMeta> beanMeta,
     List<_RouteMeta> routeMeta,
     List<_InterceptorMeta> interceptorMeta,
-    List<_ClientFilterMeta> clientFilterMeta,
-    List<_ServerFilterMeta> serverFilterMeta,
-    List<_ExceptionHandlerMeta> exceptionHandlerMeta,
-    List<_AuthProviderMeta> authProviderMeta,
-    List<_WebSocketMeta> webSocketMeta,
-    List<_HealthIndicatorMeta> healthIndicatorMeta,
-    List<_EventListenerMeta> eventListenerMeta,
-    List<_ScheduledMeta> scheduledMeta,
   ) {
     final importUri = assetId.uri.toString();
 
     for (final element in library.topLevelElements) {
       if (element is! ClassElement) continue;
 
-      final isManagedBean = _singletonChecker.hasAnnotationOf(element) ||
-          _prototypeChecker.hasAnnotationOf(element) ||
-          _controllerChecker.hasAnnotationOf(element) ||
-          _serverWebSocketChecker.hasAnnotationOf(element) ||
-          _interceptorBeanChecker.hasAnnotationOf(element) ||
-          _clientFilterChecker.hasAnnotationOf(element) ||
-          TypeChecker.fromRuntime(ServerFilter).hasAnnotationOf(element);
-      final hasControllerAnnotation = _controllerChecker.hasAnnotationOf(element);
+      final isManagedBean = _hasBeanSourceAnnotation(element);
+      final hasRouteSource = _hasRouteSourceAnnotation(element);
 
       if (isManagedBean) {
         final className = element.name;
@@ -454,14 +392,14 @@ class ContextBuilder implements Builder {
 
         // Auto-detect implemented interfaces from AST (including inherited)
         final autoInterfaces = element.allSupertypes
-            .map((i) => i.getDisplayString())
+            .map((i) => i.element.name)
             .where((s) => s != 'Object')
             .toSet()
             .toList();
 
         // Collect import URIs for interface types
         final interfaceImports = element.allSupertypes
-            .where((t) => t.getDisplayString() != 'Object')
+            .where((t) => t.element.name != 'Object')
             .map((i) => i.element.source.uri.toString())
             .toSet()
             .toList();
@@ -534,7 +472,7 @@ class ContextBuilder implements Builder {
         ));
       }
 
-      if (hasControllerAnnotation) {
+      if (hasRouteSource) {
         routeMeta.add(_RouteMeta(
           className: element.name,
           routesClass: '\$${element.name}Routes',
@@ -560,122 +498,6 @@ class ContextBuilder implements Builder {
             import: importUri,
             adviceTypeImport: adviceTypeImport,
           ));
-        }
-      }
-
-      // AuthenticationProvider
-      if (isManagedBean && _authProviderChecker.isAssignableFromType(element.thisType)) {
-        authProviderMeta.add(_AuthProviderMeta(className: element.name, import: importUri));
-      }
-
-      // HealthIndicator
-      if (isManagedBean && _healthIndicatorChecker.isAssignableFromType(element.thisType)) {
-        healthIndicatorMeta.add(_HealthIndicatorMeta(className: element.name, import: importUri));
-      }
-
-      // @ServerWebSocket
-      if (_serverWebSocketChecker.hasAnnotationOf(element)) {
-        final wsAnnotation = _serverWebSocketChecker.firstAnnotationOf(element)!;
-        final wsPath = wsAnnotation.getField('path')!.toStringValue()!;
-        final protocols = wsAnnotation.getField('protocols')!.toListValue()
-            ?.map((e) => e.toStringValue()!).toList() ?? [];
-        final idleTimeout = wsAnnotation.getField('idleTimeout')?.toStringValue();
-        final maxMessageSize = wsAnnotation.getField('maxMessageSize')?.toIntValue();
-        final onOpen = element.methods.where((m) => TypeChecker.fromRuntime(OnOpen).hasAnnotationOf(m)).firstOrNull?.name;
-        final onMessage = element.methods.where((m) => TypeChecker.fromRuntime(OnMessage).hasAnnotationOf(m)).firstOrNull?.name;
-        final onClose = element.methods.where((m) => TypeChecker.fromRuntime(OnClose).hasAnnotationOf(m)).firstOrNull?.name;
-        final onError = element.methods.where((m) => TypeChecker.fromRuntime(OnError).hasAnnotationOf(m)).firstOrNull?.name;
-        webSocketMeta.add(_WebSocketMeta(
-          className: element.name, path: wsPath, import: importUri,
-          protocols: protocols, idleTimeout: idleTimeout, maxMessageSize: maxMessageSize,
-          onOpen: onOpen, onMessage: onMessage, onClose: onClose, onError: onError,
-        ));
-      }
-
-      // ExceptionHandler
-      if (isManagedBean && _exceptionHandlerChecker.isAssignableFromType(element.thisType)) {
-        final ehInterface = element.interfaces.firstWhere((i) => _exceptionHandlerChecker.isExactlyType(i));
-        final exceptionType = ehInterface.typeArguments.isNotEmpty
-            ? ehInterface.typeArguments.first.getDisplayString()
-            : null;
-        if (exceptionType != null) {
-          String? exceptionTypeImport;
-          final exceptionElement = ehInterface.typeArguments.first.element;
-          if (exceptionElement != null && exceptionElement.source != null) {
-            exceptionTypeImport = exceptionElement.source!.uri.toString();
-          }
-          exceptionHandlerMeta.add(_ExceptionHandlerMeta(
-            className: element.name, exceptionType: exceptionType, import: importUri,
-            exceptionTypeImport: exceptionTypeImport,
-          ));
-        }
-      }
-
-      // @ClientFilter
-      if (_clientFilterChecker.hasAnnotationOf(element) && isManagedBean) {
-        clientFilterMeta.add(_ClientFilterMeta(className: element.name, import: importUri));
-      }
-
-      // @ServerFilter detection
-      final serverFilterChecker = TypeChecker.fromRuntime(ServerFilter);
-      if (serverFilterChecker.hasAnnotationOf(element) && isManagedBean) {
-        final annotation = serverFilterChecker.firstAnnotationOf(element)!;
-        final pattern = annotation.getField('pattern')?.toStringValue() ?? '/**';
-        int order = 0;
-        final orderChecker = TypeChecker.fromRuntime(Order);
-        final orderAnnotation = orderChecker.firstAnnotationOf(element);
-        if (orderAnnotation != null) {
-          order = orderAnnotation.getField('value')!.toIntValue()!;
-        }
-        serverFilterMeta.add(_ServerFilterMeta(className: element.name, import: importUri, order: order, pattern: pattern));
-      }
-
-      // Beans from @BeanSource meta-annotated annotations (e.g., @Client)
-      if (_hasBeanSourceAnnotation(element)) {
-        beanMeta.add(_BeanMeta(
-          className: element.name,
-          definitionClass: '\$${element.name}Definition',
-          dependencies: [],
-          import: importUri,
-        ));
-      }
-
-      // @EventListener and @Scheduled methods on managed beans
-      if (isManagedBean) {
-        for (final method in element.methods) {
-          if (method.isPrivate || method.isStatic) continue;
-          if (_eventListenerChecker.hasAnnotationOf(method)) {
-            final paramType = method.parameters.isNotEmpty
-                ? method.parameters.first.type.getDisplayString()
-                : null;
-            if (paramType != null) {
-              // Resolve the import path of the event type
-              String? eventTypeImport;
-              final paramElement = method.parameters.first.type.element;
-              if (paramElement != null && paramElement.source != null) {
-                eventTypeImport = paramElement.source!.uri.toString();
-              }
-              eventListenerMeta.add(_EventListenerMeta(
-                className: element.name,
-                methodName: method.name,
-                eventType: paramType,
-                import: importUri,
-                eventTypeImport: eventTypeImport,
-              ));
-            }
-          }
-          if (_scheduledChecker.hasAnnotationOf(method)) {
-            final annotation = _scheduledChecker.firstAnnotationOf(method)!;
-            scheduledMeta.add(_ScheduledMeta(
-              className: element.name,
-              methodName: method.name,
-              fixedRate: annotation.getField('fixedRate')?.toStringValue(),
-              fixedDelay: annotation.getField('fixedDelay')?.toStringValue(),
-              cron: annotation.getField('cron')?.toStringValue(),
-              initialDelay: annotation.getField('initialDelay')?.toStringValue(),
-              import: importUri,
-            ));
-          }
         }
       }
 
@@ -722,15 +544,7 @@ class ContextBuilder implements Builder {
   String _generateOutput(
     List<_BeanMeta> sorted,
     List<_RouteMeta> routeMeta,
-    List<_InterceptorMeta> interceptorMeta,
-    List<_ClientFilterMeta> clientFilterMeta,
-    List<_ServerFilterMeta> serverFilterMeta,
-    List<_ExceptionHandlerMeta> exceptionHandlerMeta,
-    List<_AuthProviderMeta> authProviderMeta,
-    List<_WebSocketMeta> webSocketMeta,
-    List<_HealthIndicatorMeta> healthIndicatorMeta,
-    List<_EventListenerMeta> eventListenerMeta,
-    List<_ScheduledMeta> scheduledMeta, {
+    List<_InterceptorMeta> interceptorMeta, {
     List<_LibraryModule> libraryModules = const [],
   }) {
     final imports = <String>{};
@@ -747,20 +561,6 @@ class ContextBuilder implements Builder {
       imports.add(i.import);
       if (i.adviceTypeImport != null) imports.add(i.adviceTypeImport!);
     }
-    for (final cf in clientFilterMeta) imports.add(cf.import);
-    for (final sf in serverFilterMeta) imports.add(sf.import);
-    for (final eh in exceptionHandlerMeta) {
-      imports.add(eh.import);
-      if (eh.exceptionTypeImport != null) imports.add(eh.exceptionTypeImport!);
-    }
-    for (final ap in authProviderMeta) imports.add(ap.import);
-    for (final ws in webSocketMeta) imports.add(ws.import);
-    for (final h in healthIndicatorMeta) imports.add(h.import);
-    for (final el in eventListenerMeta) {
-      imports.add(el.import);
-      if (el.eventTypeImport != null) imports.add(el.eventTypeImport!);
-    }
-    for (final s in scheduledMeta) imports.add(s.import);
 
     final importStatements = imports.map((i) => "import '$i';").join('\n');
 
@@ -775,46 +575,6 @@ class ContextBuilder implements Builder {
       '  router.addAll(${r.routesClass}(container.get<${r.className}>()).routes);').join('\n');
     final interceptorRegistrations = interceptorMeta.map((i) =>
       '  container.registerInterceptor(${i.adviceType}, container.get<${i.className}>());').join('\n');
-    final clientFilterRegistrations = clientFilterMeta.map((f) =>
-      '  container.get<HttpClient>().addFilter(container.get<${f.className}>());').join('\n');
-    final serverFilterRegistrations = serverFilterMeta.map((f) =>
-      '  router.addFilter(\'${f.pattern}\', container.get<${f.className}>(), order: ${f.order});').join('\n');
-    final exceptionHandlerRegistrations = exceptionHandlerMeta.map((h) =>
-      '  router.addExceptionHandler<${h.exceptionType}>(container.get<${h.className}>());').join('\n');
-    final authProviderRegistrations = authProviderMeta.map((p) =>
-      '  router.addAuthenticationProvider(container.get<${p.className}>());').join('\n');
-    final healthIndicatorRegistrations = healthIndicatorMeta.map((h) =>
-      '  router.addHealthIndicator(container.get<${h.className}>());').join('\n');
-
-    final wsRegistrations = webSocketMeta.map((ws) {
-      final buf = StringBuffer();
-      buf.writeln("  if (container.has<WebSocketServer>()) {");
-      buf.writeln("    final ${_lcFirst(ws.className)} = container.get<${ws.className}>();");
-      final protocolsArg = ws.protocols.isNotEmpty ? ", protocols: [${ws.protocols.map((p) => "'$p'").join(', ')}]" : '';
-      final idleArg = ws.idleTimeout != null ? ", idleTimeout: parseDuration('${ws.idleTimeout}')" : '';
-      final maxMsgArg = ws.maxMessageSize != null ? ", maxMessageSize: ${ws.maxMessageSize}" : '';
-      buf.writeln("    container.get<WebSocketServer>().handle('${ws.path}', (session) {");
-      if (ws.onOpen != null) buf.writeln("      ${_lcFirst(ws.className)}.${ws.onOpen}(session${_wsPathArgs(ws.path)});");
-      if (ws.onMessage != null) buf.writeln("      session.onMessage((msg) => ${_lcFirst(ws.className)}.${ws.onMessage}(session, msg${_wsPathArgs(ws.path)}));");
-      if (ws.onClose != null) buf.writeln("      session.onClose((code, reason) => ${_lcFirst(ws.className)}.${ws.onClose}(session${_wsPathArgs(ws.path)}));");
-      if (ws.onError != null) buf.writeln("      session.onError((e) => ${_lcFirst(ws.className)}.${ws.onError}(session, e${_wsPathArgs(ws.path)}));");
-      buf.writeln("    }$protocolsArg$idleArg$maxMsgArg);");
-      buf.writeln("  }");
-      return buf.toString();
-    }).join('\n');
-
-    final eventListenerRegistrations = eventListenerMeta.map((e) =>
-      '  container.get<EventBus>().on<${e.eventType}>((event) => container.get<${e.className}>().${e.methodName}(event));').join('\n');
-    final scheduledRegistrations = scheduledMeta.map((s) {
-      final delay = s.initialDelay != null ? ", initialDelay: parseDuration('${s.initialDelay}')" : '';
-      if (s.fixedRate != null) {
-        return "  container.get<TaskScheduler>().scheduleFixedRate('${s.className}.${s.methodName}', parseDuration('${s.fixedRate}'), () => container.get<${s.className}>().${s.methodName}()$delay);";
-      } else if (s.fixedDelay != null) {
-        return "  container.get<TaskScheduler>().scheduleFixedDelay('${s.className}.${s.methodName}', parseDuration('${s.fixedDelay}'), () => container.get<${s.className}>().${s.methodName}()$delay);";
-      } else {
-        return "  // cron: '${s.cron}' — cron scheduling not yet implemented at runtime";
-      }
-    }).join('\n');
 
     // Library module calls
     final moduleCalls = libraryModules.map((m) =>
@@ -831,7 +591,7 @@ class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -856,32 +616,8 @@ $deferredRegistrations
   // Register interceptors
 $interceptorRegistrations
 
-  // Register client filters
-$clientFilterRegistrations
-
-  // Register server filters
-$serverFilterRegistrations
-
-  // Register exception handlers
-$exceptionHandlerRegistrations
-
-  // Register authentication providers
-$authProviderRegistrations
-
-  // Register health indicators
-$healthIndicatorRegistrations
-
-  // Register WebSocket handlers
-$wsRegistrations
-
   // Register routes
 $routeRegistrations
-
-  // Register event listeners
-$eventListenerRegistrations
-
-  // Register scheduled tasks
-$scheduledRegistrations
 }
 ''';
   }
@@ -1146,15 +882,7 @@ $scheduledRegistrations
     String packageName,
     List<_BeanMeta> sorted,
     List<_RouteMeta> routeMeta,
-    List<_InterceptorMeta> interceptorMeta,
-    List<_ClientFilterMeta> clientFilterMeta,
-    List<_ServerFilterMeta> serverFilterMeta,
-    List<_ExceptionHandlerMeta> exceptionHandlerMeta,
-    List<_AuthProviderMeta> authProviderMeta,
-    List<_WebSocketMeta> webSocketMeta,
-    List<_HealthIndicatorMeta> healthIndicatorMeta,
-    List<_EventListenerMeta> eventListenerMeta,
-    List<_ScheduledMeta> scheduledMeta, {
+    List<_InterceptorMeta> interceptorMeta, {
     List<_LibraryModule> libraryDeps = const [],
   }) {
     final imports = <String>{};
@@ -1171,20 +899,6 @@ $scheduledRegistrations
       imports.add(i.import);
       if (i.adviceTypeImport != null) imports.add(i.adviceTypeImport!);
     }
-    for (final cf in clientFilterMeta) imports.add(cf.import);
-    for (final sf in serverFilterMeta) imports.add(sf.import);
-    for (final eh in exceptionHandlerMeta) {
-      imports.add(eh.import);
-      if (eh.exceptionTypeImport != null) imports.add(eh.exceptionTypeImport!);
-    }
-    for (final ap in authProviderMeta) imports.add(ap.import);
-    for (final ws in webSocketMeta) imports.add(ws.import);
-    for (final h in healthIndicatorMeta) imports.add(h.import);
-    for (final el in eventListenerMeta) {
-      imports.add(el.import);
-      if (el.eventTypeImport != null) imports.add(el.eventTypeImport!);
-    }
-    for (final s in scheduledMeta) imports.add(s.import);
 
     final importStatements = imports.map((i) => "import '$i';").join('\n');
     final functionName = '\$${_camelCase(packageName)}Module';
@@ -1197,29 +911,6 @@ $scheduledRegistrations
       '  router.addAll(${r.routesClass}(container.get<${r.className}>()).routes);').join('\n');
     final interceptorRegistrations = interceptorMeta.map((i) =>
       '  container.registerInterceptor(${i.adviceType}, container.get<${i.className}>());').join('\n');
-    final clientFilterRegistrations = clientFilterMeta.map((f) =>
-      '  container.get<HttpClient>().addFilter(container.get<${f.className}>());').join('\n');
-    final serverFilterRegistrations = serverFilterMeta.map((f) =>
-      '  router.addFilter(\'${f.pattern}\', container.get<${f.className}>(), order: ${f.order});').join('\n');
-    final exceptionHandlerRegistrations = exceptionHandlerMeta.map((h) =>
-      '  router.addExceptionHandler<${h.exceptionType}>(container.get<${h.className}>());').join('\n');
-    final authProviderRegistrations = authProviderMeta.map((p) =>
-      '  router.addAuthenticationProvider(container.get<${p.className}>());').join('\n');
-    final healthIndicatorRegistrations = healthIndicatorMeta.map((h) =>
-      '  router.addHealthIndicator(container.get<${h.className}>());').join('\n');
-
-    final eventListenerRegistrations = eventListenerMeta.map((e) =>
-      '  container.get<EventBus>().on<${e.eventType}>((event) => container.get<${e.className}>().${e.methodName}(event));').join('\n');
-    final scheduledRegistrations = scheduledMeta.map((s) {
-      final delay = s.initialDelay != null ? ", initialDelay: parseDuration('${s.initialDelay}')" : '';
-      if (s.fixedRate != null) {
-        return "  container.get<TaskScheduler>().scheduleFixedRate('${s.className}.${s.methodName}', parseDuration('${s.fixedRate}'), () => container.get<${s.className}>().${s.methodName}()$delay);";
-      } else if (s.fixedDelay != null) {
-        return "  container.get<TaskScheduler>().scheduleFixedDelay('${s.className}.${s.methodName}', parseDuration('${s.fixedDelay}'), () => container.get<${s.className}>().${s.methodName}()$delay);";
-      } else {
-        return "  // cron: '${s.cron}' — cron scheduling not yet implemented at runtime";
-      }
-    }).join('\n');
 
     final depImports = libraryDeps.map((d) => "import '${d.import}';").join('\n');
     final depCalls = libraryDeps.map((d) =>
@@ -1246,21 +937,7 @@ $deferredRegistrations
 
 $interceptorRegistrations
 
-$clientFilterRegistrations
-
-$serverFilterRegistrations
-
-$exceptionHandlerRegistrations
-
-$authProviderRegistrations
-
-$healthIndicatorRegistrations
-
 $routeRegistrations
-
-$eventListenerRegistrations
-
-$scheduledRegistrations
 }
 ''';
   }
@@ -1274,13 +951,33 @@ $scheduledRegistrations
       if (enclosing == null) continue;
       if (enclosing is ClassElement) {
         if (_beanSourceChecker.hasAnnotationOf(enclosing)) return true;
+        // Check transitively (e.g., @RouteSource has @BeanSource)
+        for (final meta in enclosing.metadata) {
+          final metaEnclosing = meta.element?.enclosingElement3;
+          if (metaEnclosing is ClassElement && _beanSourceChecker.hasAnnotationOf(metaEnclosing)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  /// Checks if an element has an annotation meta-annotated with @RouteSource.
+  bool _hasRouteSourceAnnotation(ClassElement element) {
+    final routeSourceChecker = TypeChecker.fromRuntime(RouteSource);
+    for (final annotation in element.metadata) {
+      final annotationType = annotation.element;
+      if (annotationType == null) continue;
+      final enclosing = annotationType.enclosingElement3;
+      if (enclosing == null) continue;
+      if (enclosing is ClassElement) {
+        if (routeSourceChecker.hasAnnotationOf(enclosing)) return true;
       }
     }
     return false;
   }
 }
-
-String _lcFirst(String s) => s[0].toLowerCase() + s.substring(1);
 
 /// Derives a qualifier name from a class name.
 /// `ReadOnlyPool` → `readOnlyPool`, `DiskCache` → `diskCache`.
@@ -1291,12 +988,6 @@ String _camelCase(String s) {
   return s.split(RegExp(r'[_\-]')).map((part) =>
     part.isEmpty ? '' : part[0].toUpperCase() + part.substring(1)
   ).join();
-}
-
-String _wsPathArgs(String path) {
-  final params = RegExp(r'<(\w+)>').allMatches(path).map((m) => m.group(1)!).toList();
-  if (params.isEmpty) return '';
-  return ', ${params.map((p) => "session.pathParams['$p']!").join(', ')}';
 }
 
 class _LibraryModule {
@@ -1386,73 +1077,3 @@ class _InterceptorMeta {
   _InterceptorMeta({required this.className, required this.adviceType, required this.import, this.adviceTypeImport});
 }
 
-class _ClientFilterMeta {
-  final String className;
-  final String import;
-  _ClientFilterMeta({required this.className, required this.import});
-}
-
-class _ServerFilterMeta {
-  final String className;
-  final String import;
-  final int order;
-  final String pattern;
-  _ServerFilterMeta({required this.className, required this.import, required this.order, required this.pattern});
-}
-
-class _ExceptionHandlerMeta {
-  final String className;
-  final String exceptionType;
-  final String import;
-  final String? exceptionTypeImport;
-  _ExceptionHandlerMeta({required this.className, required this.exceptionType, required this.import, this.exceptionTypeImport});
-}
-
-class _AuthProviderMeta {
-  final String className;
-  final String import;
-  _AuthProviderMeta({required this.className, required this.import});
-}
-
-class _HealthIndicatorMeta {
-  final String className;
-  final String import;
-  _HealthIndicatorMeta({required this.className, required this.import});
-}
-
-class _WebSocketMeta {
-  final String className;
-  final String path;
-  final String import;
-  final List<String> protocols;
-  final String? idleTimeout;
-  final int? maxMessageSize;
-  final String? onOpen;
-  final String? onMessage;
-  final String? onClose;
-  final String? onError;
-
-  _WebSocketMeta({required this.className, required this.path, required this.import,
-      this.protocols = const [], this.idleTimeout, this.maxMessageSize,
-      this.onOpen, this.onMessage, this.onClose, this.onError});
-}
-
-class _EventListenerMeta {
-  final String className;
-  final String methodName;
-  final String eventType;
-  final String import;
-  final String? eventTypeImport;
-  _EventListenerMeta({required this.className, required this.methodName, required this.eventType, required this.import, this.eventTypeImport});
-}
-
-class _ScheduledMeta {
-  final String className;
-  final String methodName;
-  final String? fixedRate;
-  final String? fixedDelay;
-  final String? cron;
-  final String? initialDelay;
-  final String import;
-  _ScheduledMeta({required this.className, required this.methodName, this.fixedRate, this.fixedDelay, this.cron, this.initialDelay, required this.import});
-}

@@ -131,7 +131,7 @@ void main() {
   group('DI integration', () {
     test('registers TokenReader via container', () {
       final container = BeanContainer();
-      container.register<TokenReader>(_Def('BearerTokenReader', (_) => BearerTokenReader()));
+      container.register<TokenReader>(_Def(BearerTokenReader, (_) => BearerTokenReader()));
 
       final reader = container.get<TokenReader>();
       expect(reader, isA<BearerTokenReader>());
@@ -154,9 +154,9 @@ class _Chain implements FilterChain {
 
 class _Def extends BeanDefinition {
   @override
-  final String typeName;
+  final Type beanType;
   final dynamic Function(BeanContainer) _factory;
-  _Def(this.typeName, this._factory);
+  _Def(this.beanType, this._factory);
   @override
   dynamic create(BeanContainer container) => _factory(container);
 }

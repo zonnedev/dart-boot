@@ -134,13 +134,13 @@ void main() {
   group('DI integration', () {
     test('full wiring via container', () {
       final container = BeanContainer();
-      container.register<JwtConfig>(_Def('JwtConfig', (_) => config));
-      container.register<TokenReader>(_Def('DefaultTokenReader', (_) => DefaultTokenReader()));
-      container.register<BearerTokenReader>(_Def('DefaultTokenReader', (_) => DefaultTokenReader()));
-      container.register<TokenValidator>(_Def('JwtTokenValidator', (c) => JwtTokenValidator(c.get<JwtConfig>())));
-      container.register<TokenGenerator>(_Def('JwtTokenGenerator', (c) => JwtTokenGenerator(c.get<JwtConfig>())));
-      container.register<RefreshTokenGenerator>(_Def('JwtRefreshTokenGenerator', (c) => JwtRefreshTokenGenerator(c.get<JwtConfig>())));
-      container.register<AuthenticationProvider>(_Def('JwtAuthenticationProvider', (c) =>
+      container.register<JwtConfig>(_Def(JwtConfig, (_) => config));
+      container.register<TokenReader>(_Def(DefaultTokenReader, (_) => DefaultTokenReader()));
+      container.register<BearerTokenReader>(_Def(DefaultTokenReader, (_) => DefaultTokenReader()));
+      container.register<TokenValidator>(_Def(JwtTokenValidator, (c) => JwtTokenValidator(c.get<JwtConfig>())));
+      container.register<TokenGenerator>(_Def(JwtTokenGenerator, (c) => JwtTokenGenerator(c.get<JwtConfig>())));
+      container.register<RefreshTokenGenerator>(_Def(JwtRefreshTokenGenerator, (c) => JwtRefreshTokenGenerator(c.get<JwtConfig>())));
+      container.register<AuthenticationProvider>(_Def(JwtAuthenticationProvider, (c) =>
           JwtAuthenticationProvider(c.get<TokenReader>(), c.get<TokenValidator>())));
 
       final gen = container.get<TokenGenerator>();
@@ -154,9 +154,9 @@ void main() {
       // should be resolvable as both TokenReader (interface) and BearerTokenReader (concrete super)
       final container = BeanContainer();
       final reader = DefaultTokenReader();
-      container.register<TokenReader>(_Def('DefaultTokenReader', (_) => reader));
-      container.register<BearerTokenReader>(_Def('DefaultTokenReader', (_) => reader));
-      container.register<DefaultTokenReader>(_Def('DefaultTokenReader', (_) => reader));
+      container.register<TokenReader>(_Def(DefaultTokenReader, (_) => reader));
+      container.register<BearerTokenReader>(_Def(DefaultTokenReader, (_) => reader));
+      container.register<DefaultTokenReader>(_Def(DefaultTokenReader, (_) => reader));
 
       // Resolve by interface
       expect(container.get<TokenReader>(), isA<DefaultTokenReader>());
@@ -170,9 +170,9 @@ void main() {
 
 class _Def extends BeanDefinition {
   @override
-  final String typeName;
+  final Type beanType;
   final dynamic Function(BeanContainer) _factory;
-  _Def(this.typeName, this._factory);
+  _Def(this.beanType, this._factory);
   @override
   dynamic create(BeanContainer container) => _factory(container);
 }

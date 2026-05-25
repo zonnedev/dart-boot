@@ -16,7 +16,7 @@ class _NamedBuilderDefinition extends BeanDefinition {
   final HttpClientBuilder _builder;
   _NamedBuilderDefinition(this._builder);
   @override
-  String get typeName => 'HttpClientBuilder';
+  Type get beanType => HttpClientBuilder;
   @override
   dynamic create(BeanContainer container) => _builder;
 }
@@ -25,7 +25,7 @@ class _ConfigDefinition extends BeanDefinition {
   final BootConfig _config;
   _ConfigDefinition(this._config);
   @override
-  String get typeName => 'BootConfig';
+  Type get beanType => BootConfig;
   @override
   dynamic create(BeanContainer container) => _config;
 }
@@ -34,7 +34,7 @@ class _EventBusDefinition extends BeanDefinition {
   final EventBus _bus;
   _EventBusDefinition(this._bus);
   @override
-  String get typeName => 'EventBus';
+  Type get beanType => EventBus;
   @override
   dynamic create(BeanContainer container) => _bus;
 }
@@ -43,14 +43,14 @@ class _TaskSchedulerDefinition extends BeanDefinition {
   final TaskScheduler _scheduler;
   _TaskSchedulerDefinition(this._scheduler);
   @override
-  String get typeName => 'TaskScheduler';
+  Type get beanType => TaskScheduler;
   @override
   dynamic create(BeanContainer container) => _scheduler;
 }
 
 class _HttpClientDefinition extends BeanDefinition {
   @override
-  String get typeName => 'HttpClient';
+  Type get beanType => HttpClient;
   @override
   dynamic create(BeanContainer container) {
     final config = container.get<BootConfig>();

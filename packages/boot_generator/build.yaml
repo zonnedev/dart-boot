@@ -7,22 +7,6 @@ builders:
     build_to: cache
     applies_builders: ["source_gen|combining_builder"]
 
-  controller_builder:
-    import: "package:boot_generator/builder.dart"
-    builder_factories: ["controllerBuilder"]
-    build_extensions: {".dart": [".boot_route.g.part"]}
-    auto_apply: dependents
-    build_to: cache
-    applies_builders: ["source_gen|combining_builder"]
-
-  serializable_builder:
-    import: "package:boot_generator/builder.dart"
-    builder_factories: ["serializableBuilder"]
-    build_extensions: {".dart": [".boot_serde.g.part"]}
-    auto_apply: dependents
-    build_to: cache
-    applies_builders: ["source_gen|combining_builder"]
-
   context_builder:
     import: "package:boot_generator/builder.dart"
     builder_factories: ["contextBuilder"]

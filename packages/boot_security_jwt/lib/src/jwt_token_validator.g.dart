@@ -8,7 +8,15 @@ part of 'jwt_token_validator.dart';
 
 class $JwtTokenValidatorDefinition extends BeanDefinition {
   @override
-  String get typeName => 'JwtTokenValidator';
+  Type get beanType => JwtTokenValidator;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   JwtTokenValidator create(BeanContainer container) =>

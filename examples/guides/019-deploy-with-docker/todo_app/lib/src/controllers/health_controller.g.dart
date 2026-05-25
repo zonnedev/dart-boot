@@ -3,12 +3,20 @@
 part of 'health_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $HealthControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'HealthController';
+  Type get beanType => HealthController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/health'}),
+      ];
 
   @override
   HealthController create(BeanContainer container) => HealthController();
@@ -30,6 +38,16 @@ class $HealthControllerRoutes implements RouteRegistration {
           handler: (request) async {
             return await controller.health(request);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/health'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/'})
+          ],
         ),
       ];
 }

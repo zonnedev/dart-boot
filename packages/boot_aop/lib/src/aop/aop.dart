@@ -1,4 +1,6 @@
 // coverage:ignore-file
+import 'package:boot_core/boot_core.dart';
+
 export 'package:boot_core/boot_core.dart' show MethodInterceptor;
 
 /// Meta-annotation: marks an annotation as providing Around advice.
@@ -7,6 +9,7 @@ class Around {
 }
 
 /// Associates an interceptor with an advice annotation.
+@BeanSource()
 class InterceptorBean {
   final Type value;
   const InterceptorBean(this.value);

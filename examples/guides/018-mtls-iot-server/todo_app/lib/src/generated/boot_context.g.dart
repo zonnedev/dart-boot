@@ -11,7 +11,7 @@ class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -39,38 +39,6 @@ void $configure(BeanContainer container, BootRouter router) {
   // Register interceptors
 
 
-  // Register client filters
-
-
-  // Register server filters
-
-
-  // Register exception handlers
-
-
-  // Register authentication providers
-  router.addAuthenticationProvider(container.get<DeviceCertAuth>());
-
-  // Register health indicators
-
-
-  // Register WebSocket handlers
-  if (container.has<WebSocketServer>()) {
-    final deviceSocket = container.get<DeviceSocket>();
-    container.get<WebSocketServer>().handle('/devices/<deviceId>', (session) {
-      deviceSocket.onOpen(session, session.pathParams['deviceId']!);
-      session.onMessage((msg) => deviceSocket.onMessage(session, msg, session.pathParams['deviceId']!));
-      session.onClose((code, reason) => deviceSocket.onClose(session, session.pathParams['deviceId']!));
-    });
-  }
-
-
   // Register routes
   router.addAll($HelloControllerRoutes(container.get<HelloController>()).routes);
-
-  // Register event listeners
-
-
-  // Register scheduled tasks
-
 }

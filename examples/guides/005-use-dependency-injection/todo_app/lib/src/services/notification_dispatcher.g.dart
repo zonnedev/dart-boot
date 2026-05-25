@@ -3,12 +3,20 @@
 part of 'notification_dispatcher.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $NotificationDispatcherDefinition extends BeanDefinition {
   @override
-  String get typeName => 'NotificationDispatcher';
+  Type get beanType => NotificationDispatcher;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   NotificationDispatcher create(BeanContainer container) =>

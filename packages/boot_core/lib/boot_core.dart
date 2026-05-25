@@ -21,6 +21,7 @@ export 'src/annotations/value.dart';
 // Container
 export 'src/container/bean_container.dart';
 export 'src/container/bean_definition.dart';
+export 'src/container/annotation_metadata.dart';
 export 'src/container/exceptions.dart';
 export 'src/container/method_interceptor.dart';
 
@@ -33,3 +34,6 @@ export 'src/logging/logger.dart';
 // Context (tracing)
 export 'src/context/boot_context.dart';
 export 'src/annotations/bean_source.dart';
+export 'src/annotations/route_source.dart';
+export 'src/annotations/method_hook.dart';
+export 'src/method_wiring_processor.dart';

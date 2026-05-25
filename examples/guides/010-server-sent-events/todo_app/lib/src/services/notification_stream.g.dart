@@ -3,12 +3,20 @@
 part of 'notification_stream.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $NotificationStreamDefinition extends BeanDefinition {
   @override
-  String get typeName => 'NotificationStream';
+  Type get beanType => NotificationStream;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   NotificationStream create(BeanContainer container) => NotificationStream();

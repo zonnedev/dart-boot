@@ -3,12 +3,30 @@
 part of 'todo_repository.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $TodoRepositoryDefinition extends BeanDefinition {
   @override
-  String get typeName => 'TodoRepository';
+  Type get beanType => TodoRepository;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/requires.dart#Requires'),
+            {
+              'env': [],
+              'notEnv': [],
+              'property': 'pg.host',
+              'beans': [],
+              'missingBeans': []
+            }),
+      ];
 
   @override
   TodoRepository create(BeanContainer container) =>

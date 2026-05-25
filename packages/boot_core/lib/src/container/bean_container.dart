@@ -105,7 +105,7 @@ class BeanContainer {
       return defs.last; // Primary is always added last via registerPrimary
     }
 
-    throw NonUniqueBeanException(T, defs.map((d) => d.typeName).toList());
+    throw NonUniqueBeanException(T, defs.map((d) => d.beanType.toString()).toList());
   }
 
   /// Retrieve all beans of a type.
@@ -126,6 +126,12 @@ class BeanContainer {
       return instance;
     }).toList();
   }
+
+  /// Retrieve all bean definitions for a type (with their annotation metadata).
+  List<BeanDefinition> getDefinitions<T>() => _definitions[T] ?? [];
+
+  /// All registered bean definitions (for runtime scanning).
+  Iterable<MapEntry<Type, List<BeanDefinition>>> get allDefinitions => _definitions.entries;
 
   /// Retrieve a named bean.
   T getNamed<T>(String name) {

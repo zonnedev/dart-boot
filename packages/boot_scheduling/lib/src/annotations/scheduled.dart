@@ -1,7 +1,14 @@
 // coverage:ignore-file
+import 'package:boot_core/boot_core.dart';
+
+/// AnnotationType constant for runtime metadata queries.
+const scheduledAnnotationType = AnnotationType(
+    'package:boot_scheduling/src/annotations/scheduled.dart#Scheduled');
+
 /// Schedules a method for periodic or delayed execution.
 ///
 /// Exactly one of [fixedRate], [fixedDelay], or [cron] must be specified.
+@MethodHook()
 class Scheduled {
   /// Execute at a fixed rate (e.g., '5s', '1m', '500ms').
   final String? fixedRate;

@@ -3,26 +3,51 @@
 part of 'production_jobs.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $ProductionJobsDefinition extends BeanDefinition {
-  BeanContainer? _container;
   @override
-  String get typeName => 'ProductionJobs';
+  Type get beanType => ProductionJobs;
 
   @override
-  ProductionJobs create(BeanContainer container) {
-    _container = container;
-    return ProductionJobs();
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/requires.dart#Requires'),
+            {
+              'env': [],
+              'notEnv': ['test'],
+              'beans': [],
+              'missingBeans': []
+            }),
+      ];
+
+  @override
+  List<MethodMetadata> get methodMetadata => const [
+        MethodMetadata('compactDatabase', [
+          const AnnotationValue(
+              AnnotationType(
+                  'package:boot_scheduling/src/annotations/scheduled.dart#Scheduled'),
+              {'fixedRate': '1s'})
+        ]),
+      ];
+
+  @override
+  dynamic dispatch(Object instance, String method, List<dynamic> args) {
+    final bean = instance as ProductionJobs;
+    switch (method) {
+      case 'compactDatabase':
+        return bean.compactDatabase();
+      default:
+        return super.dispatch(instance, method, args);
+    }
   }
 
   @override
-  bool get hasPostConstruct => true;
-  @override
-  void postConstruct(dynamic instance) {
-    final scheduler = _container!.get<TaskScheduler>();
-    scheduler.scheduleFixedRate('ProductionJobs.compactDatabase',
-        parseDuration('1h'), (instance as ProductionJobs).compactDatabase);
-  }
+  ProductionJobs create(BeanContainer container) => ProductionJobs();
 }

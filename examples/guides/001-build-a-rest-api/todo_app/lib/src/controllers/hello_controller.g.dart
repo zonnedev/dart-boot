@@ -3,12 +3,20 @@
 part of 'hello_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $HelloControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'HelloController';
+  Type get beanType => HelloController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/hello'}),
+      ];
 
   @override
   HelloController create(BeanContainer container) => HelloController();
@@ -30,6 +38,16 @@ class $HelloControllerRoutes implements RouteRegistration {
           handler: (request) async {
             return await controller.hello(request);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/hello'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/'})
+          ],
         ),
         RouteEntry(
           method: 'GET',
@@ -38,6 +56,16 @@ class $HelloControllerRoutes implements RouteRegistration {
             final name = request.pathParams['name']!;
             return await controller.greet(request, name);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/hello'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/<name>'})
+          ],
         ),
       ];
 }

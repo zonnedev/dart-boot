@@ -5,14 +5,13 @@ import 'package:todo_app/src/controllers/hello_controller.dart';
 import 'package:todo_app/src/controllers/todo_controller.dart';
 import 'package:todo_app/src/exceptions/todo_limit_handler.dart';
 import 'package:boot_http_common/src/http/exception_handler.dart';
-import 'package:todo_app/src/exceptions/todo_limit_exception.dart';
 
 
 class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -31,7 +30,7 @@ void $configure(BeanContainer container, BootRouter router) {
   container.register<HelloController>($HelloControllerDefinition());
   container.register<TodoController>($TodoControllerDefinition());
   container.register<TodoLimitHandler>($TodoLimitHandlerDefinition());
-  container.register<ExceptionHandler<TodoLimitException>>($TodoLimitHandlerDefinition());
+  container.register<ExceptionHandler>($TodoLimitHandlerDefinition());
 
   // Evaluate deferred beans (beans/missingBeans conditions)
 
@@ -40,31 +39,7 @@ void $configure(BeanContainer container, BootRouter router) {
   // Register interceptors
 
 
-  // Register client filters
-
-
-  // Register server filters
-
-
-  // Register exception handlers
-  router.addExceptionHandler<TodoLimitException>(container.get<TodoLimitHandler>());
-
-  // Register authentication providers
-
-
-  // Register health indicators
-
-
-  // Register WebSocket handlers
-
-
   // Register routes
   router.addAll($HelloControllerRoutes(container.get<HelloController>()).routes);
   router.addAll($TodoControllerRoutes(container.get<TodoController>()).routes);
-
-  // Register event listeners
-
-
-  // Register scheduled tasks
-
 }

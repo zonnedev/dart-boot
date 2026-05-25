@@ -3,12 +3,20 @@
 part of 'upload_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $UploadControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'UploadController';
+  Type get beanType => UploadController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/upload'}),
+      ];
 
   @override
   UploadController create(BeanContainer container) => UploadController();
@@ -30,6 +38,16 @@ class $UploadControllerRoutes implements RouteRegistration {
           handler: (request) async {
             return await controller.uploadAvatar(request);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/upload'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Post'),
+                {'path': '/avatar'})
+          ],
         ),
       ];
 }

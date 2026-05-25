@@ -47,7 +47,7 @@ class $PostClientImpl implements PostClient {
 
 class $PostClientDefinition extends BeanDefinition {
   @override
-  String get typeName => 'PostClient';
+  Type get beanType => PostClient;
 
   @override
   PostClient create(BeanContainer container) => $PostClientImpl(container);

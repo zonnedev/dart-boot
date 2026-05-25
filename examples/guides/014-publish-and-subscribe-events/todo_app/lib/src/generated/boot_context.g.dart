@@ -5,14 +5,13 @@ import 'package:todo_app/src/controllers/hello_controller.dart';
 import 'package:todo_app/src/controllers/todo_controller.dart';
 import 'package:todo_app/src/listeners/email_listener.dart';
 import 'package:todo_app/src/listeners/analytics_listener.dart';
-import 'package:todo_app/src/events/todo_events.dart';
 
 
 class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
   _ContainerSelfDefinition(this._container);
   @override
-  String get typeName => 'BeanContainer';
+  Type get beanType => BeanContainer;
   @override
   dynamic create(BeanContainer container) => _container;
 }
@@ -40,33 +39,7 @@ void $configure(BeanContainer container, BootRouter router) {
   // Register interceptors
 
 
-  // Register client filters
-
-
-  // Register server filters
-
-
-  // Register exception handlers
-
-
-  // Register authentication providers
-
-
-  // Register health indicators
-
-
-  // Register WebSocket handlers
-
-
   // Register routes
   router.addAll($HelloControllerRoutes(container.get<HelloController>()).routes);
   router.addAll($TodoControllerRoutes(container.get<TodoController>()).routes);
-
-  // Register event listeners
-  container.get<EventBus>().on<TodoCreatedEvent>((event) => container.get<EmailListener>().onTodoCreated(event));
-  container.get<EventBus>().on<TodoCreatedEvent>((event) => container.get<AnalyticsListener>().onTodoCreated(event));
-  container.get<EventBus>().on<TodoDeletedEvent>((event) => container.get<AnalyticsListener>().onTodoDeleted(event));
-
-  // Register scheduled tasks
-
 }

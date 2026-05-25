@@ -156,6 +156,12 @@ class WebSocketServer {
   /// Get all active sessions for a path.
   List<WebSocketSession> sessions(String path) => _sessions[path] ?? [];
 
+  /// Check if a handler is registered for the given path pattern.
+  bool hasEndpoint(String path) => _endpoints.containsKey(path);
+
+  /// Get all registered endpoint path patterns.
+  Iterable<String> get registeredPaths => _endpoints.keys;
+
   /// Handle an incoming WebSocket upgrade request.
   Future<bool> handleUpgrade(HttpRequest request) async {
     final path = request.uri.path;

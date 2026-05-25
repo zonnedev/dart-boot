@@ -32,7 +32,7 @@ class _SimpleDef<T> extends BeanDefinition {
   _SimpleDef(this._factory);
 
   @override
-  String get typeName => T.toString();
+  Type get beanType => T;
 
   @override
   dynamic create(BeanContainer container) => _factory(container);
@@ -45,7 +45,7 @@ class _PostConstructDef<T> extends BeanDefinition {
   _PostConstructDef(this._factory, this._postConstruct);
 
   @override
-  String get typeName => T.toString();
+  Type get beanType => T;
 
   @override
   dynamic create(BeanContainer container) => _factory(container);
@@ -64,7 +64,7 @@ class _PreDestroyDef<T> extends BeanDefinition {
   _PreDestroyDef(this._factory, this._preDestroy);
 
   @override
-  String get typeName => T.toString();
+  Type get beanType => T;
 
   @override
   dynamic create(BeanContainer container) => _factory(container);
@@ -768,7 +768,7 @@ class _AsyncPostConstructDef<T> extends BeanDefinition {
   _AsyncPostConstructDef(this._factory, this._postConstruct);
 
   @override
-  String get typeName => T.toString();
+  Type get beanType => T;
 
   @override
   dynamic create(BeanContainer container) => _factory(container);

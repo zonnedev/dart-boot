@@ -8,7 +8,15 @@ part of 'jwt_config.dart';
 
 class $JwtConfigDefinition extends BeanDefinition {
   @override
-  String get typeName => 'JwtConfig';
+  Type get beanType => JwtConfig;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   JwtConfig create(BeanContainer container) => JwtConfig(

@@ -100,7 +100,7 @@ $methods}
 
 class \$${className}Definition extends BeanDefinition {
   @override
-  String get typeName => '$className';
+  Type get beanType => $className;
 
   @override
   $className create(BeanContainer container) =>
@@ -120,7 +120,7 @@ $methods}
 
 class \$${className}Definition extends BeanDefinition {
   @override
-  String get typeName => '$className';
+  Type get beanType => $className;
 
   @override
   $className create(BeanContainer container) =>

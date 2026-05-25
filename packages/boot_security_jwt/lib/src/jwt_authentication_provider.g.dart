@@ -8,7 +8,15 @@ part of 'jwt_authentication_provider.dart';
 
 class $JwtAuthenticationProviderDefinition extends BeanDefinition {
   @override
-  String get typeName => 'JwtAuthenticationProvider';
+  Type get beanType => JwtAuthenticationProvider;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   JwtAuthenticationProvider create(BeanContainer container) =>

@@ -26,6 +26,7 @@ export 'src/health/health.dart';
 export 'src/websocket/annotations.dart';
 export 'src/websocket/websocket_server.dart';
 export 'src/websocket/websocket_builder.dart';
+export 'src/websocket/websocket_wiring_processor.dart';
 
 // Logging & Tracing
 export 'src/logging/request_logging_filter.dart';

@@ -3,25 +3,42 @@
 part of 'email_listener.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $EmailListenerDefinition extends BeanDefinition {
-  BeanContainer? _container;
   @override
-  String get typeName => 'EmailListener';
+  Type get beanType => EmailListener;
 
   @override
-  EmailListener create(BeanContainer container) {
-    _container = container;
-    return EmailListener();
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
+
+  @override
+  List<MethodMetadata> get methodMetadata => const [
+        MethodMetadata('onTodoCreated', [
+          const AnnotationValue(AnnotationType(
+              'package:boot_events/src/annotations/event_listener.dart#EventListener'))
+        ], [
+          TodoCreatedEvent
+        ]),
+      ];
+
+  @override
+  dynamic dispatch(Object instance, String method, List<dynamic> args) {
+    final bean = instance as EmailListener;
+    switch (method) {
+      case 'onTodoCreated':
+        return bean.onTodoCreated(args[0] as TodoCreatedEvent);
+      default:
+        return super.dispatch(instance, method, args);
+    }
   }
 
   @override
-  bool get hasPostConstruct => true;
-  @override
-  void postConstruct(dynamic instance) {
-    final bus = _container!.get<EventBus>();
-    bus.on<TodoCreatedEvent>((instance as EmailListener).onTodoCreated);
-  }
+  EmailListener create(BeanContainer container) => EmailListener();
 }

@@ -172,7 +172,7 @@ class _MockGreetService extends _GreetService {
 
 class _GreetServiceDef extends BeanDefinition {
   @override
-  String get typeName => '_GreetService';
+  Type get beanType => _GreetService;
   @override
   dynamic create(BeanContainer container) => _GreetService();
 }

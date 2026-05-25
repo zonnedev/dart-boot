@@ -57,7 +57,7 @@ class FactoryGenerator extends GeneratorForAnnotation<Factory> {
       output.writeln('''
 class \$${factoryClass}_${methodName}Definition extends BeanDefinition {
   @override
-  String get typeName => '$returnType (from $factoryClass.$methodName)';
+  Type get beanType => $returnType;
 
   @override
   $returnType create(BeanContainer container) {

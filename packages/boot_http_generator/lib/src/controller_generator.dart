@@ -6,6 +6,8 @@ import 'package:source_gen/source_gen.dart';
 import 'package:boot_serialization/boot_serialization.dart';
 import 'package:boot_http/boot_http.dart';
 
+import 'annotation_metadata_emitter.dart';
+
 
 
 final _pathParamChecker = TypeChecker.fromRuntime(PathParam);
@@ -54,7 +56,7 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
     final routes = <String>[];
 
     // Collect class-level annotations for metadata (e.g., @Secured on the class)
-    final classMetadata = _collectMetadata(element);
+    final classMetadata = emitAnnotationValues(element);
 
     for (final method in element.methods) {
       final routeInfo = _extractRoute(method);
@@ -65,7 +67,7 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
       final handlerCode = _buildHandler(method, className);
 
       // Merge class + method annotations as route metadata
-      final methodMetadata = _collectMetadata(method);
+      final methodMetadata = emitAnnotationValues(method);
       final allMetadata = [...classMetadata, ...methodMetadata];
       final metadataCode = allMetadata.isEmpty
           ? ''
@@ -329,43 +331,6 @@ ${routes.join(',\n')},
   }
 
   /// Structural annotations that are consumed by the generator — not forwarded as metadata.
-  static final _structuralAnnotations = {
-    'Controller', 'Get', 'Post', 'Put', 'Delete', 'Patch',
-    'PathParam', 'QueryParam', 'Body', 'Header', 'CookieValue',
-    'Singleton', 'Prototype', 'Factory', 'Order',
-  };
-
-  /// Collect non-structural annotations from an element as metadata code strings.
-  List<String> _collectMetadata(dynamic element) {
-    final result = <String>[];
-    for (final annotation in element.metadata) {
-      final name = annotation.element?.enclosingElement3?.name;
-      if (name == null || _structuralAnnotations.contains(name)) continue;
-
-      // @Secured(['ROLE_ADMIN'])
-      if (name == 'Secured') {
-        final value = annotation.computeConstantValue();
-        if (value == null) continue;
-        final roles = value.getField('value')?.toListValue()
-            ?.map((v) => "'${v.toStringValue()}'")
-            .join(', ');
-        if (roles != null) {
-          result.add("Secured([$roles])");
-        }
-        continue;
-      }
-
-      // Generic: emit const AnnotationName() for no-arg annotations
-      final value = annotation.computeConstantValue();
-      if (value != null && value.type?.element?.name != null) {
-        final typeName = value.type!.element!.name!;
-        if (!_structuralAnnotations.contains(typeName)) {
-          result.add('const $typeName()');
-        }
-      }
-    }
-    return result;
-  }
 }
 
 /// Derives a URL path from a controller class name.

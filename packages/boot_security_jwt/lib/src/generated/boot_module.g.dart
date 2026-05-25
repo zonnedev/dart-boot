@@ -45,10 +45,6 @@ void $BootSecurityJwtModule(BeanContainer container, BootRouter router, BootConf
 
 
 
-  router.addAuthenticationProvider(container.get<JwtAuthenticationProvider>());
-
-
-
 
 
 

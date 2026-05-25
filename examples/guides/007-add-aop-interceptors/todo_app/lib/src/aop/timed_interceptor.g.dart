@@ -3,12 +3,18 @@
 part of 'timed_interceptor.dart';
 
 // **************************************************************************
-// InterceptorBeanBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $TimedInterceptorDefinition extends BeanDefinition {
   @override
-  String get typeName => 'TimedInterceptor';
+  Type get beanType => TimedInterceptor;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(AnnotationType(
+            'package:boot_aop/src/aop/aop.dart#InterceptorBean')),
+      ];
 
   @override
   TimedInterceptor create(BeanContainer container) => TimedInterceptor();

@@ -3,17 +3,14 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:boot_http/boot_http.dart';
 import 'package:boot_core/boot_core.dart';
-import 'package:boot_events/boot_events.dart';
 import 'package:boot_aop/boot_aop.dart';
 
-import 'package:boot_scheduling/boot_scheduling.dart';
+import 'annotation_metadata_emitter.dart';
 
 
 final _injectChecker = TypeChecker.fromRuntime(Inject);
 final _namedChecker = TypeChecker.fromRuntime(Named);
 final _valueChecker = TypeChecker.fromRuntime(Value);
-final _eventListenerChecker = TypeChecker.fromRuntime(EventListener);
-final _scheduledChecker = TypeChecker.fromRuntime(Scheduled);
 
 /// Generates BeanDefinition classes for @Singleton annotated classes.
 class BeanGenerator extends GeneratorForAnnotation<Singleton> {
@@ -69,55 +66,97 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
     final postConstruct = _findAnnotatedMethod(element, 'PostConstruct');
     final preDestroy = _findAnnotatedMethod(element, 'PreDestroy');
 
-    // Detect @EventListener methods
-    final eventListeners = element.methods
-        .where((m) => _eventListenerChecker.hasAnnotationOf(m))
-        .toList();
-
-    // Detect @Scheduled methods
-    final scheduledMethods = <MethodElement, Map<String, String>>{};
+    // Detect methods annotated with @MethodHook annotations
+    final hookMethods = <MethodElement>[];
     for (final method in element.methods) {
-      final annotation = _scheduledChecker.firstAnnotationOf(method);
-      if (annotation == null) continue;
-      scheduledMethods[method] = {
-        'fixedRate': annotation.getField('fixedRate')?.toStringValue() ?? '',
-        'fixedDelay': annotation.getField('fixedDelay')?.toStringValue() ?? '',
-        'initialDelay': annotation.getField('initialDelay')?.toStringValue() ?? '',
-      };
+      if (method.isPrivate || method.isStatic) continue;
+      for (final ann in method.metadata) {
+        final annElement = ann.element?.enclosingElement3;
+        if (annElement is ClassElement) {
+          // Check if the annotation class is meta-annotated with @MethodHook
+          if (annElement.metadata.any((m) => m.element?.enclosingElement3?.name == 'MethodHook')) {
+            hookMethods.add(method);
+            break;
+          }
+        }
+      }
     }
 
     // Check if postConstruct is async
     final isPostConstructAsync = postConstruct != null &&
         postConstruct.returnType.isDartAsyncFuture;
 
-    final hasPostLogic = postConstruct != null || eventListeners.isNotEmpty || scheduledMethods.isNotEmpty;
-    final needsContainer = eventListeners.isNotEmpty || scheduledMethods.isNotEmpty;
-
     // Build class
     final buf = StringBuffer();
     buf.writeln('class \$${className}Definition extends BeanDefinition {');
 
-    if (needsContainer) {
-      buf.writeln('  BeanContainer? _container;');
+    buf.writeln('  @override');
+    buf.writeln('  Type get beanType => $className;');
+
+    // Emit annotation metadata (includes ExceptionHandler<E> type detection)
+    final annotationItems = emitAnnotationValues(element);
+
+    // Detect ExceptionHandler<E> and add handledType
+    final exceptionHandlerChecker = TypeChecker.fromRuntime(ExceptionHandler);
+    if (exceptionHandlerChecker.isAssignableFromType(element.thisType)) {
+      final ehInterface = element.allSupertypes
+          .where((i) => exceptionHandlerChecker.isExactlyType(i))
+          .firstOrNull;
+      if (ehInterface != null && ehInterface.typeArguments.isNotEmpty) {
+        final exceptionType = ehInterface.typeArguments.first.getDisplayString();
+        annotationItems.add(
+          "const AnnotationValue(AnnotationType('package:boot_http_common/src/http/exception_handler.dart#ExceptionHandler'), {'handledType': $exceptionType})");
+      }
     }
 
-    buf.writeln('  @override');
-    buf.writeln("  String get typeName => '$className';");
+    if (annotationItems.isNotEmpty) {
+      buf.writeln();
+      buf.writeln('  @override');
+      buf.writeln('  List<AnnotationValue> get annotationMetadata => const [');
+      buf.writeln('    ${annotationItems.join(',\n    ')},');
+      buf.writeln('  ];');
+    }
+
+    // Emit methodMetadata for @MethodHook methods
+    if (hookMethods.isNotEmpty) {
+      buf.writeln();
+      buf.writeln('  @override');
+      buf.writeln('  List<MethodMetadata> get methodMetadata => const [');
+      for (final m in hookMethods) {
+        final methodAnnotations = emitAnnotationValues(m);
+        final paramTypes = m.parameters.map((p) => p.type.getDisplayString()).toList();
+        final paramTypesCode = paramTypes.isNotEmpty
+            ? ', [${paramTypes.join(', ')}]'
+            : '';
+        buf.writeln("    MethodMetadata('${m.name}', [${methodAnnotations.join(', ')}]$paramTypesCode),");
+      }
+      buf.writeln('  ];');
+
+      // Emit dispatch
+      buf.writeln();
+      buf.writeln('  @override');
+      buf.writeln('  dynamic dispatch(Object instance, String method, List<dynamic> args) {');
+      buf.writeln('    final bean = instance as $className;');
+      buf.writeln('    switch (method) {');
+      for (final m in hookMethods) {
+        final args = List.generate(m.parameters.length, (i) {
+          final paramType = m.parameters[i].type.getDisplayString();
+          return 'args[$i] as $paramType';
+        }).join(', ');
+        buf.writeln("      case '${m.name}': return bean.${m.name}($args);");
+      }
+      buf.writeln("      default: return super.dispatch(instance, method, args);");
+      buf.writeln('    }');
+      buf.writeln('  }');
+    }
+
     buf.writeln();
     buf.writeln('  @override');
+    buf.writeln('  $className create(BeanContainer container) => $className($createArgs);');
 
-    if (needsContainer) {
-      buf.writeln('  $className create(BeanContainer container) {');
-      buf.writeln('    _container = container;');
-      buf.writeln('    return $className($createArgs);');
-      buf.writeln('  }');
-    } else {
-      buf.writeln('  $className create(BeanContainer container) => $className($createArgs);');
-    }
-
-    if (hasPostLogic) {
-      if (isPostConstructAsync && eventListeners.isEmpty && scheduledMethods.isEmpty) {
-        // Pure async postConstruct
+    // PostConstruct — only actual @PostConstruct, no event/scheduled wiring
+    if (postConstruct != null) {
+      if (isPostConstructAsync) {
         buf.writeln('  @override');
         buf.writeln('  bool get hasPostConstructAsync => true;');
         buf.writeln('  @override');
@@ -125,40 +164,11 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
         buf.writeln('    await (instance as $className).${postConstruct.name}();');
         buf.writeln('  }');
       } else {
-        // Sync postConstruct (possibly with event listeners and scheduled tasks)
         buf.writeln('  @override');
         buf.writeln('  bool get hasPostConstruct => true;');
         buf.writeln('  @override');
         buf.writeln('  void postConstruct(dynamic instance) {');
-        if (postConstruct != null && !isPostConstructAsync) {
-          buf.writeln('    (instance as $className).${postConstruct.name}();');
-        }
-        if (eventListeners.isNotEmpty) {
-          buf.writeln('    final bus = _container!.get<EventBus>();');
-          for (final m in eventListeners) {
-            final paramType = m.parameters.first.type.getDisplayString();
-            buf.writeln('    bus.on<$paramType>((instance as $className).${m.name});');
-          }
-        }
-        if (scheduledMethods.isNotEmpty) {
-          buf.writeln('    final scheduler = _container!.get<TaskScheduler>();');
-          for (final entry in scheduledMethods.entries) {
-            final m = entry.key;
-            final params = entry.value;
-            final fixedRate = params['fixedRate']!;
-            final fixedDelay = params['fixedDelay']!;
-            final initialDelay = params['initialDelay']!;
-            final initDelayArg = initialDelay.isNotEmpty
-                ? ", initialDelay: parseDuration('$initialDelay')"
-                : '';
-
-            if (fixedRate.isNotEmpty) {
-              buf.writeln("    scheduler.scheduleFixedRate('$className.${m.name}', parseDuration('$fixedRate'), (instance as $className).${m.name}$initDelayArg);");
-            } else if (fixedDelay.isNotEmpty) {
-              buf.writeln("    scheduler.scheduleFixedDelay('$className.${m.name}', parseDuration('$fixedDelay'), () async { (instance as $className).${m.name}(); }$initDelayArg);");
-            }
-          }
-        }
+        buf.writeln('    (instance as $className).${postConstruct.name}();');
         buf.writeln('  }');
       }
     }

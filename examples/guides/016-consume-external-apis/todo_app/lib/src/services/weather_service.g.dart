@@ -3,12 +3,20 @@
 part of 'weather_service.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $WeatherServiceDefinition extends BeanDefinition {
   @override
-  String get typeName => 'WeatherService';
+  Type get beanType => WeatherService;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   WeatherService create(BeanContainer container) => WeatherService(

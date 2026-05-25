@@ -1,4 +1,6 @@
 // coverage:ignore-file
+import 'package:boot_core/boot_core.dart';
+
 import 'request.dart';
 import 'response.dart';
 
@@ -12,7 +14,7 @@ class RouteEntry {
   final RouteHandler handler;
 
   /// Annotations from the controller method and class, available to filters at runtime.
-  final List<Object> metadata;
+  final List<AnnotationValue> metadata;
 
   const RouteEntry({
     required this.method,

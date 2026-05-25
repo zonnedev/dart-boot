@@ -3,12 +3,20 @@
 part of 'todo_controller.dart';
 
 // **************************************************************************
-// ControllerBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $TodoControllerDefinition extends BeanDefinition {
   @override
-  String get typeName => 'TodoController';
+  Type get beanType => TodoController;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http/src/annotations/controller.dart#Controller'),
+            {'path': '/todos'}),
+      ];
 
   @override
   TodoController create(BeanContainer container) =>
@@ -31,6 +39,16 @@ class $TodoControllerRoutes implements RouteRegistration {
           handler: (request) async {
             return await controller.list(request);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Get'),
+                {'path': '/'})
+          ],
         ),
         RouteEntry(
           method: 'POST',
@@ -38,6 +56,16 @@ class $TodoControllerRoutes implements RouteRegistration {
           handler: (request) async {
             return await controller.create(request);
           },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Post'),
+                {'path': '/'})
+          ],
         ),
       ];
 }

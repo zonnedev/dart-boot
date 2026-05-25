@@ -3,12 +3,18 @@
 part of 'cached_interceptor.dart';
 
 // **************************************************************************
-// InterceptorBeanBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $CachedInterceptorDefinition extends BeanDefinition {
   @override
-  String get typeName => 'CachedInterceptor';
+  Type get beanType => CachedInterceptor;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(AnnotationType(
+            'package:boot_aop/src/aop/aop.dart#InterceptorBean')),
+      ];
 
   @override
   CachedInterceptor create(BeanContainer container) => CachedInterceptor();

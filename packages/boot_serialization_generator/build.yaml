@@ -1,0 +1,8 @@
+builders:
+  serializable_builder:
+    import: "package:boot_serialization_generator/builder.dart"
+    builder_factories: ["serializableBuilder"]
+    build_extensions: {".dart": [".boot_serde.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

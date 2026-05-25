@@ -1,28 +1,34 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:boot_http/boot_http.dart';
 import 'package:boot_core/boot_core.dart';
 import 'package:boot_aop/boot_aop.dart';
 
 final _aroundChecker = TypeChecker.fromRuntime(Around);
-final _controllerChecker = TypeChecker.fromRuntime(Controller);
+final _beanSourceChecker = TypeChecker.fromRuntime(BeanSource);
 
-/// Generates proxy subclasses for beans with @Around-annotated methods.
-class AopProxyGenerator extends GeneratorForAnnotation<Singleton> {
+/// Generates proxy subclasses for any bean class with @Around-annotated methods.
+/// Scans all classes that have @BeanSource (transitively) — covers @Singleton,
+/// @Prototype, @Controller, @ServerFilter, etc.
+class AopProxyGenerator extends Generator {
   @override
-  String generateForAnnotatedElement(
-    Element element,
-    ConstantReader annotation,
-    BuildStep buildStep,
-  ) {
-    if (element is! ClassElement) return '';
-    if (_controllerChecker.hasAnnotationOf(element)) return '';
-    return _generateProxy(element);
+  String? generate(LibraryReader library, BuildStep buildStep) {
+    final output = StringBuffer();
+
+    for (final element in library.allElements) {
+      if (element is! ClassElement) continue;
+      if (element.isAbstract) continue;
+      if (!_hasBeanSourceAnnotation(element)) continue;
+
+      final code = _generateProxy(element);
+      if (code.isNotEmpty) output.writeln(code);
+    }
+
+    final result = output.toString();
+    return result.isEmpty ? null : result;
   }
 
   static String _generateProxy(ClassElement element) {
-
     // Find methods with @Around-annotated annotations
     final interceptedMethods = <MethodElement, List<String>>{};
     for (final method in element.methods) {
@@ -46,7 +52,7 @@ class AopProxyGenerator extends GeneratorForAnnotation<Singleton> {
 
     final params = constructor.parameters;
     final superArgs = params.map((p) => p.name).join(', ');
-    final createArgs = params.map((p) => _buildArg(p)).join(', ');
+    final createArgs = params.map((p) => 'container.get<${p.type.getDisplayString()}>()').join(', ');
 
     // Generate method overrides
     final overrides = StringBuffer();
@@ -66,7 +72,6 @@ class AopProxyGenerator extends GeneratorForAnnotation<Singleton> {
       final awaitKw = isAsync ? 'await ' : '';
       final invokeMethod = isAsync ? 'invokeAsync()' : 'invoke()';
 
-      // Combine interceptors from all @Around annotations on this method
       final interceptorsList = adviceAnnotations
           .map((a) => '..._\$container.getInterceptors($a)')
           .join(', ');
@@ -101,7 +106,7 @@ $overrides}
 
 class \$${className}\$ProxyDefinition extends BeanDefinition {
   @override
-  String get typeName => '$className (proxy)';
+  Type get beanType => $className;
 
   @override
   $className create(BeanContainer container) =>
@@ -110,20 +115,22 @@ class \$${className}\$ProxyDefinition extends BeanDefinition {
 ''';
   }
 
-  static String _buildArg(ParameterElement p) {
-    return 'container.get<${p.type.getDisplayString()}>()';
-  }
-}
-
-/// AOP proxy generation for @Controller classes.
-class ControllerAopProxyGenerator extends GeneratorForAnnotation<Controller> {
-  @override
-  String generateForAnnotatedElement(
-    Element element,
-    ConstantReader annotation,
-    BuildStep buildStep,
-  ) {
-    if (element is! ClassElement) return '';
-    return AopProxyGenerator._generateProxy(element);
+  bool _hasBeanSourceAnnotation(ClassElement element) {
+    for (final annotation in element.metadata) {
+      final annotationType = annotation.element;
+      if (annotationType == null) continue;
+      final enclosing = annotationType.enclosingElement3;
+      if (enclosing == null) continue;
+      if (enclosing is ClassElement) {
+        if (_beanSourceChecker.hasAnnotationOf(enclosing)) return true;
+        for (final meta in enclosing.metadata) {
+          final metaEnclosing = meta.element?.enclosingElement3;
+          if (metaEnclosing is ClassElement && _beanSourceChecker.hasAnnotationOf(metaEnclosing)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }

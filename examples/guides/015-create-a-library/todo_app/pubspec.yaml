@@ -15,6 +15,12 @@ dependencies:
 dev_dependencies:
   boot_generator:
     path: ../../../../packages/boot_generator
+  boot_http_generator:
+    path: ../../../../packages/boot_http_generator
+  boot_aop_generator:
+    path: ../../../../packages/boot_aop_generator
+  boot_serialization_generator:
+    path: ../../../../packages/boot_serialization_generator
   boot_test:
     path: ../../../../packages/boot_test
   build_runner: ^2.4.0
@@ -45,5 +51,11 @@ dependency_overrides:
     path: ../../../../packages/boot_security_jwt
   boot_generator:
     path: ../../../../packages/boot_generator
+  boot_http_generator:
+    path: ../../../../packages/boot_http_generator
+  boot_aop_generator:
+    path: ../../../../packages/boot_aop_generator
+  boot_serialization_generator:
+    path: ../../../../packages/boot_serialization_generator
   boot_test:
     path: ../../../../packages/boot_test

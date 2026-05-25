@@ -3,12 +3,24 @@
 part of 'timing_filter.dart';
 
 // **************************************************************************
-// ServerFilterBeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $TimingFilterDefinition extends BeanDefinition {
   @override
-  String get typeName => 'TimingFilter';
+  Type get beanType => TimingFilter;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_http_common/src/http/filter.dart#ServerFilter'),
+            {'pattern': '/**', 'methods': []}),
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/order.dart#Order'),
+            {'value': 2}),
+      ];
 
   @override
   TimingFilter create(BeanContainer container) => TimingFilter();

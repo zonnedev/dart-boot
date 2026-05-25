@@ -1,8 +1,19 @@
+import 'package:boot_core/boot_core.dart';
+
 import 'request.dart';
 import 'response.dart';
 
+/// AnnotationType constant for runtime metadata queries.
+const serverFilterAnnotationType = AnnotationType(
+    'package:boot_http_common/src/http/filter.dart#ServerFilter');
+
+/// AnnotationType constant for runtime metadata queries.
+const clientFilterAnnotationType = AnnotationType(
+    'package:boot_http_common/src/http/filter.dart#ClientFilter');
+
 /// Annotation for server-side HTTP filters.
 /// Apply to a class that implements HttpServerFilter.
+@BeanSource()
 class ServerFilter {
   /// URL pattern to match (ant-style: /api/**, /users/*). Defaults to '/**' (all).
   final String pattern;
@@ -15,6 +26,7 @@ class ServerFilter {
 
 /// Annotation for client-side HTTP filters.
 /// Apply to a class that implements HttpClientFilter.
+@BeanSource()
 class ClientFilter {
   /// Service ID to filter (empty = all clients).
   final String? service;

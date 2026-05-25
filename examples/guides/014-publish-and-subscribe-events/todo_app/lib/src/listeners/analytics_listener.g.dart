@@ -3,26 +3,50 @@
 part of 'analytics_listener.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $AnalyticsListenerDefinition extends BeanDefinition {
-  BeanContainer? _container;
   @override
-  String get typeName => 'AnalyticsListener';
+  Type get beanType => AnalyticsListener;
 
   @override
-  AnalyticsListener create(BeanContainer container) {
-    _container = container;
-    return AnalyticsListener();
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
+
+  @override
+  List<MethodMetadata> get methodMetadata => const [
+        MethodMetadata('onTodoCreated', [
+          const AnnotationValue(AnnotationType(
+              'package:boot_events/src/annotations/event_listener.dart#EventListener'))
+        ], [
+          TodoCreatedEvent
+        ]),
+        MethodMetadata('onTodoDeleted', [
+          const AnnotationValue(AnnotationType(
+              'package:boot_events/src/annotations/event_listener.dart#EventListener'))
+        ], [
+          TodoDeletedEvent
+        ]),
+      ];
+
+  @override
+  dynamic dispatch(Object instance, String method, List<dynamic> args) {
+    final bean = instance as AnalyticsListener;
+    switch (method) {
+      case 'onTodoCreated':
+        return bean.onTodoCreated(args[0] as TodoCreatedEvent);
+      case 'onTodoDeleted':
+        return bean.onTodoDeleted(args[0] as TodoDeletedEvent);
+      default:
+        return super.dispatch(instance, method, args);
+    }
   }
 
   @override
-  bool get hasPostConstruct => true;
-  @override
-  void postConstruct(dynamic instance) {
-    final bus = _container!.get<EventBus>();
-    bus.on<TodoCreatedEvent>((instance as AnalyticsListener).onTodoCreated);
-    bus.on<TodoDeletedEvent>((instance as AnalyticsListener).onTodoDeleted);
-  }
+  AnalyticsListener create(BeanContainer container) => AnalyticsListener();
 }

@@ -3,12 +3,20 @@
 part of 'jwt_service.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $JwtServiceDefinition extends BeanDefinition {
   @override
-  String get typeName => 'JwtService';
+  Type get beanType => JwtService;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+      ];
 
   @override
   JwtService create(BeanContainer container) => JwtService(container

@@ -1,3 +1,4 @@
+import 'package:boot_core/boot_core.dart';
 import 'package:boot_http_common/boot_http_common.dart';
 
 import 'authentication.dart';
@@ -41,10 +42,11 @@ class SecurityFilter implements HttpServerFilter {
     if (urlResult != null) return urlResult;
 
     // Check route-level @Secured metadata
-    final metadata = request.getAttribute<List<Object>>('route.metadata');
+    final metadata = request.getAttribute<List<AnnotationValue>>('route.metadata');
     if (metadata != null) {
-      for (final secured in metadata.whereType<Secured>()) {
-        final metaResult = _enforce(secured.value, authentication);
+      for (final ann in metadata.where((a) => a.type == securedAnnotationType)) {
+        final roles = (ann.values['value'] as List?)?.cast<String>() ?? [];
+        final metaResult = _enforce(roles, authentication);
         if (metaResult != null) return metaResult;
       }
     }
