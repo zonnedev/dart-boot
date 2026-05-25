@@ -1,9 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:boot_http/boot_http.dart';
 import 'package:boot_core/boot_core.dart';
-import 'package:boot_aop/boot_aop.dart';
 
 import 'annotation_metadata_emitter.dart';
 
@@ -20,10 +18,6 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
     ConstantReader annotation,
     BuildStep buildStep,
   ) {
-    // Skip if also has @Controller — ControllerBeanGenerator handles it
-    if (element is ClassElement && TypeChecker.fromRuntime(Controller).hasAnnotationOf(element)) {
-      return '';
-    }
     return generateBeanDefinition(element, annotation);
   }
 
@@ -110,7 +104,7 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
     final annotationItems = emitAnnotationValues(element);
 
     // Detect ExceptionHandler<E> and add handledType
-    final exceptionHandlerChecker = TypeChecker.fromRuntime(ExceptionHandler);
+    final exceptionHandlerChecker = TypeChecker.fromUrl('package:boot_http_common/src/http/exception_handler.dart#ExceptionHandler');
     if (exceptionHandlerChecker.isAssignableFromType(element.thisType)) {
       final ehInterface = element.allSupertypes
           .where((i) => exceptionHandlerChecker.isExactlyType(i))
@@ -271,50 +265,4 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
   }
 }
 
-/// Generates BeanDefinition for @Controller classes (implies @Singleton).
-class ControllerBeanGenerator extends GeneratorForAnnotation<Controller> {
-  @override
-  String generateForAnnotatedElement(
-    Element element,
-    ConstantReader annotation,
-    BuildStep buildStep,
-  ) {
-    return BeanGenerator.generateBeanDefinition(element, annotation);
-  }
-}
 
-/// Generates BeanDefinition for @ServerFilter classes (implies @Singleton).
-class ServerFilterBeanGenerator extends GeneratorForAnnotation<ServerFilter> {
-  @override
-  String generateForAnnotatedElement(
-    Element element,
-    ConstantReader annotation,
-    BuildStep buildStep,
-  ) {
-    return BeanGenerator.generateBeanDefinition(element, annotation);
-  }
-}
-
-/// Generates BeanDefinition for @ClientFilter classes (implies @Singleton).
-class ClientFilterBeanGenerator extends GeneratorForAnnotation<ClientFilter> {
-  @override
-  String generateForAnnotatedElement(
-    Element element,
-    ConstantReader annotation,
-    BuildStep buildStep,
-  ) {
-    return BeanGenerator.generateBeanDefinition(element, annotation);
-  }
-}
-
-/// Generates BeanDefinition for @InterceptorBean classes (implies @Singleton).
-class InterceptorBeanBeanGenerator extends GeneratorForAnnotation<InterceptorBean> {
-  @override
-  String generateForAnnotatedElement(
-    Element element,
-    ConstantReader annotation,
-    BuildStep buildStep,
-  ) {
-    return BeanGenerator.generateBeanDefinition(element, annotation);
-  }
-}
