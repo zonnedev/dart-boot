@@ -3,12 +3,12 @@
 part of 'jwt_authentication_provider.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $JwtAuthenticationProviderDefinition extends BeanDefinition {
   @override
-  Type get beanType => JwtAuthenticationProvider;
+  get beanType => JwtAuthenticationProvider;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

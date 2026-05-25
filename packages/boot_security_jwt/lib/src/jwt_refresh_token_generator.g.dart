@@ -3,12 +3,12 @@
 part of 'jwt_refresh_token_generator.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $JwtRefreshTokenGeneratorDefinition extends BeanDefinition {
   @override
-  Type get beanType => JwtRefreshTokenGenerator;
+  get beanType => JwtRefreshTokenGenerator;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

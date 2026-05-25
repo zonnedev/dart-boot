@@ -3,12 +3,12 @@
 part of 'jwt_config.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $JwtConfigDefinition extends BeanDefinition {
   @override
-  Type get beanType => JwtConfig;
+  get beanType => JwtConfig;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

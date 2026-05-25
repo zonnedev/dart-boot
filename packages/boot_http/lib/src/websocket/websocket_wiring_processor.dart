@@ -57,7 +57,7 @@ class WebSocketWiringProcessor {
               .toList();
 
           if (onOpen != null) {
-            def.dispatch(instance, onOpen!, [session, ...pathArgs]);
+            def.dispatch(instance, onOpen, [session, ...pathArgs]);
           }
           if (onMessage != null) {
             session.onMessage((msg) =>

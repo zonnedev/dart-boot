@@ -66,14 +66,16 @@ class ContextBuilder implements Builder {
 
     if (isBootLibrary) {
       // ─── Library mode: generate $<package>Module() ─────────────────────────
-      // Discover this library's own @BootLibrary dependencies
+      // Discover this library's own @BootLibrary dependencies (direct only)
       final libraryDeps = <_LibraryModule>[];
       final libraryProvidedTypes = <String>{};
+      final depPackages = await _getDepPackages(buildStep);
       final packageConfig = await buildStep.packageConfig;
 
       for (final package in packageConfig.packages) {
         final packageName = package.name;
         if (packageName == buildStep.inputId.package) continue;
+        if (depPackages != null && !depPackages.contains(packageName)) continue;
 
         final depBarrelId = AssetId(packageName, 'lib/$packageName.dart');
         if (!await buildStep.canRead(depBarrelId)) continue;

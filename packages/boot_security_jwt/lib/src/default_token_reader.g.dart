@@ -3,12 +3,12 @@
 part of 'default_token_reader.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $DefaultTokenReaderDefinition extends BeanDefinition {
   @override
-  Type get beanType => DefaultTokenReader;
+  get beanType => DefaultTokenReader;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [
