@@ -1,6 +1,19 @@
 # Testing
 
-Boot provides an in-memory HTTP client and bean override system for testing. No real server is started — tests run in milliseconds with full isolation.
+Boot provides two test modes:
+
+| | `bootTest` | `bootIntegrationTest` |
+|---|---|---|
+| **Server** | None — in-memory function calls | Real HTTP server on random port |
+| **Speed** | Milliseconds | ~50ms startup |
+| **HTTP** | Simulated via shelf handler | Real `dart:io` connections |
+| **WebSocket** | Simulated in-memory channel | Real TCP WebSocket |
+| **Isolation** | Full — fresh container per test | Full — fresh server per test |
+| **Use for** | Controllers, filters, security, DI, serialization | WebSocket flows, TLS, streaming, multi-client |
+
+Both modes run the same `configureRuntime` as production — filters, security, events, scheduling all execute identically.
+
+For feature lifecycle tests (create → update → delete) that share a running server across a group, use `BootIntegrationTestApp`.
 
 ## Setup
 
@@ -917,6 +930,141 @@ await bootIntegrationTest($configure, timeout: Duration(seconds: 30), test: ...)
 ```
 
 If the test exceeds the timeout, a `TimeoutException` is thrown with a clear message.
+
+---
+
+## Shared App for Feature Tests — BootIntegrationTestApp
+
+For feature lifecycle tests where multiple tests share the same running server and state, use `BootIntegrationTestApp`. The server starts once per group, tests run sequentially against it.
+
+### Basic Usage
+
+```dart
+import 'package:boot_test/boot_test.dart';
+import 'package:myapp/src/generated/boot_context.g.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('User lifecycle', () {
+    final app = BootIntegrationTestApp($configure);
+    setUpAll(() => app.start());
+    tearDownAll(() => app.stop());
+
+    late String userId;
+
+    test('create user', () async {
+      final res = await app.client.post('/users/', body: {
+        'name': 'Alice',
+        'email': 'alice@test.com',
+      });
+      res.expectStatus(201);
+      userId = res.json()['id'];
+    });
+
+    test('get user', () async {
+      final res = await app.client.get('/users/$userId');
+      res.expectStatus(200);
+      expect(res.json()['name'], 'Alice');
+    });
+
+    test('update user', () async {
+      final res = await app.client.put('/users/$userId', body: {'name': 'Bob'});
+      res.expectStatus(200);
+      expect(res.json()['name'], 'Bob');
+    });
+
+    test('delete user', () async {
+      final res = await app.client.delete('/users/$userId');
+      res.expectStatus(204);
+    });
+
+    test('deleted user returns 404', () async {
+      final res = await app.client.get('/users/$userId');
+      res.expectStatus(404);
+    });
+  });
+}
+```
+
+### With WebSocket
+
+```dart
+group('Chat feature', () {
+  final app = BootIntegrationTestApp($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  });
+  setUpAll(() => app.start());
+  tearDownAll(() => app.stop());
+
+  test('connect to room', () async {
+    final ws = await app.client.ws('/chat/lobby');
+    await ws.messages.take(2).last;
+    expect(ws.received, isNotEmpty);
+    await ws.close();
+  });
+
+  test('broadcast between clients', () async {
+    final ws1 = await app.client.ws('/chat/lobby');
+    await ws1.messages.first;
+    final ws2 = await app.client.ws('/chat/lobby');
+    await ws2.messages.take(2).last;
+
+    ws1.send('hello');
+    await ws2.messages.first;
+    expect(ws2.received, contains('hello'));
+
+    await ws1.close();
+    await ws2.close();
+  });
+}
+```
+
+### With Bean Overrides
+
+```dart
+group('Payments', () {
+  final app = BootIntegrationTestApp($configure, overrides: (c) {
+    c.override<PaymentGateway>(FakePaymentGateway());
+  });
+  setUpAll(() => app.start());
+  tearDownAll(() => app.stop());
+
+  test('checkout succeeds', () async {
+    final res = await app.client.post('/checkout', body: {'amount': 100});
+    res.expectStatus(200);
+  });
+});
+```
+
+### API
+
+```dart
+class BootIntegrationTestApp {
+  BootIntegrationTestApp(
+    BootContextRegistrar configure, {
+    void Function(TestContainer container)? overrides,
+    String env = 'test',
+    Map<String, String>? properties,
+  });
+
+  Future<void> start();                    // Start server. Call in setUpAll.
+  Future<void> stop();                     // Stop server. Call in tearDownAll.
+  BootIntegrationClient get client;        // HTTP + WebSocket client
+  TestContainer get container;             // Access beans directly
+  Uri get serverUri;                       // http://127.0.0.1:<port>
+  bool get isRunning;                      // Server state
+}
+```
+
+### When to Use What
+
+| Scenario | Use |
+|----------|-----|
+| Single request/response test | `bootTest` |
+| Test with real WebSocket | `bootIntegrationTest` |
+| Feature lifecycle (create → update → delete) | `BootIntegrationTestApp` |
+| Multiple tests sharing expensive setup | `BootIntegrationTestApp` |
+| Tests that must be fully isolated | `bootTest` or `bootIntegrationTest` |
 
 ---
 
