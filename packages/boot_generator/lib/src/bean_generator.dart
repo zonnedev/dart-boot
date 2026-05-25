@@ -67,7 +67,10 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
         return p.isNamed ? '${p.name}: $value' : value;
       }).join(', ');
     } else {
-      createArgs = params.map((p) => _buildArg(p)).join(', ');
+      createArgs = params.map((p) {
+        final arg = _buildArg(p);
+        return p.isNamed ? '${p.name}: $arg' : arg;
+      }).join(', ');
     }
 
     final postConstruct = _findAnnotatedMethod(element, 'PostConstruct');
