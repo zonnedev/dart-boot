@@ -8,7 +8,7 @@ part of 'auth_controller.dart';
 
 class $AuthControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => AuthController;
+  get beanType => AuthController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

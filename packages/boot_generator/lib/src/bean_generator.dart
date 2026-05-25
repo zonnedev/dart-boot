@@ -91,7 +91,7 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
     buf.writeln('class \$${className}Definition extends BeanDefinition {');
 
     buf.writeln('  @override');
-    buf.writeln('  Type get beanType => $className;');
+    buf.writeln('  get beanType => $className;');
 
     // Emit annotation metadata (includes ExceptionHandler<E> type detection)
     final annotationItems = emitAnnotationValues(element);

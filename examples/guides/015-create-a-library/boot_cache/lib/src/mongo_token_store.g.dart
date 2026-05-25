@@ -3,12 +3,31 @@
 part of 'mongo_token_store.dart';
 
 // **************************************************************************
-// BeanGenerator
+// BeanDefinitionGenerator
 // **************************************************************************
 
 class $MongoTokenStoreDefinition extends BeanDefinition {
   @override
-  String get typeName => 'MongoTokenStore';
+  Type get beanType => MongoTokenStore;
+
+  @override
+  List<AnnotationValue> get annotationMetadata => const [
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/singleton.dart#Singleton'),
+            {'typed': []}),
+        const AnnotationValue(
+            AnnotationType(
+                'package:boot_core/src/annotations/requires.dart#Requires'),
+            {
+              'env': [],
+              'notEnv': [],
+              'property': 'mongo.enabled',
+              'value': 'true',
+              'beans': [],
+              'missingBeans': [null]
+            }),
+      ];
 
   @override
   MongoTokenStore create(BeanContainer container) => MongoTokenStore();

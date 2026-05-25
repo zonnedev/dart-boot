@@ -8,7 +8,7 @@ part of 'todo_limit_handler.dart';
 
 class $TodoLimitHandlerDefinition extends BeanDefinition {
   @override
-  Type get beanType => TodoLimitHandler;
+  get beanType => TodoLimitHandler;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

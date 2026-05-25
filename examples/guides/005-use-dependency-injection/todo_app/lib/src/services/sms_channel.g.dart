@@ -8,7 +8,7 @@ part of 'sms_channel.dart';
 
 class $SmsChannelDefinition extends BeanDefinition {
   @override
-  Type get beanType => SmsChannel;
+  get beanType => SmsChannel;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

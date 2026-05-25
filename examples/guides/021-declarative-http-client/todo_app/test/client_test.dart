@@ -11,8 +11,8 @@ import 'package:test/test.dart';
 class _Def extends BeanDefinition {
   final dynamic Function(BeanContainer) _factory;
   @override
-  final String typeName;
-  _Def(this.typeName, this._factory);
+  final Type beanType;
+  _Def(this.beanType, this._factory);
   @override
   dynamic create(BeanContainer container) => _factory(container);
 }
@@ -60,7 +60,7 @@ void main() {
   void registerMockClient(TestContainer c) {
     c.container.registerNamed<HttpClientBuilder>(
       'jsonplaceholder',
-      _Def('HttpClientBuilder', (_) => HttpClientBuilder().baseUrl(mockBaseUrl)),
+      _Def(HttpClientBuilder, (_) => HttpClientBuilder().baseUrl(mockBaseUrl)),
     );
   }
 

@@ -8,7 +8,7 @@ part of 'push_channel.dart';
 
 class $PushChannelDefinition extends BeanDefinition {
   @override
-  Type get beanType => PushChannel;
+  get beanType => PushChannel;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -8,7 +8,7 @@ part of 'notification_controller.dart';
 
 class $NotificationControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => NotificationController;
+  get beanType => NotificationController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

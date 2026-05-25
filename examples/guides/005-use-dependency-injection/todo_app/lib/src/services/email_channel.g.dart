@@ -8,7 +8,7 @@ part of 'email_channel.dart';
 
 class $EmailChannelDefinition extends BeanDefinition {
   @override
-  Type get beanType => EmailChannel;
+  get beanType => EmailChannel;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

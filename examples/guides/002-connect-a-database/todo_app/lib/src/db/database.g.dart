@@ -8,7 +8,7 @@ part of 'database.dart';
 
 class $DatabaseDefinition extends BeanDefinition {
   @override
-  Type get beanType => Database;
+  get beanType => Database;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [
