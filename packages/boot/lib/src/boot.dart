@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:boot_core/boot_core.dart';
 import 'package:boot_events/boot_events.dart';
 import 'package:boot_http/boot_http.dart';
-import 'package:boot_http_client/boot_http_client.dart';
 import 'package:boot_scheduling/boot_scheduling.dart';
 
 import 'configure_runtime.dart';
