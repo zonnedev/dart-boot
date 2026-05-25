@@ -147,15 +147,6 @@ class ContextBuilder implements Builder {
         }
       }
 
-      // Also generate a boot_context.g.dart for the library's own tests
-      _validateGraph(beanMeta, libraryProvided: libraryProvidedTypes);
-      final contextOutput = _generateOutput(sorted, routeMeta, interceptorMeta, eachPropertyMeta,
-          libraryModules: []);
-      final contextId = AssetId(
-        buildStep.inputId.package,
-        'lib/src/generated/boot_context.g.dart',
-      );
-      await buildStep.writeAsString(contextId, contextOutput);
     } else {
       // ─── App mode: discover @BootLibrary deps and generate $configure() ────
       List<String>? scanFilter;
