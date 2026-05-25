@@ -3,7 +3,7 @@ import 'package:boot_core/boot_core.dart';
 
 /// Built-in filter that logs every HTTP request with method, path, status, and duration.
 class RequestLoggingFilter implements HttpServerFilter {
-  final _log = Logger('http');
+  static final _log = Logger('http');
 
   @override
   Future<Response> filter(Request request, FilterChain chain) async {
