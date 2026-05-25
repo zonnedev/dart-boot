@@ -58,9 +58,9 @@ void main() {
   });
 
   void registerMockClient(TestContainer c) {
-    c.container.registerNamed<HttpClientBuilder>(
+    c.overrideNamed<HttpClientServiceConfig>(
       'jsonplaceholder',
-      _Def(HttpClientBuilder, (_) => HttpClientBuilder().baseUrl(mockBaseUrl)),
+      _Def(HttpClientServiceConfig, (_) => HttpClientServiceConfig(url: mockBaseUrl)),
     );
   }
 

@@ -7,7 +7,8 @@ import 'package:todo_app/src/controllers/auth_controller.dart';
 import 'package:todo_app/src/websocket/chat_socket.dart';
 import 'package:todo_app/src/security/jwt_auth_provider.dart';
 import 'package:boot_security/src/authentication_provider.dart';
-
+import 'package:boot_http_client/src/generated/boot_module.g.dart';
+import 'package:boot_security_jwt/src/generated/boot_module.g.dart';
 
 class _ContainerSelfDefinition extends BeanDefinition {
   final BeanContainer _container;
@@ -18,6 +19,15 @@ class _ContainerSelfDefinition extends BeanDefinition {
   dynamic create(BeanContainer container) => _container;
 }
 
+class _EachPropertyDef<T> extends BeanDefinition {
+  final T Function() _factory;
+  _EachPropertyDef(this._factory);
+  @override
+  get beanType => T;
+  @override
+  dynamic create(BeanContainer container) => _factory();
+}
+
 void $configure(BeanContainer container, BootRouter router) {
   // Self-register the container
   container.register<BeanContainer>(_ContainerSelfDefinition(container));
@@ -26,7 +36,8 @@ void $configure(BeanContainer container, BootRouter router) {
   final deferred = <void Function()>[];
 
   // Load library modules
-
+  $BootHttpClientModule(container, router, config, deferred);
+  $BootSecurityJwtModule(container, router, config, deferred);
 
   // Register beans in dependency order
   container.register<HelloController>($HelloControllerDefinition());
@@ -40,10 +51,13 @@ void $configure(BeanContainer container, BootRouter router) {
 
   for (final d in deferred.reversed) { d(); }
 
+  // @EachProperty registrations
+
+
   // Register interceptors
 
 
   // Register routes
-  router.addAll($HelloControllerRoutes(container.get<HelloController>()).routes);
-  router.addAll($AuthControllerRoutes(container.get<AuthController>()).routes);
+  router.addAllLazy(() => $HelloControllerRoutes(container.get<HelloController>()).routes);
+  router.addAllLazy(() => $AuthControllerRoutes(container.get<AuthController>()).routes);
 }

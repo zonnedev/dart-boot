@@ -73,13 +73,14 @@ void main() {
       client.close();
     });
 
-    test('fromServiceConfig pre-loads from configuration', () {
-      final config = HttpClientConfiguration(
+    test('fromConfig pre-loads from configuration', () {
+      final config = HttpClientServiceConfig(
+        url: 'http://svc.local',
         connectTimeout: Duration(seconds: 3),
         readTimeout: Duration(seconds: 15),
         maxRedirects: 2,
       );
-      final client = HttpClientBuilder.fromServiceConfig(config, baseUrl: 'http://svc.local').build();
+      final client = HttpClientBuilder.fromConfig(config).build();
       expect(client.baseUrl, 'http://svc.local');
       expect(client.readTimeout, Duration(seconds: 15));
       expect(client.maxRedirects, 2);
@@ -153,8 +154,8 @@ void main() {
 
     test('HttpClientBuilder as named bean in container', () {
       final container = BeanContainer();
-      final config = HttpClientConfiguration(connectTimeout: Duration(seconds: 1));
-      final builder = HttpClientBuilder.fromServiceConfig(config, baseUrl: 'http://payments.local');
+      final config = HttpClientServiceConfig(url: 'http://payments.local', connectTimeout: Duration(seconds: 1));
+      final builder = HttpClientBuilder.fromConfig(config);
 
       // Simulate: container.registerNamed<HttpClientBuilder>('payments', def)
       container.overrideWithInstance<HttpClientBuilder>(builder);

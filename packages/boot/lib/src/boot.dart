@@ -12,15 +12,6 @@ import 'configure_runtime.dart';
 /// Function type for the generated context registration.
 typedef BootContextRegistrar = void Function(BeanContainer container, BootRouter router);
 
-class _NamedBuilderDefinition extends BeanDefinition {
-  final HttpClientBuilder _builder;
-  _NamedBuilderDefinition(this._builder);
-  @override
-  Type get beanType => HttpClientBuilder;
-  @override
-  dynamic create(BeanContainer container) => _builder;
-}
-
 class _ConfigDefinition extends BeanDefinition {
   final BootConfig _config;
   _ConfigDefinition(this._config);
@@ -48,18 +39,6 @@ class _TaskSchedulerDefinition extends BeanDefinition {
   dynamic create(BeanContainer container) => _scheduler;
 }
 
-class _HttpClientDefinition extends BeanDefinition {
-  @override
-  Type get beanType => HttpClient;
-  @override
-  dynamic create(BeanContainer container) {
-    final config = container.get<BootConfig>();
-    final clientConfig = HttpClientConfiguration.fromConfig(config);
-    return HttpClientBuilder.fromServiceConfig(clientConfig).build();
-  }
-}
-
-
 /// Main entry point for Boot applications.
 class Boot {
   Boot._();
@@ -84,21 +63,6 @@ class Boot {
     container.register<BootConfig>(_ConfigDefinition(config));
     container.register<EventBus>(_EventBusDefinition(eventBus));
     container.register<TaskScheduler>(_TaskSchedulerDefinition(taskScheduler));
-    container.register<HttpClient>(_HttpClientDefinition());
-
-    // Register named HttpClientBuilder beans from boot.http.services.*
-    final serviceNames = config.getSubKeys('boot.http.services');
-    for (final name in serviceNames) {
-      final prefix = 'boot.http.services.$name';
-      final serviceConfig = HttpClientConfiguration(
-        connectTimeout: parseDurationOrNull(config.get('$prefix.connect-timeout')) ?? const Duration(seconds: 5),
-        readTimeout: parseDurationOrNull(config.get('$prefix.read-timeout')) ?? const Duration(seconds: 30),
-        maxRedirects: int.tryParse(config.get('$prefix.max-redirects') ?? '') ?? 5,
-      );
-      final baseUrl = config.get('$prefix.url') ?? '';
-      final builder = HttpClientBuilder.fromServiceConfig(serviceConfig, baseUrl: baseUrl);
-      container.registerNamed<HttpClientBuilder>(name, _NamedBuilderDefinition(builder));
-    }
 
     // Run user's generated $configure (registers beans, routes, listeners)
     configure(container, router);

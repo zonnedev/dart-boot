@@ -15,6 +15,10 @@ class TestContainer {
   void overrideFactory<T>(BeanDefinition definition) =>
       _container.replace<T>(definition);
 
+  /// Override a named bean.
+  void overrideNamed<T>(String name, BeanDefinition definition) =>
+      _container.overrideNamed<T>(name, definition);
+
   /// Retrieve a bean.
   T get<T>() => _container.get<T>();
 

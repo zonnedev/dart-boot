@@ -61,7 +61,20 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
     final className = element.name;
     final params = constructor.parameters;
 
-    final createArgs = params.map((p) => _buildArg(p)).join(', ');
+    // Check for @ConfigurationProperties
+    final configPropsChecker = TypeChecker.fromRuntime(ConfigurationProperties);
+    final configPropsAnnotation = configPropsChecker.firstAnnotationOf(element);
+    final String createArgs;
+
+    if (configPropsAnnotation != null) {
+      final prefix = configPropsAnnotation.getField('prefix')!.toStringValue()!;
+      createArgs = params.map((p) {
+        final value = _buildConfigArg(p, prefix);
+        return p.isNamed ? '${p.name}: $value' : value;
+      }).join(', ');
+    } else {
+      createArgs = params.map((p) => _buildArg(p)).join(', ');
+    }
 
     final postConstruct = _findAnnotatedMethod(element, 'PostConstruct');
     final preDestroy = _findAnnotatedMethod(element, 'PreDestroy');
@@ -213,6 +226,37 @@ class BeanGenerator extends GeneratorForAnnotation<Singleton> {
       return "container.getNamed<${p.type.getDisplayString()}>('$qualifierName')";
     }
     return 'container.get<${p.type.getDisplayString()}>()';
+  }
+
+  static String _buildConfigArg(ParameterElement p, String prefix) {
+    final kebabName = p.name.replaceAllMapped(
+        RegExp(r'[A-Z]'), (m) => '-${m.group(0)!.toLowerCase()}');
+    final key = '$prefix.$kebabName';
+    final getter = "container.get<BootConfig>().get('$key')";
+    final type = p.type;
+    final defaultCode = p.defaultValueCode;
+
+    if (type.getDisplayString() == 'Duration') {
+      final fallback = defaultCode ?? 'Duration.zero';
+      return "parseDurationOrNull($getter) ?? $fallback";
+    }
+    if (type.isDartCoreInt) {
+      final fallback = defaultCode ?? '0';
+      return "int.tryParse($getter ?? '') ?? $fallback";
+    }
+    if (type.isDartCoreDouble) {
+      final fallback = defaultCode ?? '0.0';
+      return "double.tryParse($getter ?? '') ?? $fallback";
+    }
+    if (type.isDartCoreBool) {
+      return "$getter == 'true'";
+    }
+    if (type.isDartCoreString) {
+      final fallback = defaultCode ?? "''";
+      return "$getter ?? $fallback";
+    }
+    // Fallback: try to resolve as a bean (nested config or dependency)
+    return 'container.get<${type.getDisplayString()}>()';
   }
 
   static MethodElement? _findAnnotatedMethod(ClassElement cls, String annotationName) {

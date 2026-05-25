@@ -31,9 +31,19 @@ class BeanContainer {
 
   /// Register a named bean definition.
   void registerNamed<T>(String name, BeanDefinition definition) {
+    if (_namedDefinitions.containsKey(name) && _namedTypes[name] == T) {
+      throw StateError('Named bean "$name" of type $T already registered');
+    }
     _namedDefinitions[name] = definition;
     _namedTypes[name] = T;
     // Also register by type for getAll<T>()
+    _definitions.putIfAbsent(T, () => []).add(definition);
+  }
+
+  /// Override a named bean (replaces existing). Used by test overrides.
+  void overrideNamed<T>(String name, BeanDefinition definition) {
+    _namedDefinitions[name] = definition;
+    _namedTypes[name] = T;
     _definitions.putIfAbsent(T, () => []).add(definition);
   }
 

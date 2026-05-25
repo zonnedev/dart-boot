@@ -53,7 +53,7 @@ class ClientGenerator extends GeneratorForAnnotation<Client> {
       throw InvalidGenerationSourceError(
         '@Client class "$className" specifies both url and name. '
         'Use one or the other:\n'
-        "  @Client(name: '$name')        → URL from boot.http.services.$name.url\n"
+        "  @Client(name: '$name')        → URL from boot.http.client.services.$name.url\n"
         "  @Client(url: '$url')  → URL inline, uses global HttpClient",
         element: element,
       );
@@ -84,7 +84,7 @@ class ClientGenerator extends GeneratorForAnnotation<Client> {
 
     // Generate different constructors based on name vs url
     if (name != null && name.isNotEmpty) {
-      // Named client — resolve from container (named HttpClient bean or named builder)
+      // Named client — resolve from container (named HttpClient, HttpClientBuilder, or HttpClientServiceConfig)
       return '''
 class \$${className}Impl implements $className {
   final HttpClient _client;
@@ -93,7 +93,9 @@ class \$${className}Impl implements $className {
   \$${className}Impl(BeanContainer container)
       : _client = container.hasNamed<HttpClient>('$name')
             ? container.getNamed<HttpClient>('$name')
-            : container.getNamed<HttpClientBuilder>('$name').build(),
+            : container.hasNamed<HttpClientBuilder>('$name')
+                ? container.getNamed<HttpClientBuilder>('$name').build()
+                : HttpClientBuilder.fromConfig(container.getNamed<HttpClientServiceConfig>('$name')).build(),
         _baseUrl = '${basePath}';
 
 $methods}

@@ -3,6 +3,7 @@ import 'dart:io' as io;
 
 import 'client_configuration.dart';
 import 'client_exceptions.dart';
+import 'http_service_config.dart';
 import 'package:boot_http_common/boot_http_common.dart';
 
 /// Fluent builder for creating configured [HttpClient] instances.
@@ -27,12 +28,12 @@ class HttpClientBuilder {
         _followRedirects = followRedirects;
 
   /// Create a builder pre-loaded from a service config section.
-  factory HttpClientBuilder.fromServiceConfig(HttpClientConfiguration config, {String? baseUrl}) {
+  factory HttpClientBuilder.fromConfig(HttpClientServiceConfig config) {
     return HttpClientBuilder(
       connectTimeout: config.connectTimeout,
       readTimeout: config.readTimeout,
       maxRedirects: config.maxRedirects,
-    ).._baseUrl = baseUrl;
+    ).._baseUrl = config.url.isNotEmpty ? config.url : null;
   }
 
   HttpClientBuilder baseUrl(String url) {

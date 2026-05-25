@@ -13,7 +13,13 @@ class $PostClientImpl implements PostClient {
   $PostClientImpl(BeanContainer container)
       : _client = container.hasNamed<HttpClient>('jsonplaceholder')
             ? container.getNamed<HttpClient>('jsonplaceholder')
-            : container.getNamed<HttpClientBuilder>('jsonplaceholder').build(),
+            : container.hasNamed<HttpClientBuilder>('jsonplaceholder')
+                ? container
+                    .getNamed<HttpClientBuilder>('jsonplaceholder')
+                    .build()
+                : HttpClientBuilder.fromConfig(container
+                        .getNamed<HttpClientServiceConfig>('jsonplaceholder'))
+                    .build(),
         _baseUrl = '/posts';
 
   @override

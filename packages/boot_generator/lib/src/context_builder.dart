@@ -27,6 +27,7 @@ class ContextBuilder implements Builder {
   final _requiresChecker = TypeChecker.fromRuntime(Requires);
   final _replacesChecker = TypeChecker.fromRuntime(Replaces);
   final _interceptorBeanChecker = TypeChecker.fromRuntime(InterceptorBean);
+  final _eachPropertyChecker = TypeChecker.fromRuntime(EachProperty);
   final _namedChecker = TypeChecker.fromUrl('package:boot_core/src/annotations/named.dart#Named');
   final _primaryChecker = TypeChecker.fromUrl('package:boot_core/src/annotations/primary.dart#Primary');
   final _aroundChecker = TypeChecker.fromRuntime(Around);
@@ -36,6 +37,7 @@ class ContextBuilder implements Builder {
     final beanMeta = <_BeanMeta>[];
     final routeMeta = <_RouteMeta>[];
     final interceptorMeta = <_InterceptorMeta>[];
+    final eachPropertyMeta = <_EachPropertyMeta>[];
 
     // Detect if this package is a @BootLibrary or an app
     bool isBootLibrary = false;
@@ -59,7 +61,7 @@ class ContextBuilder implements Builder {
       } catch (_) {
         continue;
       }
-      _scanLibrary(library, input, beanMeta, routeMeta, interceptorMeta);
+      _scanLibrary(library, input, beanMeta, routeMeta, interceptorMeta, eachPropertyMeta);
     }
 
     if (isBootLibrary) {
@@ -67,13 +69,11 @@ class ContextBuilder implements Builder {
       // Discover this library's own @BootLibrary dependencies
       final libraryDeps = <_LibraryModule>[];
       final libraryProvidedTypes = <String>{};
-      final depPackages = await _getDepPackages(buildStep);
       final packageConfig = await buildStep.packageConfig;
 
       for (final package in packageConfig.packages) {
         final packageName = package.name;
         if (packageName == buildStep.inputId.package) continue;
-        if (depPackages != null && !depPackages.contains(packageName)) continue;
 
         final depBarrelId = AssetId(packageName, 'lib/$packageName.dart');
         if (!await buildStep.canRead(depBarrelId)) continue;
@@ -117,7 +117,7 @@ class ContextBuilder implements Builder {
 
       final sorted = _topologicalSort(beanMeta);
       final moduleOutput = _generateModuleOutput(
-          buildStep.inputId.package, sorted, routeMeta, interceptorMeta,
+          buildStep.inputId.package, sorted, routeMeta, interceptorMeta, eachPropertyMeta,
           libraryDeps: libraryDeps);
 
       final moduleId = AssetId(
@@ -147,7 +147,7 @@ class ContextBuilder implements Builder {
 
       // Also generate a boot_context.g.dart for the library's own tests
       _validateGraph(beanMeta, libraryProvided: libraryProvidedTypes);
-      final contextOutput = _generateOutput(sorted, routeMeta, interceptorMeta,
+      final contextOutput = _generateOutput(sorted, routeMeta, interceptorMeta, eachPropertyMeta,
           libraryModules: []);
       final contextId = AssetId(
         buildStep.inputId.package,
@@ -180,13 +180,11 @@ class ContextBuilder implements Builder {
       // Discover @BootLibrary dependencies
       final libraryModules = <_LibraryModule>[];
       final libraryProvidedTypes = <String>{};
-      final depPackages = await _getDepPackages(buildStep);
       final packageConfig = await buildStep.packageConfig;
 
       for (final package in packageConfig.packages) {
         final packageName = package.name;
         if (packageName == buildStep.inputId.package) continue;
-        if (depPackages != null && !depPackages.contains(packageName)) continue;
         if (scanFilter != null && !scanFilter.contains(packageName)) continue;
 
         // Check if this dependency has @BootLibrary
@@ -231,7 +229,7 @@ class ContextBuilder implements Builder {
           } else {
             // Not a boot library — try source scanning (legacy/workspace support)
             await _scanDependencyPackage(buildStep, packageName, beanMeta,
-                routeMeta, interceptorMeta);
+                routeMeta, interceptorMeta, eachPropertyMeta);
           }
         } catch (_) {}
       }
@@ -276,7 +274,7 @@ class ContextBuilder implements Builder {
       _validateGraph(beanMeta, libraryProvided: libraryProvidedTypes);
       final sorted = _topologicalSort(beanMeta);
 
-      final output = _generateOutput(sorted, routeMeta, interceptorMeta,
+      final output = _generateOutput(sorted, routeMeta, interceptorMeta, eachPropertyMeta,
           libraryModules: libraryModules);
 
       final outputId = AssetId(
@@ -318,6 +316,7 @@ class ContextBuilder implements Builder {
     List<_BeanMeta> beanMeta,
     List<_RouteMeta> routeMeta,
     List<_InterceptorMeta> interceptorMeta,
+    List<_EachPropertyMeta> eachPropertyMeta,
   ) async {
     // Check if this package depends on boot (i.e., is a boot library)
     final depPubspecId = AssetId(packageName, 'pubspec.yaml');
@@ -339,14 +338,14 @@ class ContextBuilder implements Builder {
     try {
       final library = await buildStep.resolver.libraryFor(barrelId);
       // Scan the barrel file itself
-      _scanLibrary(library, barrelId, beanMeta, routeMeta, interceptorMeta);
+      _scanLibrary(library, barrelId, beanMeta, routeMeta, interceptorMeta, eachPropertyMeta);
 
       // Scan all exported libraries (transitively)
       for (final exported in library.exportedLibraries) {
         final uri = exported.source.uri;
         if (!uri.toString().startsWith('package:$packageName/')) continue;
         final assetId = AssetId.resolve(uri);
-        _scanLibrary(exported, assetId, beanMeta, routeMeta, interceptorMeta);
+        _scanLibrary(exported, assetId, beanMeta, routeMeta, interceptorMeta, eachPropertyMeta);
       }
     } catch (_) {}
   }
@@ -358,6 +357,7 @@ class ContextBuilder implements Builder {
     List<_BeanMeta> beanMeta,
     List<_RouteMeta> routeMeta,
     List<_InterceptorMeta> interceptorMeta,
+    List<_EachPropertyMeta> eachPropertyMeta,
   ) {
     final importUri = assetId.uri.toString();
 
@@ -370,10 +370,14 @@ class ContextBuilder implements Builder {
       if (isManagedBean) {
         final className = element.name;
         final constructor = element.unnamedConstructor;
-        final deps = constructor?.parameters
-                .map((p) => p.type.getDisplayString())
-                .toList() ??
-            [];
+        final isConfigProps = _eachPropertyChecker.hasAnnotationOf(element) ||
+            TypeChecker.fromRuntime(ConfigurationProperties).hasAnnotationOf(element);
+        final deps = isConfigProps
+            ? <String>[]
+            : (constructor?.parameters
+                    .map((p) => p.type.getDisplayString())
+                    .toList() ??
+                []);
 
         final namedAnnotation = _namedChecker.firstAnnotationOf(element);
         final namedValue = namedAnnotation != null
@@ -501,6 +505,33 @@ class ContextBuilder implements Builder {
         }
       }
 
+      // @EachProperty classes
+      final eachPropertyAnn = _eachPropertyChecker.firstAnnotationOf(element);
+      if (eachPropertyAnn != null) {
+        final prefix = eachPropertyAnn.getField('prefix')!.toStringValue()!;
+        final fields = <_EachPropertyField>[];
+        final constructor = element.unnamedConstructor;
+        if (constructor != null) {
+          for (final param in constructor.parameters) {
+            final fieldType = param.type.getDisplayString();
+            final configKey = _camelToKebab(param.name);
+            fields.add(_EachPropertyField(
+              name: param.name,
+              configKey: configKey,
+              type: fieldType,
+              hasDefault: param.hasDefaultValue,
+              defaultCode: param.defaultValueCode,
+            ));
+          }
+        }
+        eachPropertyMeta.add(_EachPropertyMeta(
+          className: element.name,
+          prefix: prefix,
+          fields: fields,
+          import: importUri,
+        ));
+      }
+
       // @Factory classes
       if (_factoryChecker.hasAnnotationOf(element)) {
         final factoryClass = element.name;
@@ -544,7 +575,8 @@ class ContextBuilder implements Builder {
   String _generateOutput(
     List<_BeanMeta> sorted,
     List<_RouteMeta> routeMeta,
-    List<_InterceptorMeta> interceptorMeta, {
+    List<_InterceptorMeta> interceptorMeta,
+    List<_EachPropertyMeta> eachPropertyMeta, {
     List<_LibraryModule> libraryModules = const [],
   }) {
     final imports = <String>{};
@@ -561,6 +593,9 @@ class ContextBuilder implements Builder {
       imports.add(i.import);
       if (i.adviceTypeImport != null) imports.add(i.adviceTypeImport!);
     }
+    for (final ep in eachPropertyMeta) {
+      imports.add(ep.import);
+    }
 
     final importStatements = imports.map((i) => "import '$i';").join('\n');
 
@@ -572,9 +607,11 @@ class ContextBuilder implements Builder {
     final deferredRegistrations = regs.deferred;
 
     final routeRegistrations = routeMeta.map((r) =>
-      '  router.addAll(${r.routesClass}(container.get<${r.className}>()).routes);').join('\n');
+      '  router.addAllLazy(() => ${r.routesClass}(container.get<${r.className}>()).routes);').join('\n');
     final interceptorRegistrations = interceptorMeta.map((i) =>
       '  container.registerInterceptor(${i.adviceType}, container.get<${i.className}>());').join('\n');
+
+    final eachPropertyRegistrations = _buildEachPropertyRegistrations(eachPropertyMeta);
 
     // Library module calls
     final moduleCalls = libraryModules.map((m) =>
@@ -596,6 +633,15 @@ class _ContainerSelfDefinition extends BeanDefinition {
   dynamic create(BeanContainer container) => _container;
 }
 
+class _EachPropertyDef<T> extends BeanDefinition {
+  final T Function() _factory;
+  _EachPropertyDef(this._factory);
+  @override
+  get beanType => T;
+  @override
+  dynamic create(BeanContainer container) => _factory();
+}
+
 void \$configure(BeanContainer container, BootRouter router) {
   // Self-register the container
   container.register<BeanContainer>(_ContainerSelfDefinition(container));
@@ -612,6 +658,9 @@ $registrations
   // Evaluate deferred beans (beans/missingBeans conditions)
 $deferredRegistrations
   for (final d in deferred.reversed) { d(); }
+
+  // @EachProperty registrations
+$eachPropertyRegistrations
 
   // Register interceptors
 $interceptorRegistrations
@@ -882,7 +931,8 @@ $routeRegistrations
     String packageName,
     List<_BeanMeta> sorted,
     List<_RouteMeta> routeMeta,
-    List<_InterceptorMeta> interceptorMeta, {
+    List<_InterceptorMeta> interceptorMeta,
+    List<_EachPropertyMeta> eachPropertyMeta, {
     List<_LibraryModule> libraryDeps = const [],
   }) {
     final imports = <String>{};
@@ -899,6 +949,7 @@ $routeRegistrations
       imports.add(i.import);
       if (i.adviceTypeImport != null) imports.add(i.adviceTypeImport!);
     }
+    for (final ep in eachPropertyMeta) imports.add(ep.import);
 
     final importStatements = imports.map((i) => "import '$i';").join('\n');
     final functionName = '\$${_camelCase(packageName)}Module';
@@ -908,9 +959,23 @@ $routeRegistrations
     final deferredRegistrations = regs.deferred;
 
     final routeRegistrations = routeMeta.map((r) =>
-      '  router.addAll(${r.routesClass}(container.get<${r.className}>()).routes);').join('\n');
+      '  router.addAllLazy(() => ${r.routesClass}(container.get<${r.className}>()).routes);').join('\n');
     final interceptorRegistrations = interceptorMeta.map((i) =>
       '  container.registerInterceptor(${i.adviceType}, container.get<${i.className}>());').join('\n');
+
+    final eachPropertyRegistrations = _buildEachPropertyRegistrations(eachPropertyMeta);
+
+    final eachPropertyHelper = eachPropertyMeta.isNotEmpty ? '''
+
+class _EachPropertyDef<T> extends BeanDefinition {
+  final T Function() _factory;
+  _EachPropertyDef(this._factory);
+  @override
+  get beanType => T;
+  @override
+  dynamic create(BeanContainer container) => _factory();
+}
+''' : '';
 
     final depImports = libraryDeps.map((d) => "import '${d.import}';").join('\n');
     final depCalls = libraryDeps.map((d) =>
@@ -935,11 +1000,13 @@ $registrations
 
 $deferredRegistrations
 
+$eachPropertyRegistrations
+
 $interceptorRegistrations
 
 $routeRegistrations
 }
-''';
+$eachPropertyHelper''';
   }
 
   /// Checks if an element has an annotation that is itself meta-annotated with @BeanSource.
@@ -988,6 +1055,46 @@ String _camelCase(String s) {
   return s.split(RegExp(r'[_\-]')).map((part) =>
     part.isEmpty ? '' : part[0].toUpperCase() + part.substring(1)
   ).join();
+}
+
+String _camelToKebab(String s) =>
+    s.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '-${m.group(0)!.toLowerCase()}');
+
+String _buildEachPropertyRegistrations(List<_EachPropertyMeta> metas) {
+  if (metas.isEmpty) return '';
+  final buf = StringBuffer();
+  for (final meta in metas) {
+    buf.writeln("  for (final _epName in config.getSubKeys('${meta.prefix}')) {");
+    buf.writeln("    final _epPrefix = '${meta.prefix}.\$_epName';");
+    final args = meta.fields.map((f) {
+      final getter = "config.get('\$_epPrefix.${f.configKey}')";
+      return '      ${f.name}: ${_fieldParserWithDefault(f, getter)},';
+    }).join('\n');
+    buf.writeln('    container.registerNamed<${meta.className}>(_epName, _EachPropertyDef(() => ${meta.className}(');
+    buf.writeln(args);
+    buf.writeln('    )));');
+    buf.writeln('  }');
+  }
+  return buf.toString();
+}
+
+String _fieldParserWithDefault(_EachPropertyField f, String getter) {
+  final fallback = f.hasDefault && f.defaultCode != null ? f.defaultCode! : null;
+  switch (f.type) {
+    case 'String':
+      return "$getter ?? ${fallback ?? "''"}";
+    case 'int':
+      return "int.tryParse($getter ?? '') ?? ${fallback ?? '0'}";
+    case 'double':
+      return "double.tryParse($getter ?? '') ?? ${fallback ?? '0.0'}";
+    case 'bool':
+      return "$getter == 'true'";
+    case 'Duration':
+      return "parseDurationOrNull($getter) ?? ${fallback ?? 'Duration.zero'}";
+    default:
+      if (f.type == 'Duration?') return "parseDurationOrNull($getter)";
+      return "$getter ?? ${fallback ?? "''"}";
+  }
 }
 
 class _LibraryModule {
@@ -1077,3 +1184,20 @@ class _InterceptorMeta {
   _InterceptorMeta({required this.className, required this.adviceType, required this.import, this.adviceTypeImport});
 }
 
+
+class _EachPropertyMeta {
+  final String className;
+  final String prefix;
+  final List<_EachPropertyField> fields;
+  final String import;
+  _EachPropertyMeta({required this.className, required this.prefix, required this.fields, required this.import});
+}
+
+class _EachPropertyField {
+  final String name;
+  final String configKey;
+  final String type;
+  final bool hasDefault;
+  final String? defaultCode;
+  _EachPropertyField({required this.name, required this.configKey, required this.type, required this.hasDefault, this.defaultCode});
+}

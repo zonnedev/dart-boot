@@ -103,6 +103,19 @@ class BootRouter {
   void add(RouteEntry entry) => _entries.add(entry);
   void addAll(List<RouteEntry> entries) => _entries.addAll(entries);
 
+  final _lazyRoutes = <List<RouteEntry> Function()>[];
+
+  /// Register routes lazily — the factory is called during [materializeRoutes].
+  void addAllLazy(List<RouteEntry> Function() factory) => _lazyRoutes.add(factory);
+
+  /// Materialize all lazy routes. Called once during configureRuntime after overrides.
+  void materializeRoutes() {
+    for (final factory in _lazyRoutes) {
+      _entries.addAll(factory());
+    }
+    _lazyRoutes.clear();
+  }
+
   /// Register a server filter with a path pattern.
   void addFilter(String pattern, HttpServerFilter filter, {int order = 0}) {
     _filters.add(_FilterEntry(pattern, filter, order));

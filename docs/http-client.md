@@ -35,11 +35,12 @@ abstract class UserClient {
 ```yaml
 boot:
   http:
-    services:
-      user-service:
-        url: https://api.users.com
-        connect-timeout: 10s
-        read-timeout: 60s
+    client:
+      services:
+        user-service:
+          url: https://api.users.com
+          connect-timeout: 10s
+          read-timeout: 60s
 ```
 
 Using `name` is mutually exclusive with `url` — specifying both is a compile-time error.
@@ -125,17 +126,19 @@ boot:
 ```yaml
 boot:
   http:
-    services:
-      payments:
-        url: https://payments.api.com
-        connect-timeout: 10s
-        read-timeout: 120s
+    client:
+      services:
+        payments:
+          url: https://payments.api.com
+          connect-timeout: 10s
+          read-timeout: 120s
 ```
 
 ## Resolution Order for `@Client(name: 'payments')`
 
 1. **Named `HttpClient` bean** — if a `@Named('payments') HttpClient` bean exists, use it
-2. **Named `HttpClientBuilder`** — auto-created from YAML, calls `.build()`
+2. **Named `HttpClientBuilder`** — if registered manually, calls `.build()`
+3. **Named `HttpClientServiceConfig`** — auto-created from YAML via `@EachProperty`, builds client via `HttpClientBuilder.fromConfig()`
 
 ## Error Handling
 

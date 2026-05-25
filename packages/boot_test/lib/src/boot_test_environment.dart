@@ -19,16 +19,16 @@ class BootTestEnvironment {
     container.container.overrideWithInstance<BootConfig>(config);
     container.container.overrideWithInstance<EventBus>(EventBus());
     container.container.overrideWithInstance<TaskScheduler>(TaskScheduler());
-    container.container.overrideWithInstance<HttpClient>(HttpClient());
 
-    // Apply overrides BEFORE configure so that pre-populated singletons
-    // are found by container.get<T>() during eager route registration,
-    // preventing @PostConstruct from running on replaced beans.
+    configure(container.container, router);
+
+    // Apply overrides AFTER configure but BEFORE configureRuntime.
+    // Routes are lazy (materialized in configureRuntime), so overrides
+    // take effect before any controller or service is instantiated.
     if (overrides != null) {
       overrides(container);
     }
 
-    configure(container.container, router);
     await configureRuntime(container.container, router, config);
   }
 

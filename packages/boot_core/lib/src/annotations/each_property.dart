@@ -1,29 +1,38 @@
-// coverage:ignore-file
-/// Creates a bean for each sub-property under the given prefix.
+/// Marks a class as a config-driven multi-instance bean.
 ///
-/// For config like:
-/// ```yaml
-/// datasources:
-///   primary:
-///     url: localhost
-///   analytics:
-///     url: analytics-host
+/// For each sub-key under [prefix] in the configuration, one named bean
+/// instance is created with fields populated from the config values.
+///
+/// ```dart
+/// @EachProperty('boot.http.services')
+/// class HttpServiceConfig {
+///   final String url;
+///   final Duration connectTimeout;
+///   final int maxRedirects;
+///   HttpServiceConfig({this.url = '', this.connectTimeout = const Duration(seconds: 5), this.maxRedirects = 5});
+/// }
 /// ```
 ///
-/// `@EachProperty('datasources')` creates one bean per key (primary, analytics).
-/// The bean's constructor receives a `String name` parameter with the key,
-/// and `@Value` params resolve relative to that key's prefix.
+/// With config:
+/// ```yaml
+/// boot:
+///   http:
+///     services:
+///       github:
+///         url: https://api.github.com
+///         connect-timeout: 10s
+///       stripe:
+///         url: https://api.stripe.com
+/// ```
+///
+/// Produces:
+/// - `@Named('github') HttpServiceConfig` with url=https://api.github.com, connectTimeout=10s
+/// - `@Named('stripe') HttpServiceConfig` with url=https://api.stripe.com, connectTimeout=5s (default)
+///
+/// Field names are converted from camelCase to kebab-case for config lookup.
 class EachProperty {
-  final String value;
-  final bool list;
+  /// The config prefix to scan for sub-keys.
+  final String prefix;
 
-  const EachProperty(this.value, {this.list = false});
-}
-
-/// Creates a bean for each bean of the given configuration type.
-/// Used with @EachProperty to produce dependent beans per config instance.
-class EachBean {
-  final Type value;
-
-  const EachBean(this.value);
+  const EachProperty(this.prefix);
 }

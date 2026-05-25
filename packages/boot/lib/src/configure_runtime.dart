@@ -146,6 +146,9 @@ Future<void> configureRuntime(
     router.add(RouteEntry(method: 'GET', path: readyPath, handler: healthEndpoint.readiness));
   }
 
+  // Materialize lazy routes (controllers instantiated here, after overrides)
+  router.materializeRoutes();
+
   // Wait for async @PostConstruct
   await container.ready();
 

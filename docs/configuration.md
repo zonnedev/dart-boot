@@ -181,6 +181,185 @@ class MyService {
 
 ---
 
+## @ConfigurationProperties — Type-Safe Config Beans
+
+`@ConfigurationProperties` creates a singleton bean whose constructor parameters are automatically bound from config using the specified prefix.
+
+### Definition
+
+```dart
+import 'package:boot_core/boot_core.dart';
+
+@ConfigurationProperties('boot.http.client')
+class HttpClientConfig {
+  final Duration connectTimeout;
+  final Duration readTimeout;
+  final int maxRedirects;
+
+  HttpClientConfig({
+    this.connectTimeout = const Duration(seconds: 5),
+    this.readTimeout = const Duration(seconds: 30),
+    this.maxRedirects = 5,
+  });
+}
+```
+
+### Configuration
+
+```yaml
+boot:
+  http:
+    client:
+      connect-timeout: 10s
+      read-timeout: 60s
+      max-redirects: 3
+```
+
+### Result
+
+A singleton `HttpClientConfig` bean is registered with values from config (or constructor defaults if absent).
+
+### Usage
+
+Inject it like any other bean:
+
+```dart
+@Singleton()
+class MyService {
+  final HttpClientConfig _config;
+  MyService(this._config);
+
+  void printTimeout() => print(_config.connectTimeout);
+}
+```
+
+Or use it in a `@Factory`:
+
+```dart
+@Factory()
+class HttpClientFactory {
+  @Singleton()
+  HttpClient httpClient(HttpClientConfig config) =>
+    HttpClientBuilder(
+      connectTimeout: config.connectTimeout,
+      readTimeout: config.readTimeout,
+      maxRedirects: config.maxRedirects,
+    ).build();
+}
+```
+
+### Field Mapping
+
+Constructor parameter names are converted from camelCase to kebab-case:
+
+| Parameter | Config Key |
+|-----------|-----------|
+| `connectTimeout` | `connect-timeout` |
+| `readTimeout` | `read-timeout` |
+| `maxRedirects` | `max-redirects` |
+
+### Supported Types
+
+| Dart Type | Config Format | Example |
+|-----------|--------------|---------|
+| `String` | Plain text | `localhost` |
+| `int` | Integer | `5` |
+| `double` | Decimal | `0.5` |
+| `bool` | `true`/`false` | `true` |
+| `Duration` | Duration string | `5s`, `500ms`, `2m` |
+
+### Difference from @EachProperty
+
+| | `@ConfigurationProperties` | `@EachProperty` |
+|---|---|---|
+| Instances | One singleton | One per config sub-key |
+| Naming | Not named | `@Named` per key |
+| Use case | Global config | Multi-instance config |
+
+---
+
+## @EachProperty — Multi-Instance Config Beans
+
+`@EachProperty` creates one named bean per config sub-key. Use it for services, database pools, cache regions — anything with multiple named instances.
+
+### Definition
+
+```dart
+import 'package:boot_core/boot_core.dart';
+
+@EachProperty('boot.http.client.services')
+class HttpClientServiceConfig {
+  final String url;
+  final Duration connectTimeout;
+  final Duration readTimeout;
+  final int maxRedirects;
+
+  HttpClientServiceConfig({
+    this.url = '',
+    this.connectTimeout = const Duration(seconds: 5),
+    this.readTimeout = const Duration(seconds: 30),
+    this.maxRedirects = 5,
+  });
+}
+```
+
+### Configuration
+
+```yaml
+boot:
+  http:
+    client:
+      services:
+        github:
+          url: https://api.github.com
+          connect-timeout: 10s
+        stripe:
+          url: https://api.stripe.com
+          read-timeout: 60s
+          max-redirects: 3
+```
+
+### Result
+
+Two named beans are registered automatically:
+- `@Named('github') HttpClientServiceConfig` — url=https://api.github.com, connectTimeout=10s
+- `@Named('stripe') HttpClientServiceConfig` — url=https://api.stripe.com, readTimeout=60s, maxRedirects=3
+
+### Usage
+
+```dart
+@Singleton()
+class PaymentService {
+  final HttpClientServiceConfig _config;
+  PaymentService(@Named('stripe') this._config);
+
+  HttpClient get client => HttpClientBuilder.fromConfig(_config).build();
+}
+```
+
+### Field Mapping
+
+Constructor parameter names are converted from camelCase to kebab-case for config lookup:
+
+| Field | Config Key |
+|-------|-----------|
+| `url` | `url` |
+| `connectTimeout` | `connect-timeout` |
+| `readTimeout` | `read-timeout` |
+| `maxRedirects` | `max-redirects` |
+
+### Supported Types
+
+| Dart Type | Config Format | Example |
+|-----------|--------------|---------|
+| `String` | Plain text | `https://api.github.com` |
+| `int` | Integer | `5` |
+| `double` | Decimal | `0.5` |
+| `bool` | `true`/`false` | `true` |
+| `Duration` | Duration string | `5s`, `500ms`, `2m` |
+
+---
+
 ## Duration Values
 
 Many config options accept duration strings. The format is `<number><unit>`:
