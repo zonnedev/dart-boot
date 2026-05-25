@@ -45,16 +45,31 @@ class WebSocketWiringProcessor {
 
         final instance = def.create(container);
 
+        // Extract path param names from the pattern (e.g., '/chat/<room>' → ['room'])
+        final pathParamNames = RegExp(r'<(\w+)>')
+            .allMatches(path)
+            .map((m) => m.group(1)!)
+            .toList();
+
         _server.handle(path, (session) {
-          if (onOpen != null) def.dispatch(instance, onOpen!, [session]);
+          final pathArgs = pathParamNames
+              .map((name) => session.pathParams[name] ?? '')
+              .toList();
+
+          if (onOpen != null) {
+            def.dispatch(instance, onOpen!, [session, ...pathArgs]);
+          }
           if (onMessage != null) {
-            session.onMessage((msg) => def.dispatch(instance, onMessage!, [session, msg]));
+            session.onMessage((msg) =>
+                def.dispatch(instance, onMessage!, [session, msg, ...pathArgs]));
           }
           if (onClose != null) {
-            session.onClose((code, reason) => def.dispatch(instance, onClose!, [session]));
+            session.onClose((code, reason) =>
+                def.dispatch(instance, onClose!, [session, ...pathArgs]));
           }
           if (onError != null) {
-            session.onError((e) => def.dispatch(instance, onError!, [session, e]));
+            session.onError((e) =>
+                def.dispatch(instance, onError!, [session, e, ...pathArgs]));
           }
         },
           protocols: protocols,

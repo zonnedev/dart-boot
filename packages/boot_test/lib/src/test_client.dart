@@ -3,11 +3,16 @@ import 'dart:convert';
 import 'package:boot/boot.dart';
 import 'package:shelf/shelf.dart' as shelf;
 
+import 'boot_test_websocket.dart';
+
 /// In-memory HTTP test client for Boot applications.
 class BootTestClient {
   final shelf.Handler _handler;
+  final WebSocketServer? _wsServer;
 
-  BootTestClient(BootRouter router) : _handler = router.build();
+  BootTestClient(BootRouter router, {WebSocketServer? wsServer})
+      : _handler = router.build(),
+        _wsServer = wsServer;
 
   Future<TestResponse> get(String path, {Map<String, String>? headers}) =>
       _send('GET', path, headers: headers);
@@ -22,6 +27,16 @@ class BootTestClient {
 
   Future<TestResponse> delete(String path, {Map<String, String>? headers}) =>
       _send('DELETE', path, headers: headers);
+
+  /// Open a simulated WebSocket connection (unit test mode).
+  BootTestWebSocket ws(String path, {dynamic authentication}) {
+    if (_wsServer == null) {
+      throw StateError(
+          'WebSocket not available. Ensure boot.websocket.enabled is true.');
+    }
+    return simulateWebSocketConnection(_wsServer, path,
+        authentication: authentication);
+  }
 
   Future<TestResponse> _send(String method, String path,
       {Object? body, Map<String, String>? headers}) async {

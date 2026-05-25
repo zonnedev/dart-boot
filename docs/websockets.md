@@ -194,25 +194,106 @@ class StreamSocket {
 }
 ```
 
-## Testing WebSocket Beans
+## Testing WebSockets
+
+### Unit Tests (In-Memory)
+
+Use `client.ws()` for fast, in-memory WebSocket tests — no real server, no ports:
 
 ```dart
-test('ChatSocket bean is registered', () async {
+test('receives welcome on connect', () async {
   await bootTest($configure, properties: {
     'boot.websocket.enabled': 'true',
   }, test: (client, container) async {
-    final socket = container.get<ChatSocket>();
-    expect(socket, isNotNull);
+    final ws = client.ws('/chat/general');
+    expect(ws.received, contains('Welcome to room "general"!'));
+    await ws.close();
   });
 });
 
-test('WebSocket server has endpoints', () async {
+test('broadcast on message', () async {
+  await bootTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  }, test: (client, container) async {
+    final ws = client.ws('/chat/lobby');
+    ws.send('hello');
+    expect(ws.received, contains('hello'));
+    await ws.close();
+  });
+});
+
+test('authenticated connection', () async {
+  await bootTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  }, test: (client, container) async {
+    final auth = Authentication(name: 'Alice', roles: ['user']);
+    final ws = client.ws('/chat/room', authentication: auth);
+    expect(ws.received, contains(contains('Alice')));
+    await ws.close();
+  });
+});
+```
+
+### Integration Tests (Real Server)
+
+Use `bootIntegrationTest` for real WebSocket connections with actual TCP sockets:
+
+```dart
+test('multi-client broadcast', () async {
+  await bootIntegrationTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  }, test: (client, container) async {
+    final ws1 = await client.ws('/chat/lobby');
+    await ws1.messages.first; // wait for join broadcast
+    final ws2 = await client.ws('/chat/lobby');
+    await ws2.messages.take(2).last; // wait for welcome
+
+    ws1.send('hello from ws1');
+    await ws1.messages.first; // wait for broadcast
+    await ws2.messages.first;
+
+    expect(ws1.received, contains('hello from ws1'));
+    expect(ws2.received, contains('hello from ws1'));
+
+    await ws1.close();
+    await ws2.close();
+  });
+});
+
+test('auth rejection', () async {
+  await bootIntegrationTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+    'boot.websocket.auth': 'true',
+  }, test: (client, container) async {
+    final uri = client.serverUri.replace(scheme: 'ws', path: '/chat/room');
+    expect(() => WebSocket.connect(uri.toString()), throwsA(anything));
+  });
+});
+```
+
+### BootTestWebSocket API
+
+Both `client.ws()` (unit) and `await client.ws()` (integration) return a `BootTestWebSocket`:
+
+```dart
+ws.send('message');           // send to server
+ws.received;                  // List<String> — all messages received so far
+ws.messages;                  // Stream<String> — stream of incoming messages
+await ws.next;                // await next single message
+ws.isClosed;                  // connection state
+await ws.close();             // close connection
+```
+
+### Endpoint Introspection
+
+```dart
+test('endpoint registered', () async {
   await bootTest($configure, properties: {
     'boot.websocket.enabled': 'true',
   }, test: (client, container) async {
     final server = container.get<WebSocketServer>();
-    // Verify endpoint is registered
-    expect(server, isNotNull);
+    expect(server.hasEndpoint('/chat/<room>'), isTrue);
+    expect(server.registeredPaths, contains('/chat/<room>'));
   });
 });
 ```

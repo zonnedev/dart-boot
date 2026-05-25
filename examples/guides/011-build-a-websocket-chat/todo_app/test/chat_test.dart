@@ -14,14 +14,6 @@ void main() {
       });
     });
 
-    test('WebSocketServer is available when enabled', () async {
-      await bootTest($configure, properties: {
-        'boot.websocket.enabled': 'true',
-      }, test: (client, container) async {
-        expect(container.get<WebSocketServer>(), isNotNull);
-      });
-    });
-
     test('endpoint is registered at /chat/<room>', () async {
       await bootTest($configure, properties: {
         'boot.websocket.enabled': 'true',
@@ -31,41 +23,33 @@ void main() {
       });
     });
 
-    test('WebSocketServer not registered when disabled', () async {
+    test('receives welcome message on connect', () async {
+      await bootTest($configure, properties: {
+        'boot.websocket.enabled': 'true',
+      }, test: (client, container) async {
+        final ws = client.ws('/chat/general');
+        expect(ws.received, contains('Welcome to room "general"!'));
+        await ws.close();
+      });
+    });
+
+    test('broadcast on message', () async {
+      await bootTest($configure, properties: {
+        'boot.websocket.enabled': 'true',
+      }, test: (client, container) async {
+        final ws = client.ws('/chat/lobby');
+        ws.send('hello everyone');
+        // In unit test mode, dispatch is synchronous
+        expect(ws.received, contains('hello everyone'));
+        await ws.close();
+      });
+    });
+
+    test('WebSocket not available when disabled', () async {
       await bootTest($configure, properties: {
         'boot.websocket.enabled': 'false',
       }, test: (client, container) async {
-        expect(container.has<WebSocketServer>(), isFalse);
-      });
-    });
-
-    test('dispatch onMessage invokes handler', () async {
-      await bootTest($configure, properties: {
-        'boot.websocket.enabled': 'true',
-      }, test: (client, container) async {
-        final defs = container.container.getDefinitions<ChatSocket>();
-        expect(defs, isNotEmpty);
-
-        final def = defs.first;
-        final instance = container.get<ChatSocket>();
-
-        // Verify methodMetadata contains expected hooks
-        final methodNames = def.methodMetadata.map((m) => m.methodName).toList();
-        expect(methodNames, contains('onOpen'));
-        expect(methodNames, contains('onMessage'));
-        expect(methodNames, contains('onClose'));
-        expect(methodNames, contains('onError'));
-      });
-    });
-
-    test('broadcast sends to all sessions on path', () async {
-      await bootTest($configure, properties: {
-        'boot.websocket.enabled': 'true',
-      }, test: (client, container) async {
-        final server = container.get<WebSocketServer>();
-        // No sessions connected — broadcast should not throw
-        expect(() => server.broadcast('/chat/general', 'hello'), returnsNormally);
-        expect(server.sessions('/chat/general'), isEmpty);
+        expect(() => client.ws('/chat/room'), throwsStateError);
       });
     });
   });

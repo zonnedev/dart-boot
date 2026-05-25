@@ -162,6 +162,29 @@ class WebSocketServer {
   /// Get all registered endpoint path patterns.
   Iterable<String> get registeredPaths => _endpoints.keys;
 
+  /// Match a request path to a registered endpoint.
+  /// Returns the handler and extracted path params, or null if no match.
+  ({WebSocketHandler handler, Map<String, String> pathParams})? matchEndpoint(String path) {
+    final result = _matchEndpoint(path);
+    if (result == null) return null;
+    return (handler: result.$1.handler, pathParams: result.$2);
+  }
+
+  /// Register a session for a path manually.
+  ///
+  /// This is a low-level API — it bypasses authentication and idle timeout
+  /// setup that [handleUpgrade] performs automatically. Use this for:
+  /// - Programmatic/internal connections
+  /// - WebSocket proxying or bridging
+  /// - Testing with simulated sessions
+  ///
+  /// The caller is responsible for authentication and timeout management.
+  /// The session is automatically removed from tracking when it closes.
+  void addSession(String path, WebSocketSession session) {
+    _sessions.putIfAbsent(path, () => []).add(session);
+    session.onClose((code, reason) => _sessions[path]?.remove(session));
+  }
+
   /// Handle an incoming WebSocket upgrade request.
   Future<bool> handleUpgrade(HttpRequest request) async {
     final path = request.uri.path;
@@ -177,6 +200,7 @@ class WebSocketServer {
       if (auth == null) {
         request.response.statusCode = 401;
         request.response.headers.contentType = ContentType.json;
+        request.response.headers.set('connection', 'close');
         request.response.write('{"error":"Unauthorized"}');
         await request.response.close();
         return true; // handled (rejected)

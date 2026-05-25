@@ -765,6 +765,161 @@ boot test -- --concurrency=1     # Sequential (for integration tests)
 
 ---
 
+## Integration Tests — Real Server
+
+`bootIntegrationTest` starts a real HTTP server on a random port. Use it for WebSocket connections, streaming, TLS, and full end-to-end flows.
+
+```dart
+import 'package:boot_test/boot_test.dart';
+import 'package:myapp/src/generated/boot_context.g.dart';
+import 'package:test/test.dart';
+
+void main() {
+  test('full HTTP flow', () async {
+    await bootIntegrationTest($configure, test: (client, container) async {
+      final res = await client.post('/users/', body: {'name': 'Alice'});
+      res.expectStatus(201);
+
+      final list = await client.get('/users/');
+      expect(list.jsonList(), hasLength(1));
+    });
+  });
+}
+```
+
+### bootIntegrationTest() API
+
+```dart
+Future<void> bootIntegrationTest(
+  BootContextRegistrar configure, {
+  String env = 'test',
+  Map<String, String>? properties,
+  void Function(TestContainer container)? overrides,
+  Duration timeout = const Duration(seconds: 15),
+  required Future<void> Function(BootIntegrationClient client, TestContainer container) test,
+})
+```
+
+### BootIntegrationClient
+
+Same API as `BootTestClient` but uses real HTTP + WebSocket connections:
+
+```dart
+await client.get('/path');
+await client.post('/path', body: {...});
+await client.put('/path', body: {...});
+await client.delete('/path');
+final ws = await client.ws('/chat/room');  // real WebSocket connection
+client.serverUri;  // http://127.0.0.1:<port>
+```
+
+### Bean Overrides in Integration Tests
+
+Same as `bootTest` — swap external services while keeping the real server:
+
+```dart
+test('with mock payment gateway', () async {
+  await bootIntegrationTest($configure, overrides: (container) {
+    container.override<PaymentGateway>(FakePaymentGateway());
+  }, test: (client, container) async {
+    final res = await client.post('/checkout', body: {'amount': 100});
+    res.expectStatus(200);
+  });
+});
+```
+
+---
+
+## Testing WebSockets
+
+### Unit Tests (In-Memory)
+
+`client.ws()` creates a simulated WebSocket connection — no real server, instant execution:
+
+```dart
+test('welcome message on connect', () async {
+  await bootTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  }, test: (client, container) async {
+    final ws = client.ws('/chat/general');
+    expect(ws.received, contains('Welcome!'));
+    await ws.close();
+  });
+});
+
+test('echo on message', () async {
+  await bootTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  }, test: (client, container) async {
+    final ws = client.ws('/chat/room');
+    ws.send('hello');
+    expect(ws.received, contains('Echo: hello'));
+    await ws.close();
+  });
+});
+```
+
+### Integration Tests (Real WebSocket)
+
+```dart
+test('multi-client broadcast', () async {
+  await bootIntegrationTest($configure, properties: {
+    'boot.websocket.enabled': 'true',
+  }, test: (client, container) async {
+    final ws1 = await client.ws('/chat/lobby');
+    await ws1.messages.first; // wait for join
+    final ws2 = await client.ws('/chat/lobby');
+    await ws2.messages.take(2).last; // wait for welcome
+
+    ws1.send('hello');
+    await ws2.messages.first; // wait for broadcast
+
+    expect(ws2.received, contains('hello'));
+    await ws1.close();
+    await ws2.close();
+  });
+});
+```
+
+### BootTestWebSocket API
+
+```dart
+ws.send('message');           // send to server
+ws.received;                  // List<String> — all received messages
+ws.messages;                  // Stream<String> — incoming message stream
+await ws.next;                // await next message
+ws.isClosed;                  // connection state
+await ws.close();             // close connection
+```
+
+### Authenticated WebSocket
+
+```dart
+// Unit test — pass auth directly
+final ws = client.ws('/chat/room', authentication: Authentication(name: 'Alice', roles: ['user']));
+
+// Integration test — pass token via header or query param
+final ws = await client.ws('/chat/room?token=eyJ...');
+```
+
+---
+
+## Timeouts
+
+Both test helpers have configurable timeouts to prevent hung tests:
+
+```dart
+// Unit test — default 5s
+await bootTest($configure, timeout: Duration(seconds: 10), test: ...);
+
+// Integration test — default 15s
+await bootIntegrationTest($configure, timeout: Duration(seconds: 30), test: ...);
+```
+
+If the test exceeds the timeout, a `TimeoutException` is thrown with a clear message.
+
+---
+
 ## Tips
 
 - **Tests are fast** — in-memory, no network, no port binding. Hundreds of tests in seconds.

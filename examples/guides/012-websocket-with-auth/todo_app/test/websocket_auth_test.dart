@@ -1,12 +1,20 @@
 import 'package:boot/boot.dart';
 import 'package:boot_test/boot_test.dart';
 import 'package:todo_app/src/generated/boot_context.g.dart';
-import 'package:todo_app/src/websocket/chat_socket.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('WebSocket Auth', () {
-    test('WebSocket server requires auth when configured', () async {
+    test('endpoint is registered', () async {
+      await bootTest($configure, properties: {
+        'boot.websocket.enabled': 'true',
+      }, test: (client, container) async {
+        final server = container.get<WebSocketServer>();
+        expect(server.hasEndpoint('/chat/<room>'), isTrue);
+      });
+    });
+
+    test('auth required when configured', () async {
       await bootTest($configure, properties: {
         'boot.websocket.enabled': 'true',
         'boot.websocket.auth': 'true',
@@ -16,45 +24,26 @@ void main() {
       });
     });
 
-    test('WebSocket server does not require auth when disabled', () async {
+    test('authenticated user receives welcome with name', () async {
       await bootTest($configure, properties: {
         'boot.websocket.enabled': 'true',
-        'boot.websocket.auth': 'false',
       }, test: (client, container) async {
-        final server = container.get<WebSocketServer>();
-        expect(server.authRequired, isFalse);
+        final auth = Authentication(name: 'Alice', roles: ['user']);
+        final ws = client.ws('/chat/general', authentication: auth);
+        expect(ws.received, contains('Welcome, Alice! You are in room "general".'));
+        await ws.close();
       });
     });
 
-    test('auth providers are wired to WebSocket server', () async {
-      await bootTest($configure, properties: {
-        'boot.websocket.enabled': 'true',
-        'boot.websocket.auth': 'true',
-      }, test: (client, container) async {
-        final providers = container.container.getAll<AuthenticationProvider>();
-        expect(providers, isNotEmpty);
-      });
-    });
-
-    test('endpoint is registered at /chat/<room>', () async {
+    test('message includes sender name', () async {
       await bootTest($configure, properties: {
         'boot.websocket.enabled': 'true',
       }, test: (client, container) async {
-        final server = container.get<WebSocketServer>();
-        expect(server.hasEndpoint('/chat/<room>'), isTrue);
-      });
-    });
-
-    test('ChatSocket has correct method hooks', () async {
-      await bootTest($configure, properties: {
-        'boot.websocket.enabled': 'true',
-      }, test: (client, container) async {
-        final defs = container.container.getDefinitions<ChatSocket>();
-        expect(defs, isNotEmpty);
-
-        final def = defs.first;
-        final methodNames = def.methodMetadata.map((m) => m.methodName).toSet();
-        expect(methodNames, containsAll(['onOpen', 'onMessage', 'onClose']));
+        final auth = Authentication(name: 'Bob', roles: ['user']);
+        final ws = client.ws('/chat/lobby', authentication: auth);
+        ws.send('hi there');
+        expect(ws.received, contains('Bob: hi there'));
+        await ws.close();
       });
     });
   });

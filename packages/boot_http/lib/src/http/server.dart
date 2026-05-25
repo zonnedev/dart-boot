@@ -47,6 +47,9 @@ class BootServer {
     this.sslConfig,
   });
 
+  /// The actual port the server is listening on (useful when binding to port 0).
+  int get actualPort => _server!.port;
+
   /// Start the HTTP server.
   Future<void> start() async {
     if (webSocketServer != null) {
