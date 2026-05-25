@@ -37,3 +37,4 @@ export 'src/annotations/bean_source.dart';
 export 'src/annotations/route_source.dart';
 export 'src/annotations/method_hook.dart';
 export 'src/method_wiring_processor.dart';
+export 'src/util/duration_parser.dart';

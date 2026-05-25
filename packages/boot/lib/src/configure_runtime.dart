@@ -42,7 +42,7 @@ Future<void> configureRuntime(
     if (!container.has<WebSocketServer>()) {
       final maxFrame = int.tryParse(config.get('boot.websocket.max-frame-size') ?? '') ?? 65536;
       final pingStr = config.get('boot.websocket.ping-interval');
-      final ping = pingStr != null ? _parseDur(pingStr) : null;
+      final ping = pingStr != null ? parseDurationOrNull(pingStr) : null;
       final wsServer = WebSocketServerBuilder(maxFrameSize: maxFrame, pingInterval: ping).build();
       container.overrideWithInstance<WebSocketServer>(wsServer);
     }
@@ -184,10 +184,4 @@ Future<void> configureRuntime(
   container.get<EventBus>().publish(StartupEvent(Uri.parse('boot://runtime')));
 }
 
-Duration? _parseDur(String? value) {
-  if (value == null || value.isEmpty) return null;
-  if (value.endsWith('ms')) return Duration(milliseconds: int.parse(value.replaceAll('ms', '')));
-  if (value.endsWith('s')) return Duration(seconds: int.parse(value.replaceAll('s', '')));
-  if (value.endsWith('m')) return Duration(minutes: int.parse(value.replaceAll('m', '')));
-  return null;
-}
+

@@ -16,12 +16,15 @@ Future<void> bootIntegrationTest(
   void Function(TestContainer container)? overrides,
   String env = 'test',
   Map<String, String>? properties,
-  Duration timeout = const Duration(seconds: 15),
+  Duration? timeout,
   required Future<void> Function(BootIntegrationClient client, TestContainer container) test,
 }) async {
   final testEnv = BootTestEnvironment();
   await testEnv.setUp(configure,
       overrides: overrides, env: env, properties: properties);
+
+  final effectiveTimeout =
+      timeout ?? testEnv.integrationTimeout ?? const Duration(seconds: 15);
 
   final server = BootServer(
     router: testEnv.router,
@@ -36,9 +39,9 @@ Future<void> bootIntegrationTest(
   );
 
   try {
-    await test(client, testEnv.container).timeout(timeout,
+    await test(client, testEnv.container).timeout(effectiveTimeout,
         onTimeout: () => throw TimeoutException(
-            'bootIntegrationTest exceeded ${timeout.inSeconds}s timeout'));
+            'bootIntegrationTest exceeded ${effectiveTimeout.inSeconds}s timeout'));
   } finally {
     await client.closeAll();
     await server.stop();

@@ -44,4 +44,11 @@ class BootTestEnvironment {
       container.container.has<WebSocketServer>()
           ? container.container.get<WebSocketServer>()
           : null;
+
+  /// Test timeout from config (`boot.test.timeout`).
+  Duration? get testTimeout => parseDurationOrNull(config.get('boot.test.timeout'));
+
+  /// Integration test timeout from config (`boot.test.integration-timeout`).
+  Duration? get integrationTimeout =>
+      parseDurationOrNull(config.get('boot.test.integration-timeout'));
 }

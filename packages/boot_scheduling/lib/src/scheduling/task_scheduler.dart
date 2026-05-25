@@ -1,25 +1,7 @@
 import 'dart:async';
 
-/// Parses duration strings like '5s', '500ms', '1m', '2h'.
-Duration parseDuration(String input) {
-  final match = RegExp(r'^(\d+)(ms|s|m|h|d)$').firstMatch(input.trim());
-  if (match == null) throw FormatException('Invalid duration: $input');
-  final value = int.parse(match.group(1)!);
-  switch (match.group(2)) {
-    case 'ms':
-      return Duration(milliseconds: value);
-    case 's':
-      return Duration(seconds: value);
-    case 'm':
-      return Duration(minutes: value);
-    case 'h':
-      return Duration(hours: value);
-    case 'd':
-      return Duration(days: value);
-    default:
-      throw FormatException('Invalid duration unit: ${match.group(2)}');
-  }
-}
+import 'package:boot_core/boot_core.dart' show parseDuration;
+export 'package:boot_core/boot_core.dart' show parseDuration;
 
 /// A scheduled task entry.
 class ScheduledTask {

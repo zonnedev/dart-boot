@@ -59,13 +59,6 @@ class _HttpClientDefinition extends BeanDefinition {
   }
 }
 
-Duration? _parseDur(String? value) {
-  if (value == null || value.isEmpty) return null;
-  if (value.endsWith('ms')) return Duration(milliseconds: int.parse(value.replaceAll('ms', '')));
-  if (value.endsWith('s')) return Duration(seconds: int.parse(value.replaceAll('s', '')));
-  if (value.endsWith('m')) return Duration(minutes: int.parse(value.replaceAll('m', '')));
-  return null;
-}
 
 /// Main entry point for Boot applications.
 class Boot {
@@ -98,8 +91,8 @@ class Boot {
     for (final name in serviceNames) {
       final prefix = 'boot.http.services.$name';
       final serviceConfig = HttpClientConfiguration(
-        connectTimeout: _parseDur(config.get('$prefix.connect-timeout')) ?? const Duration(seconds: 5),
-        readTimeout: _parseDur(config.get('$prefix.read-timeout')) ?? const Duration(seconds: 30),
+        connectTimeout: parseDurationOrNull(config.get('$prefix.connect-timeout')) ?? const Duration(seconds: 5),
+        readTimeout: parseDurationOrNull(config.get('$prefix.read-timeout')) ?? const Duration(seconds: 30),
         maxRedirects: int.tryParse(config.get('$prefix.max-redirects') ?? '') ?? 5,
       );
       final baseUrl = config.get('$prefix.url') ?? '';

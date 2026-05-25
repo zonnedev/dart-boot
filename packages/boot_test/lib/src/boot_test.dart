@@ -15,7 +15,7 @@ Future<void> bootTest(
   void Function(TestContainer container)? overrides,
   String env = 'test',
   Map<String, String>? properties,
-  Duration timeout = const Duration(seconds: 5),
+  Duration? timeout,
   required Future<void> Function(BootTestClient client, TestContainer container)
       test,
 }) async {
@@ -23,12 +23,14 @@ Future<void> bootTest(
   await testEnv.setUp(configure,
       overrides: overrides, env: env, properties: properties);
 
+  final effectiveTimeout =
+      timeout ?? testEnv.testTimeout ?? const Duration(seconds: 5);
   final client = BootTestClient(testEnv.router, wsServer: testEnv.wsServer);
 
   try {
-    await test(client, testEnv.container).timeout(timeout,
+    await test(client, testEnv.container).timeout(effectiveTimeout,
         onTimeout: () => throw TimeoutException(
-            'bootTest exceeded ${timeout.inSeconds}s timeout'));
+            'bootTest exceeded ${effectiveTimeout.inSeconds}s timeout'));
   } finally {
     await testEnv.tearDown();
   }

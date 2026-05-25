@@ -24,17 +24,9 @@ class HttpClientConfiguration {
   /// Create from BootConfig (reads boot.http.client.* properties).
   factory HttpClientConfiguration.fromConfig(BootConfig config) {
     return HttpClientConfiguration(
-      connectTimeout: _parseDuration(config.get('boot.http.client.connect-timeout')) ?? const Duration(seconds: 5),
-      readTimeout: _parseDuration(config.get('boot.http.client.read-timeout')) ?? const Duration(seconds: 30),
+      connectTimeout: parseDurationOrNull(config.get('boot.http.client.connect-timeout')) ?? const Duration(seconds: 5),
+      readTimeout: parseDurationOrNull(config.get('boot.http.client.read-timeout')) ?? const Duration(seconds: 30),
       maxRedirects: int.tryParse(config.get('boot.http.client.max-redirects') ?? '') ?? 5,
     );
-  }
-
-  static Duration? _parseDuration(String? value) {
-    if (value == null || value.isEmpty) return null;
-    if (value.endsWith('ms')) return Duration(milliseconds: int.parse(value.replaceAll('ms', '')));
-    if (value.endsWith('s')) return Duration(seconds: int.parse(value.replaceAll('s', '')));
-    if (value.endsWith('m')) return Duration(minutes: int.parse(value.replaceAll('m', '')));
-    return null;
   }
 }

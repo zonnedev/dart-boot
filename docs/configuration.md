@@ -178,3 +178,47 @@ class MyService {
   }
 }
 ```
+
+---
+
+## Duration Values
+
+Many config options accept duration strings. The format is `<number><unit>`:
+
+| Unit | Meaning | Example |
+|------|---------|---------|
+| `ms` | Milliseconds | `500ms` |
+| `s` | Seconds | `5s` |
+| `m` | Minutes | `2m` |
+| `h` | Hours | `1h` |
+| `d` | Days | `7d` |
+
+```yaml
+boot:
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 30s
+  websocket:
+    ping-interval: 30s
+  test:
+    timeout: 5s
+    integration-timeout: 15s
+```
+
+### Parsing in Code
+
+Use `parseDuration` and `parseDurationOrNull` from `boot_core`:
+
+```dart
+import 'package:boot_core/boot_core.dart';
+
+// Throws FormatException on invalid input
+final timeout = parseDuration('5s'); // Duration(seconds: 5)
+
+// Returns null if input is null/empty, throws on invalid format
+final optional = parseDurationOrNull(config.get('my.timeout')); // Duration? 
+final withDefault = parseDurationOrNull(config.get('my.timeout')) ?? Duration(seconds: 10);
+```
+
+Invalid values (e.g., `timeout: abc`) throw a `FormatException` at startup — fail fast rather than silently using defaults.

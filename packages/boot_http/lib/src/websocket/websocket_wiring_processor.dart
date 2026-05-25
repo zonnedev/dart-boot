@@ -73,18 +73,11 @@ class WebSocketWiringProcessor {
           }
         },
           protocols: protocols,
-          idleTimeout: idleTimeout != null ? _parseDuration(idleTimeout) : null,
+          idleTimeout: parseDurationOrNull(idleTimeout),
           maxMessageSize: maxMessageSize,
         );
       }
     }
   }
 
-  Duration? _parseDuration(String value) {
-    if (value.endsWith('ms')) return Duration(milliseconds: int.parse(value.substring(0, value.length - 2)));
-    if (value.endsWith('s')) return Duration(seconds: int.parse(value.substring(0, value.length - 1)));
-    if (value.endsWith('m')) return Duration(minutes: int.parse(value.substring(0, value.length - 1)));
-    if (value.endsWith('h')) return Duration(hours: int.parse(value.substring(0, value.length - 1)));
-    return null;
-  }
 }

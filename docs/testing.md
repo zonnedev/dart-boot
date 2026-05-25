@@ -919,15 +919,32 @@ final ws = await client.ws('/chat/room?token=eyJ...');
 
 ## Timeouts
 
-Both test helpers have configurable timeouts to prevent hung tests:
+Both test helpers have configurable timeouts to prevent hung tests.
+
+### Priority (highest wins)
+
+1. `timeout:` parameter passed directly
+2. `boot.test.timeout` / `boot.test.integration-timeout` from YAML config
+3. Default (5s for unit, 15s for integration)
+
+### Per-test override
 
 ```dart
-// Unit test — default 5s
 await bootTest($configure, timeout: Duration(seconds: 10), test: ...);
-
-// Integration test — default 15s
 await bootIntegrationTest($configure, timeout: Duration(seconds: 30), test: ...);
 ```
+
+### Global config in application-test.yml
+
+```yaml
+# application-test.yml
+boot:
+  test:
+    timeout: 10s              # bootTest default
+    integration-timeout: 30s  # bootIntegrationTest default
+```
+
+Supported formats: `500ms`, `5s`, `2m`.
 
 If the test exceeds the timeout, a `TimeoutException` is thrown with a clear message.
 
