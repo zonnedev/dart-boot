@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:boot_core/boot_core.dart';
 
 part 'http_client_config.g.dart';

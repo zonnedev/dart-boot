@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:boot_core/boot_core.dart';
 
 /// Per-service HTTP client configuration, auto-registered from YAML.

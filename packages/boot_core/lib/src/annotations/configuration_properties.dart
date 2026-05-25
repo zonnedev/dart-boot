@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'bean_source.dart';
 
 /// Marks a class as a configuration-bound singleton bean.

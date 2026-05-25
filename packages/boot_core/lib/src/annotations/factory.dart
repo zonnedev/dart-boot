@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'bean_source.dart';
 
 /// Marks a class as a bean factory. Methods annotated with @Singleton or @Prototype

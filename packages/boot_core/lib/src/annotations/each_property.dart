@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Marks a class as a config-driven multi-instance bean.
 ///
 /// For each sub-key under [prefix] in the configuration, one named bean
