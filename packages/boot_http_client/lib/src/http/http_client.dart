@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io' as io;
 
-import 'client_configuration.dart';
 import 'client_exceptions.dart';
 import 'http_service_config.dart';
 import 'package:boot_http_common/boot_http_common.dart';

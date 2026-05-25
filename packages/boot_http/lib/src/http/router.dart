@@ -31,7 +31,7 @@ Response _defaultErrorHandler(Object error, StackTrace stack) {
 }
 
 /// Boot's router. Collects route entries and builds a shelf Router internally.
-class BootRouter {
+class BootRouter implements RouteRegistry {
   static final _log = Logger('BootRouter');
   final _entries = <RouteEntry>[];
   final _filters = <_FilterEntry>[];
