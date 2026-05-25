@@ -1,3 +1,8 @@
+## 0.2.0+1
+
+ - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))
+ - **FIX**(core): remove duplicate export in boot_core barre. ([8747eaf8](https://github.com/zonnedev/dart-boot/commit/8747eaf816d02e18701c60d7dbcf57c364d8d118))
+
 ## 0.2.0
 
 > Note: This release has breaking changes.

@@ -1,3 +1,7 @@
+## 0.2.0+1
+
+ - **FIX**(scheduling): remove unused import. ([11d0b5b9](https://github.com/zonnedev/dart-boot/commit/11d0b5b94b713ba494495e05e0535c979b0539c2))
+
 ## 0.2.0
 
 > Note: This release has breaking changes.

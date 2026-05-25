@@ -11,6 +11,88 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`boot` - `v0.2.0+1`](#boot---v0201)
+ - [`boot_cli` - `v0.1.6+1`](#boot_cli---v0161)
+ - [`boot_core` - `v0.2.0+1`](#boot_core---v0201)
+ - [`boot_generator` - `v0.2.0+1`](#boot_generator---v0201)
+ - [`boot_http` - `v0.2.0+1`](#boot_http---v0201)
+ - [`boot_http_client` - `v0.1.3+1`](#boot_http_client---v0131)
+ - [`boot_scheduling` - `v0.2.0+1`](#boot_scheduling---v0201)
+ - [`boot_security_jwt` - `v0.2.0+1`](#boot_security_jwt---v0201)
+ - [`boot_test` - `v0.2.0+1`](#boot_test---v0201)
+ - [`boot_aop` - `v0.2.0+1`](#boot_aop---v0201)
+ - [`boot_events` - `v0.2.0+1`](#boot_events---v0201)
+ - [`boot_serialization` - `v0.1.1+7`](#boot_serialization---v0117)
+ - [`boot_http_common` - `v0.2.0+1`](#boot_http_common---v0201)
+ - [`boot_security` - `v0.2.0+1`](#boot_security---v0201)
+ - [`boot_http_client_generator` - `v0.2.0+1`](#boot_http_client_generator---v0201)
+ - [`boot_http_generator` - `v0.2.0+1`](#boot_http_generator---v0201)
+ - [`boot_aop_generator` - `v0.2.0+1`](#boot_aop_generator---v0201)
+ - [`boot_serialization_generator` - `v0.2.0+1`](#boot_serialization_generator---v0201)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `boot_test` - `v0.2.0+1`
+ - `boot_aop` - `v0.2.0+1`
+ - `boot_events` - `v0.2.0+1`
+ - `boot_serialization` - `v0.1.1+7`
+ - `boot_http_common` - `v0.2.0+1`
+ - `boot_security` - `v0.2.0+1`
+ - `boot_http_client_generator` - `v0.2.0+1`
+ - `boot_http_generator` - `v0.2.0+1`
+ - `boot_aop_generator` - `v0.2.0+1`
+ - `boot_serialization_generator` - `v0.2.0+1`
+
+---
+
+#### `boot` - `v0.2.0+1`
+
+ - **FIX**(boot): remove unused boot_http_client import. ([e9290b60](https://github.com/zonnedev/dart-boot/commit/e9290b60b879d8db83cc064f79b346396890055a))
+
+#### `boot_cli` - `v0.1.6+1`
+
+ - **FIX**(cli): update boot create templates for new framework structure. ([b7e37cee](https://github.com/zonnedev/dart-boot/commit/b7e37cee03420bce787776435b8443be6bbc61bd))
+
+#### `boot_core` - `v0.2.0+1`
+
+ - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))
+ - **FIX**(core): remove duplicate export in boot_core barre. ([8747eaf8](https://github.com/zonnedev/dart-boot/commit/8747eaf816d02e18701c60d7dbcf57c364d8d118))
+
+#### `boot_generator` - `v0.2.0+1`
+
+ - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))
+
+#### `boot_http` - `v0.2.0+1`
+
+ - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))
+
+#### `boot_http_client` - `v0.1.3+1`
+
+ - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))
+
+#### `boot_scheduling` - `v0.2.0+1`
+
+ - **FIX**(scheduling): remove unused import. ([11d0b5b9](https://github.com/zonnedev/dart-boot/commit/11d0b5b94b713ba494495e05e0535c979b0539c2))
+
+#### `boot_security_jwt` - `v0.2.0+1`
+
+ - **REFACTOR**(core): move RouteRegistry interface to boot_core, decouple module from boot_http. ([bb34c6fe](https://github.com/zonnedev/dart-boot/commit/bb34c6fe02ef3aa83ec050d90c72bce1e3a01fc4))
+
+
+## 2026-05-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
  - [`boot` - `v0.2.0`](#boot---v020)
  - [`boot_aop` - `v0.2.0`](#boot_aop---v020)
  - [`boot_aop_generator` - `v0.2.0`](#boot_aop_generator---v020)

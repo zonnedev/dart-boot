@@ -1,7 +1,7 @@
 name: boot_aop_generator
 description: Code generator for Boot AOP proxies (@Around interceptors).
 repository: https://github.com/zonnedev/dart-boot/tree/master/packages/boot_aop_generator
-version: 0.2.0
+version: 0.2.0+1
 
 environment:
   sdk: ^3.5.0
@@ -9,8 +9,8 @@ environment:
 resolution: workspace
 
 dependencies:
-  boot_core: ^0.2.0
-  boot_aop: ^0.2.0
+  boot_core: ^0.2.0+1
+  boot_aop: ^0.2.0+1
   analyzer: ^7.0.0
   build: ^2.4.0
   source_gen: ^2.0.0

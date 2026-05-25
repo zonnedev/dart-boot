@@ -1,3 +1,7 @@
+## 0.1.6+1
+
+ - **FIX**(cli): update boot create templates for new framework structure. ([b7e37cee](https://github.com/zonnedev/dart-boot/commit/b7e37cee03420bce787776435b8443be6bbc61bd))
+
 ## 0.1.6
 
  - **FEAT**(cli): generate integration test in boot create app. ([2b53cfbe](https://github.com/zonnedev/dart-boot/commit/2b53cfbe41fd9b6c464a0bffcfa80ad933e268e5))

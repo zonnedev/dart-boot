@@ -1,3 +1,7 @@
+## 0.2.0+1
+
+ - **FIX**(boot): remove unused boot_http_client import. ([e9290b60](https://github.com/zonnedev/dart-boot/commit/e9290b60b879d8db83cc064f79b346396890055a))
+
 ## 0.2.0
 
 > Note: This release has breaking changes.
