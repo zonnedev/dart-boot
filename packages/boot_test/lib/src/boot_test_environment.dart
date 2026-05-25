@@ -22,6 +22,11 @@ class BootTestEnvironment {
 
     configure(container.container, router);
 
+    // Register default HttpClient if not provided by a @BootLibrary module
+    if (!container.container.has<HttpClient>()) {
+      container.container.overrideWithInstance<HttpClient>(HttpClient());
+    }
+
     // Apply overrides AFTER configure but BEFORE configureRuntime.
     // Routes are lazy (materialized in configureRuntime), so overrides
     // take effect before any controller or service is instantiated.
