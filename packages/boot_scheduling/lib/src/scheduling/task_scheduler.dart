@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:boot_core/boot_core.dart' show parseDuration;
 export 'package:boot_core/boot_core.dart' show parseDuration;
 
 /// A scheduled task entry.
