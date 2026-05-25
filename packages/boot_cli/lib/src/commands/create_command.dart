@@ -65,6 +65,9 @@ class CreateAppCommand extends Command<int> {
 
     final bootDep = _dep('boot', gitUrl, ref);
     final generatorDep = _dep('boot_generator', gitUrl, ref);
+    final httpGenDep = _dep('boot_http_generator', gitUrl, ref);
+    final aopGenDep = _dep('boot_aop_generator', gitUrl, ref);
+    final serdeGenDep = _dep('boot_serialization_generator', gitUrl, ref);
     final testDep = _dep('boot_test', gitUrl, ref);
 
     _write(dir, 'pubspec.yaml', '''
@@ -79,6 +82,9 @@ $bootDep
 
 dev_dependencies:
 $generatorDep
+$httpGenDep
+$aopGenDep
+$serdeGenDep
 $testDep
   build_runner: ^2.4.0
   test: ^1.25.0
@@ -130,9 +136,12 @@ boot:
   env: dev
   logging:
     level: info
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 30s
 
 server:
-  host: 0.0.0.0
   port: 8080
 ''');
 
@@ -225,9 +234,8 @@ class CreateLibraryCommand extends Command<int> {
     print('⚡ Creating Boot library "$projectName"...');
     dir.createSync();
 
-    final bootDep = _dep('boot', gitUrl, ref);
+    final coreDep = _dep('boot_core', gitUrl, ref);
     final generatorDep = _dep('boot_generator', gitUrl, ref);
-    final testDep = _dep('boot_test', gitUrl, ref);
 
     _write(dir, 'pubspec.yaml', '''
 name: $projectName
@@ -238,11 +246,10 @@ environment:
   sdk: ^${cli.minSdk}
 
 dependencies:
-$bootDep
+$coreDep
 
 dev_dependencies:
 $generatorDep
-$testDep
   build_runner: ^2.4.0
   test: ^1.25.0
 ''');
@@ -261,14 +268,14 @@ targets:
 @BootLibrary()
 library $projectName;
 
-import 'package:boot/boot.dart';
+import 'package:boot_core/boot_core.dart';
 
 export 'src/${projectName}_client.dart';
 export 'src/generated/boot_module.g.dart';
 ''');
 
     _write(dir, 'lib/src/${projectName}_client.dart', '''
-import 'package:boot/boot.dart';
+import 'package:boot_core/boot_core.dart';
 
 part '${projectName}_client.g.dart';
 
@@ -285,18 +292,13 @@ class ${camelName}Client {
 ''');
 
     _write(dir, 'test/${projectName}_test.dart', '''
-import 'package:boot_test/boot_test.dart';
-import 'package:$projectName/src/generated/boot_context.g.dart';
+import 'package:$projectName/src/${projectName}_client.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('${camelName}Client is created when enabled', () async {
-    await bootTest(\$configure, properties: {
-      '$projectName.enabled': 'true',
-    }, test: (client, container) async {
-      // final bean = container.get<${camelName}Client>();
-      // expect(bean.ping(), 'pong from $projectName');
-    });
+  test('${camelName}Client.ping returns pong', () {
+    final client = ${camelName}Client();
+    expect(client.ping(), 'pong from $projectName');
   });
 }
 ''');
