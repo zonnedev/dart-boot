@@ -8,7 +8,7 @@ part of 'smtp_email_service.dart';
 
 class $SmtpEmailServiceDefinition extends BeanDefinition {
   @override
-  Type get beanType => SmtpEmailService;
+  get beanType => SmtpEmailService;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

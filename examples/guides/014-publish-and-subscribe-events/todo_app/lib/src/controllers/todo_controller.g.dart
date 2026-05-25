@@ -8,7 +8,7 @@ part of 'todo_controller.dart';
 
 class $TodoControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => TodoController;
+  get beanType => TodoController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

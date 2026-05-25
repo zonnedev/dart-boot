@@ -8,7 +8,7 @@ part of 'cached_interceptor.dart';
 
 class $CachedInterceptorDefinition extends BeanDefinition {
   @override
-  Type get beanType => CachedInterceptor;
+  get beanType => CachedInterceptor;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

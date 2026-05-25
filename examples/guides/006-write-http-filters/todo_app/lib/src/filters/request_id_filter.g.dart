@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'device_cert_auth.dart';
+part of 'request_id_filter.dart';
 
 // **************************************************************************
 // BeanDefinitionGenerator
 // **************************************************************************
 
-class $DeviceCertAuthDefinition extends BeanDefinition {
+class $RequestIdFilterDefinition extends BeanDefinition {
   @override
-  get beanType => DeviceCertAuth;
+  get beanType => RequestIdFilter;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [
         const AnnotationValue(
             AnnotationType(
-                'package:boot_core/src/annotations/singleton.dart#Singleton'),
-            {'typed': []}),
+                'package:boot_http_common/src/http/filter.dart#ServerFilter'),
+            {'pattern': '/**', 'methods': []}),
         const AnnotationValue(
             AnnotationType(
                 'package:boot_core/src/annotations/order.dart#Order'),
-            {'value': 0}),
+            {'value': 1}),
       ];
 
   @override
-  DeviceCertAuth create(BeanContainer container) => DeviceCertAuth();
+  RequestIdFilter create(BeanContainer container) => RequestIdFilter();
 }

@@ -8,7 +8,7 @@ part of 'product_controller.dart';
 
 class $ProductControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => ProductController;
+  get beanType => ProductController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -8,7 +8,7 @@ part of 'hello_controller.dart';
 
 class $HelloControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => HelloController;
+  get beanType => HelloController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'device_cert_auth.dart';
+part of 'timing_filter.dart';
 
 // **************************************************************************
 // BeanDefinitionGenerator
 // **************************************************************************
 
-class $DeviceCertAuthDefinition extends BeanDefinition {
+class $TimingFilterDefinition extends BeanDefinition {
   @override
-  get beanType => DeviceCertAuth;
+  get beanType => TimingFilter;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [
         const AnnotationValue(
             AnnotationType(
-                'package:boot_core/src/annotations/singleton.dart#Singleton'),
-            {'typed': []}),
+                'package:boot_http_common/src/http/filter.dart#ServerFilter'),
+            {'pattern': '/**', 'methods': []}),
         const AnnotationValue(
             AnnotationType(
                 'package:boot_core/src/annotations/order.dart#Order'),
-            {'value': 0}),
+            {'value': 2}),
       ];
 
   @override
-  DeviceCertAuth create(BeanContainer container) => DeviceCertAuth();
+  TimingFilter create(BeanContainer container) => TimingFilter();
 }

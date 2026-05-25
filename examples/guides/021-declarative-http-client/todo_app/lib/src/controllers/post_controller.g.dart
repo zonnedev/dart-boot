@@ -8,7 +8,7 @@ part of 'post_controller.dart';
 
 class $PostControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => PostController;
+  get beanType => PostController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -49,5 +49,22 @@ class $TodoControllerRoutes implements RouteRegistration {
                 {'path': '/'})
           ],
         ),
+        RouteEntry(
+          method: 'POST',
+          path: '/todos/',
+          handler: (request) async {
+            return await controller.create(request);
+          },
+          metadata: [
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/controller.dart#Controller'),
+                {'path': '/todos'}),
+            const AnnotationValue(
+                AnnotationType(
+                    'package:boot_http/src/annotations/routes.dart#Post'),
+                {'path': '/'})
+          ],
+        ),
       ];
 }

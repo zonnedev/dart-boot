@@ -8,7 +8,7 @@ part of 'jwt_auth_provider.dart';
 
 class $JwtAuthProviderDefinition extends BeanDefinition {
   @override
-  Type get beanType => JwtAuthProvider;
+  get beanType => JwtAuthProvider;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -8,7 +8,7 @@ part of 'chat_socket.dart';
 
 class $ChatSocketDefinition extends BeanDefinition {
   @override
-  Type get beanType => ChatSocket;
+  get beanType => ChatSocket;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

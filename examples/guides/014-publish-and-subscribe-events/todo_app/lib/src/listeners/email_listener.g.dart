@@ -8,7 +8,7 @@ part of 'email_listener.dart';
 
 class $EmailListenerDefinition extends BeanDefinition {
   @override
-  Type get beanType => EmailListener;
+  get beanType => EmailListener;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

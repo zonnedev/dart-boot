@@ -8,7 +8,7 @@ part of 'production_jobs.dart';
 
 class $ProductionJobsDefinition extends BeanDefinition {
   @override
-  Type get beanType => ProductionJobs;
+  get beanType => ProductionJobs;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -8,7 +8,7 @@ part of 'events_controller.dart';
 
 class $EventsControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => EventsController;
+  get beanType => EventsController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

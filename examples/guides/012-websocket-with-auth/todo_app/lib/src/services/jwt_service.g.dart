@@ -8,7 +8,7 @@ part of 'jwt_service.dart';
 
 class $JwtServiceDefinition extends BeanDefinition {
   @override
-  Type get beanType => JwtService;
+  get beanType => JwtService;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

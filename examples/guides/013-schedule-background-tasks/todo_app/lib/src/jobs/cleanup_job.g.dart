@@ -8,7 +8,7 @@ part of 'cleanup_job.dart';
 
 class $CleanupJobDefinition extends BeanDefinition {
   @override
-  Type get beanType => CleanupJob;
+  get beanType => CleanupJob;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

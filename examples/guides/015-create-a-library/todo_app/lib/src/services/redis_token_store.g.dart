@@ -8,7 +8,7 @@ part of 'redis_token_store.dart';
 
 class $RedisTokenStoreDefinition extends BeanDefinition {
   @override
-  Type get beanType => RedisTokenStore;
+  get beanType => RedisTokenStore;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

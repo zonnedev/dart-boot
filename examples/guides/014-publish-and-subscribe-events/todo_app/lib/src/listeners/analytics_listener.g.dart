@@ -8,7 +8,7 @@ part of 'analytics_listener.dart';
 
 class $AnalyticsListenerDefinition extends BeanDefinition {
   @override
-  Type get beanType => AnalyticsListener;
+  get beanType => AnalyticsListener;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

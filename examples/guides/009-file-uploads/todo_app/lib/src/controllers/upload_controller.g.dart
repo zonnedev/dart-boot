@@ -8,7 +8,7 @@ part of 'upload_controller.dart';
 
 class $UploadControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => UploadController;
+  get beanType => UploadController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

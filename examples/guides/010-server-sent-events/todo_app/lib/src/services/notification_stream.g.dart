@@ -8,7 +8,7 @@ part of 'notification_stream.dart';
 
 class $NotificationStreamDefinition extends BeanDefinition {
   @override
-  Type get beanType => NotificationStream;
+  get beanType => NotificationStream;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

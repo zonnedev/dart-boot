@@ -8,7 +8,7 @@ part of 'device_socket.dart';
 
 class $DeviceSocketDefinition extends BeanDefinition {
   @override
-  Type get beanType => DeviceSocket;
+  get beanType => DeviceSocket;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

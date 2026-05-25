@@ -8,7 +8,7 @@ part of 'fake_email_service.dart';
 
 class $FakeEmailServiceDefinition extends BeanDefinition {
   @override
-  Type get beanType => FakeEmailService;
+  get beanType => FakeEmailService;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

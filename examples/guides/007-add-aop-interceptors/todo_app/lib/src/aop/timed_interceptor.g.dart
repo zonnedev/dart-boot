@@ -8,7 +8,7 @@ part of 'timed_interceptor.dart';
 
 class $TimedInterceptorDefinition extends BeanDefinition {
   @override
-  Type get beanType => TimedInterceptor;
+  get beanType => TimedInterceptor;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

@@ -8,7 +8,7 @@ part of 'health_controller.dart';
 
 class $HealthControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => HealthController;
+  get beanType => HealthController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [

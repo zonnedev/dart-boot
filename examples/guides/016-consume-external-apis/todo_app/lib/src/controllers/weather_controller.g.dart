@@ -8,7 +8,7 @@ part of 'weather_controller.dart';
 
 class $WeatherControllerDefinition extends BeanDefinition {
   @override
-  Type get beanType => WeatherController;
+  get beanType => WeatherController;
 
   @override
   List<AnnotationValue> get annotationMetadata => const [
